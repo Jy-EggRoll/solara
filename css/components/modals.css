@@ -302,6 +302,28 @@
     flex-shrink: 0;
 }
 
+/* 「显示与性能」开关仅在移动端出现（桌面端用顶栏按钮） */
+html:not(.mobile-view) .display-perf-section {
+    display: none;
+}
+
+/* 防息屏不支持时的禁用态（复用调试开关同款视觉） */
+.settings-action-btn:disabled,
+.settings-action-btn.is-disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.settings-action-btn.is-disabled:hover {
+    background: rgba(0, 0, 0, 0.05);
+    transform: none;
+}
+
+.dark-mode .settings-action-btn.is-disabled:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
 /* 适配移动端 */
 @media (max-width: 820px) {
     body.layout-compact .container {

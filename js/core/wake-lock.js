@@ -19,14 +19,24 @@ function isPlaying() {
     return !!audio && !audio.paused && !audio.ended;
 }
 
+function buttons() {
+    const list = [];
+    if (domRef && domRef.wakeLockBtn) list.push(domRef.wakeLockBtn);
+    const setting = document.getElementById("wakeLockSettingToggle");
+    if (setting) list.push(setting);
+    return list;
+}
+
 function render() {
-    const btn = domRef && domRef.wakeLockBtn;
-    if (!btn) return;
-    btn.classList.toggle("is-active", enabled);
-    btn.setAttribute("aria-pressed", enabled ? "true" : "false");
     const label = enabled ? "关闭播放防息屏" : "开启播放防息屏";
-    btn.setAttribute("aria-label", label);
-    btn.setAttribute("title", label);
+    for (const btn of buttons()) {
+        btn.classList.toggle("is-active", enabled);
+        btn.setAttribute("aria-pressed", enabled ? "true" : "false");
+        btn.setAttribute("aria-label", label);
+        btn.setAttribute("title", label);
+    }
+    const settingText = document.getElementById("wakeLockSettingText");
+    if (settingText) settingText.textContent = label;
 }
 
 function log(message) {
@@ -71,14 +81,19 @@ async function refresh() {
 export function initWakeLock(dom, state) {
     domRef = dom || domRef;
     const btn = domRef && domRef.wakeLockBtn;
-    if (!btn) return;
+    const settingBtn = document.getElementById("wakeLockSettingToggle");
+    if (!btn && !settingBtn) return;
 
     if (!isSupported()) {
-        btn.disabled = true;
-        btn.classList.add("is-disabled");
-        const tip = "当前环境不支持防息屏（需 HTTPS 或 localhost）";
-        btn.setAttribute("aria-label", tip);
-        btn.setAttribute("title", tip);
+        for (const target of buttons()) {
+            target.disabled = true;
+            target.classList.add("is-disabled");
+            const tip = "当前环境不支持防息屏（需 HTTPS 或 localhost）";
+            target.setAttribute("aria-label", tip);
+            target.setAttribute("title", tip);
+        }
+        const settingText = document.getElementById("wakeLockSettingText");
+        if (settingText) settingText.textContent = "防息屏不可用（需 HTTPS）";
         log(`不可用：Wake Lock 支持=${"wakeLock" in navigator}，安全上下文=${window.isSecureContext}`);
         return;
     }
@@ -88,16 +103,22 @@ export function initWakeLock(dom, state) {
     render();
     log(`初始化完成：可用，当前开关=${enabled ? "开" : "关"}`);
 
-    if (!btn.__wakeLockBound) {
+    const toggle = () => {
+        enabled = !enabled;
+        localStorage.setItem(STORAGE_KEY, enabled ? "1" : "0");
+        if (state) state.wakeLockEnabled = enabled;
+        render();
+        log(`开关切换为：${enabled ? "开" : "关"}`);
+        refresh();
+    };
+
+    if (btn && !btn.__wakeLockBound) {
         btn.__wakeLockBound = true;
-        btn.addEventListener("click", () => {
-            enabled = !enabled;
-            localStorage.setItem(STORAGE_KEY, enabled ? "1" : "0");
-            if (state) state.wakeLockEnabled = enabled;
-            render();
-            log(`开关切换为：${enabled ? "开" : "关"}`);
-            refresh();
-        });
+        btn.addEventListener("click", toggle);
+    }
+    if (settingBtn && !settingBtn.__wakeLockBound) {
+        settingBtn.__wakeLockBound = true;
+        settingBtn.addEventListener("click", toggle);
     }
 
     const audio = domRef && domRef.audioPlayer;

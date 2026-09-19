@@ -177,7 +177,7 @@ body.mobile-view .container {
     -webkit-backdrop-filter: none !important;
 }
 
-/* 隐藏桌面端专有的大头部元素与标语 */
+/* 隐藏桌面端专有的大头部元素 */
 body.mobile-view .header,
 body.mobile-view .theme-switch-wrapper {
     display: none !important;

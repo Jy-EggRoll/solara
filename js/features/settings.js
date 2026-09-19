@@ -259,18 +259,22 @@ export function initLayoutMode(dom) {
 
 export function initEcoMode(dom) {
     const STORAGE_KEY = "solara_eco";
-    const btn = dom?.ecoToggleButton || document.getElementById("ecoToggleBtn");
+    const headerBtn = dom?.ecoToggleButton || document.getElementById("ecoToggleBtn");
+    const settingBtn = document.getElementById("ecoSettingToggle");
+    const settingText = document.getElementById("ecoSettingText");
 
     const applyEco = (on) => {
         document.documentElement.classList.toggle("eco-mode", on);
         if (document.body) document.body.classList.toggle("eco-mode", on);
-        if (btn) {
-            btn.classList.toggle("is-active", on);
-            btn.setAttribute("aria-pressed", on ? "true" : "false");
+        for (const target of [headerBtn, settingBtn]) {
+            if (!target) continue;
+            target.classList.toggle("is-active", on);
+            target.setAttribute("aria-pressed", on ? "true" : "false");
             const label = on ? "关闭极简省电模式" : "开启极简省电模式";
-            btn.setAttribute("aria-label", label);
-            btn.setAttribute("title", label);
+            target.setAttribute("aria-label", label);
+            target.setAttribute("title", label);
         }
+        if (settingText) settingText.textContent = on ? "关闭极简省电模式" : "开启极简省电模式";
         localStorage.setItem(STORAGE_KEY, on ? "1" : "0");
         const line = `[省电] 极简模式：${on ? "开" : "关"}（eco-mode class 已${on ? "加到" : "移出"} <html>）`;
         console.log(line);
@@ -281,11 +285,14 @@ export function initEcoMode(dom) {
 
     applyEco(localStorage.getItem(STORAGE_KEY) === "1");
 
-    if (btn && !btn.__ecoBound) {
-        btn.__ecoBound = true;
-        btn.addEventListener("click", () => {
-            applyEco(!document.documentElement.classList.contains("eco-mode"));
-        });
+    const toggle = () => applyEco(!document.documentElement.classList.contains("eco-mode"));
+    if (headerBtn && !headerBtn.__ecoBound) {
+        headerBtn.__ecoBound = true;
+        headerBtn.addEventListener("click", toggle);
+    }
+    if (settingBtn && !settingBtn.__ecoBound) {
+        settingBtn.__ecoBound = true;
+        settingBtn.addEventListener("click", toggle);
     }
 }
 
