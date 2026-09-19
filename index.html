@@ -45,6 +45,11 @@
                     document.documentElement.style.backgroundColor = defaultColor;
                 }
             } catch (_) {}
+            try {
+                if (localStorage.getItem("solara_eco") === "1") {
+                    document.documentElement.classList.add("eco-mode");
+                }
+            } catch (_) {}
             if (!isMobile) {
                 document.documentElement.classList.add("desktop-view");
                 const desktopLink = document.createElement("link");
@@ -191,6 +196,12 @@
                 <button id="layoutToggleBtn" class="theme-toggle-button layout-toggle-btn" type="button" aria-label="切换播放器视图大小" title="切换播放器视图大小（双击Logo打开设置）">
                     <svg class="apple-svg-icon layout-icon layout-icon--minimize" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 10 7-7m-1 7h-6V4M3 21l7-7m-6 0h6v6"/></svg>
                     <svg class="apple-svg-icon layout-icon layout-icon--maximize" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6m0-6-7 7M3 21l7-7m-1 7H3v-6"/></svg>
+                </button>
+                <button id="ecoToggleBtn" class="theme-toggle-button eco-toggle-btn" type="button" aria-label="开启极简省电模式" title="开启极简省电模式" aria-pressed="false">
+                    <svg class="apple-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6"/></svg>
+                </button>
+                <button id="wakeLockBtn" class="theme-toggle-button wake-lock-btn" type="button" aria-label="开启播放防息屏" title="开启播放防息屏" aria-pressed="false">
+                    <svg class="apple-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/><rect x="10.2" y="8" width="3.6" height="4" rx="1"/></svg>
                 </button>
             </div>
         </div>

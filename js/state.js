@@ -135,6 +135,7 @@ export const state = {
     currentSong: savedCurrentSong,
     currentArtworkUrl: null,
     debugMode: false,
+    wakeLockEnabled: false,
     isSearchMode: false,
     playlistSongs: savedPlaylistSongs,
     playMode: savedPlayMode,

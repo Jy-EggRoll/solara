@@ -5,6 +5,7 @@
 import { EXPLORE_RADAR_GENRES, DEFAULT_RADAR_GENRES } from "../constants.js";
 import { safeGetLocalStorage, safeSetLocalStorage, persistStorageItems } from "../core/storage.js";
 import { toggleDebugMode } from "../visual/spotlight.js";
+import { initWakeLock } from "../core/wake-lock.js";
 import { updateAllTabsIndicators } from "./playlist.js";
 
 const NOTIFICATION_ICONS = {
@@ -256,6 +257,33 @@ export function initLayoutMode(dom) {
     }
 }
 
+export function initEcoMode(dom) {
+    const STORAGE_KEY = "solara_eco";
+    const btn = dom?.ecoToggleButton || document.getElementById("ecoToggleBtn");
+
+    const applyEco = (on) => {
+        document.documentElement.classList.toggle("eco-mode", on);
+        if (document.body) document.body.classList.toggle("eco-mode", on);
+        if (btn) {
+            btn.classList.toggle("is-active", on);
+            btn.setAttribute("aria-pressed", on ? "true" : "false");
+            const label = on ? "关闭极简省电模式" : "开启极简省电模式";
+            btn.setAttribute("aria-label", label);
+            btn.setAttribute("title", label);
+        }
+        localStorage.setItem(STORAGE_KEY, on ? "1" : "0");
+    };
+
+    applyEco(localStorage.getItem(STORAGE_KEY) === "1");
+
+    if (btn && !btn.__ecoBound) {
+        btn.__ecoBound = true;
+        btn.addEventListener("click", () => {
+            applyEco(!document.documentElement.classList.contains("eco-mode"));
+        });
+    }
+}
+
 export function initSettings(dom, state, callbacks = {}) {
     renderGenreList(dom, state);
 
@@ -328,4 +356,6 @@ export function initSettings(dom, state, callbacks = {}) {
 
     loadSettings(dom, state);
     initLayoutMode(dom);
+    initEcoMode(dom);
+    initWakeLock(dom, state);
 }

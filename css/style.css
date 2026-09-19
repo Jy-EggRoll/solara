@@ -5,6 +5,9 @@
 /* 1. 设计系统 Tokens 与主题材质 */
 @import url("tokens/theme.css");
 
+/* 1b. 极简低开销主题 (Eco Mode)，正交开关类 html.eco-mode */
+@import url("eco-mode.css");
+
 /* 2. 基础规范与舞台排版 */
 @import url("layout/base.css");
 @import url("layout/stage.css");

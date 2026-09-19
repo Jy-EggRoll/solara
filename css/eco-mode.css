@@ -1,0 +1,105 @@
+/* ─── 极简低开销主题 (Eco Mode) ───────────────────────────────────
+   正交开关：html.eco-mode + body.eco-mode，与 dark-mode / layout-compact 独立。
+   目标：砍掉每帧整屏高斯模糊与动画重绘、去掉逐层毛玻璃重采样，大幅降 GPU/合成开销。
+   选择器均用 (类) 前缀 + !important，对运行时注入的 desktop.css / mobile.css
+   以「更高特异性」稳定压制，不依赖样式加载顺序。 */
+
+/* 1. 去极光：彻底不渲染 orb / mesh / noise / 过渡层（display:none 后 filter 无成本） */
+html.eco-mode .aurora-mesh,
+html.eco-mode .aurora-orb,
+html.eco-mode .aurora-noise,
+html.eco-mode .background-stage__layer--transition {
+    display: none !important;
+    filter: none !important;
+    will-change: auto !important;
+    animation: none !important;
+}
+
+/* 关闭跨淡入：过渡层已隐藏，基底层直接呈现静态渐变 */
+html.eco-mode body.background-transitioning .background-stage__layer--transition,
+html.eco-mode.background-transitioning .background-stage__layer--transition {
+    opacity: 0 !important;
+}
+
+/* 基底层保留单层静态渐变（background-image 已是 var(--bg-gradient)，取色仍会更新它） */
+html.eco-mode .background-stage__layer--base {
+    background-image: var(--bg-gradient) !important;
+    background-size: cover;
+    filter: none !important;
+    will-change: auto !important;
+}
+
+/* 2. 提高面板/组件底色不透明度，弥补去模糊后的可读性 */
+html.eco-mode {
+    --container-bg: rgba(255, 255, 255, 0.88);
+    --component-bg: rgba(255, 255, 255, 0.84);
+    --apple-glass-blur: none;
+    --backdrop-blur: 0px;
+}
+html.eco-mode.dark-mode {
+    --container-bg: rgba(18, 22, 28, 0.90);
+    --component-bg: rgba(255, 255, 255, 0.10);
+}
+
+/* 3. 去毛玻璃 —— 桌面常驻面板与交互菜单（单类特异性已高于基础单类规则） */
+html.eco-mode :is(
+    .container,
+    .theme-toggle-button,
+    .cover-area,
+    .playlist,
+    .lyrics,
+    .playlist-tabs,
+    .playlist-action-btn,
+    .controls,
+    .search-area,
+    .search-result-item,
+    .source-menu,
+    .import-dropdown-menu,
+    .dynamic-quality-menu,
+    .player-quality-menu,
+    .load-more-btn,
+    .modal-overlay,
+    .modal-content,
+    .import-selected-btn,
+    .close-search-btn,
+    .notification
+) {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* ID 选择器需保留 ID 特异性 */
+html.eco-mode #loadOnlineBtn,
+html.eco-mode #qualityToggle {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* 3b. 移动端玻璃层（用 var(--apple-glass-blur) 的已被上面的 token 覆盖清零；
+   以下为使用字面 blur() 的规则，按真实选择器精确命中。
+   前缀 html.eco-mode body.eco-mode.mobile-view 取得 (0,4,2)/(1,4,2) 特异性，
+   稳定压制运行时注入的 mobile.css，不依赖加载顺序与深浅色变体） */
+html.eco-mode body.eco-mode.mobile-view :is(
+    .mobile-panel,
+    .mobile-quality-chip,
+    .mobile-inline-lyrics__hint,
+    #notification,
+    .settings-content,
+    .import-dropdown-menu,
+    .mobile-panel-header .playlist-tabs
+),
+html.eco-mode body.eco-mode.mobile-view .album-cover::after {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* 4. 冻结常驻无限动画（律动条、雷达脉冲、唱片旋转、封面脉冲等）
+   只动 animation，不影响 transition（标签指示器/hover 保留） */
+html.eco-mode *,
+html.eco-mode *::before,
+html.eco-mode *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+}
+
+/* 5. 兜底：prefers-reduced-motion 下也停掉 orb（与 eco 无关的既有行为，保留） */
