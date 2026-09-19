@@ -272,6 +272,11 @@ export function initEcoMode(dom) {
             btn.setAttribute("title", label);
         }
         localStorage.setItem(STORAGE_KEY, on ? "1" : "0");
+        const line = `[省电] 极简模式：${on ? "开" : "关"}（eco-mode class 已${on ? "加到" : "移出"} <html>）`;
+        console.log(line);
+        if (typeof window !== "undefined" && typeof window.__solaraDebugLog === "function") {
+            window.__solaraDebugLog(line);
+        }
     };
 
     applyEco(localStorage.getItem(STORAGE_KEY) === "1");

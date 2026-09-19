@@ -29,10 +29,19 @@ function render() {
     btn.setAttribute("title", label);
 }
 
+function log(message) {
+    const line = `[防息屏] ${message}`;
+    console.log(line);
+    if (typeof window !== "undefined" && typeof window.__solaraDebugLog === "function") {
+        window.__solaraDebugLog(line);
+    }
+}
+
 async function release() {
     if (!sentinel) return;
     try {
         await sentinel.release();
+        log("屏幕锁已释放");
     } catch (_) { /* 已被浏览器释放，忽略 */ }
     sentinel = null;
 }
@@ -43,9 +52,11 @@ async function acquire() {
     try {
         await release();
         sentinel = await navigator.wakeLock.request("screen");
-        sentinel.addEventListener("release", () => { sentinel = null; }, { once: true });
-    } catch (_) {
+        sentinel.addEventListener("release", () => { sentinel = null; log("屏幕锁已被系统释放（切后台/锁屏）"); }, { once: true });
+        log("屏幕锁已获取（播放中，屏幕不会熄灭）");
+    } catch (err) {
         sentinel = null;
+        log(`获取屏幕锁失败: ${err && err.name ? err.name : err}`);
     }
 }
 
@@ -68,12 +79,14 @@ export function initWakeLock(dom, state) {
         const tip = "当前环境不支持防息屏（需 HTTPS 或 localhost）";
         btn.setAttribute("aria-label", tip);
         btn.setAttribute("title", tip);
+        log(`不可用：Wake Lock 支持=${"wakeLock" in navigator}，安全上下文=${window.isSecureContext}`);
         return;
     }
 
     enabled = localStorage.getItem(STORAGE_KEY) === "1";
     if (state) state.wakeLockEnabled = enabled;
     render();
+    log(`初始化完成：可用，当前开关=${enabled ? "开" : "关"}`);
 
     if (!btn.__wakeLockBound) {
         btn.__wakeLockBound = true;
@@ -82,6 +95,7 @@ export function initWakeLock(dom, state) {
             localStorage.setItem(STORAGE_KEY, enabled ? "1" : "0");
             if (state) state.wakeLockEnabled = enabled;
             render();
+            log(`开关切换为：${enabled ? "开" : "关"}`);
             refresh();
         });
     }
