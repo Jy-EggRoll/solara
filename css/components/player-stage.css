@@ -655,7 +655,6 @@ body.dark-mode .playlist-tabs {
 .playlist-items .playlist-item:hover {
     background-color: var(--item-hover-bg);
     color: var(--item-current-text);
-    transform: translateX(4px);
     border-color: rgba(255, 255, 255, 0.1);
 }
 
@@ -756,7 +755,7 @@ body.dark-mode .playlist-items .playlist-item.current {
 }
 .favorite-item-action--add:hover {
     color: var(--primary-color);
-    background: rgba(var(--primary-color-rgb, 255, 107, 107), 0.1);
+    background: var(--item-hover-bg);
 }
 .playlist-item-download:hover,
 .favorite-item-action--download:hover {

@@ -8,6 +8,10 @@ data/
 # Node.js dependencies (standalone server)
 server/node_modules/
 
+# Vite build seed (root)
+node_modules/
+dist/
+
 # Local backups and temporary scripts
 *.backup.js
 

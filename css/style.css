@@ -1,19 +1,20 @@
 /**
  * Solara 主样式入口文件 (通过原生 @import 聚合模块化样式)
+ * 缓存版本：改任一子 CSS 后，更新本文件各 @import 的 ?v= 与 index.html/login.html 的资源后缀。
  */
 
 /* 1. 设计系统 Tokens 与主题材质 */
-@import url("tokens/theme.css");
+@import url("tokens/theme.css?v=20260920");
 
 /* 1b. 极简低开销主题 (Eco Mode)，正交开关类 html.eco-mode */
-@import url("eco-mode.css");
+@import url("eco-mode.css?v=20260920");
 
 /* 2. 基础规范与舞台排版 */
-@import url("layout/base.css");
-@import url("layout/stage.css");
+@import url("layout/base.css?v=20260920");
+@import url("layout/stage.css?v=20260920");
 
 /* 3. 核心功能组件 */
-@import url("components/search.css");
-@import url("components/player-stage.css");
-@import url("components/controls.css");
-@import url("components/modals.css");
+@import url("components/search.css?v=20260920");
+@import url("components/player-stage.css?v=20260920");
+@import url("components/controls.css?v=20260920");
+@import url("components/modals.css?v=20260920");

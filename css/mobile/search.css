@@ -172,13 +172,13 @@ body.mobile-view.dark-mode .search-bar-unified {
 /* 获得焦点时的柔和微高光，不放大额外边框 */
 body.mobile-view .search-bar-unified:focus-within {
     border-color: var(--primary-color, #10a37f) !important;
-    box-shadow: 0 0 0 3px rgba(16, 163, 127, 0.18) !important;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 18%, transparent) !important;
 }
 
 body.mobile-view.dark-mode .search-bar-unified:focus-within {
     border-color: var(--primary-color, #10a37f) !important;
     background: #242426 !important;
-    box-shadow: 0 0 0 3px rgba(16, 163, 127, 0.25) !important;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 25%, transparent) !important;
 }
 
 /* 彻底剥除内层 input-wrapper 的一切边框、背景、阴影，杜绝大框套小框！ */
@@ -517,12 +517,12 @@ body.mobile-view.dark-mode .search-result-item:active {
 /* 选中高亮状态 */
 body.mobile-view .search-result-item.selected {
     border-color: var(--primary-color, #10a37f) !important;
-    background: rgba(16, 163, 127, 0.09) !important;
+    background: color-mix(in srgb, var(--primary-color) 9%, transparent) !important;
     box-shadow: 0 2px 10px var(--palette-glow, rgba(16, 163, 127, 0.2)) !important;
 }
 
 body.mobile-view.dark-mode .search-result-item.selected {
-    background: rgba(16, 163, 127, 0.18) !important;
+    background: color-mix(in srgb, var(--primary-color) 18%, transparent) !important;
 }
 
 /* 左侧选择圆圈指示器 */
@@ -858,12 +858,12 @@ body.mobile-view.dark-mode .search-result-item:active {
 /* 选中高亮状态 */
 body.mobile-view .search-result-item.selected {
     border-color: var(--primary-color, #10a37f) !important;
-    background: rgba(16, 163, 127, 0.09) !important;
+    background: color-mix(in srgb, var(--primary-color) 9%, transparent) !important;
     box-shadow: 0 4px 16px var(--palette-glow, rgba(16, 163, 127, 0.2));
 }
 
 body.mobile-view.dark-mode .search-result-item.selected {
-    background: rgba(16, 163, 127, 0.16) !important;
+    background: color-mix(in srgb, var(--primary-color) 16%, transparent) !important;
 }
 
 /* 左侧选择圆圈指示器 */
