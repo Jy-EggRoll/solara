@@ -159,14 +159,21 @@ body.background-transitioning .background-stage__layer--transition {
 
 .aurora-mesh {
     position: absolute;
-    inset: -20%;
-    width: 140%;
-    height: 140%;
+    inset: -25%;
+    width: 150%;
+    height: 150%;
     overflow: hidden;
     filter: blur(50px) saturate(140%);
     pointer-events: none;
     opacity: 0.85;
-    transform: translateZ(0);
+    will-change: transform;
+    animation: bg-revolve 140s linear infinite;
+}
+
+/* 整层缓慢旋转：纯 transform 合成，不重绘模糊 */
+@keyframes bg-revolve {
+    from { transform: translateZ(0) rotate(0deg); }
+    to   { transform: translateZ(0) rotate(360deg); }
 }
 
 .aurora-orb {
@@ -257,7 +264,9 @@ body.background-transitioning .background-stage__layer--transition {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .aurora-orb {
+    .aurora-orb,
+    .aurora-mesh,
+    .album-cover img {
         animation: none !important;
     }
 }

@@ -45,7 +45,7 @@
     height: 256px;
     min-height: 256px;
     flex-shrink: 0;
-    border-radius: 24px;
+    border-radius: 50%;
     background: linear-gradient(135deg, rgba(255,255,255,0.18), rgba(0,0,0,0.12));
     display: flex;
     align-items: center;
@@ -106,7 +106,19 @@ body.dark-mode.is-playing .album-cover:hover {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 23px;
+    border-radius: 50%;
+    animation: cover-spin 22s linear infinite;
+    animation-play-state: paused;
+    will-change: transform;
+}
+
+/* 仅在播放中旋转，暂停时停在当前角度，续播接着转 */
+body.is-playing .album-cover img {
+    animation-play-state: running;
+}
+
+@keyframes cover-spin {
+    to { transform: rotate(360deg); }
 }
 
 .album-cover.loading {

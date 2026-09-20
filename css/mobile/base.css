@@ -85,9 +85,9 @@ body.mobile-view.dark-mode .background-stage__layer {
 
 /* 移动端极光网格：采用径向光晕自然扩散，取消暴力模糊，改为纯硬件加速的柔和弥散 */
 body.mobile-view .aurora-mesh {
-    inset: -10%;
-    width: 120%;
-    height: 120%;
+    inset: -25%;
+    width: 150%;
+    height: 150%;
     filter: blur(32px) saturate(135%) !important;
     opacity: 0.85;
     transform: translateZ(0);
