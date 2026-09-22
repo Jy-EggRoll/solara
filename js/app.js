@@ -682,6 +682,12 @@ function setupEventHandlers() {
         dom.playPauseBtn.addEventListener("click", togglePlayPause);
     }
 
+    // 桌面端：单击封面切换播放 / 暂停（移动端封面点击已用于展开歌词）
+    if (dom.albumCover && !isMobileView) {
+        dom.albumCover.addEventListener("click", togglePlayPause);
+        dom.albumCover.setAttribute("title", "播放 / 暂停");
+    }
+
     // 当前歌曲收藏 / 取消收藏切换
     if (dom.currentFavoriteToggle) {
         dom.currentFavoriteToggle.addEventListener("click", () => {

@@ -5,19 +5,19 @@
  */
 
 /* 1. 基础规范、视口约束、极光背景与 Toolbar 顶栏 */
-@import url("mobile/base.css?v=20260920");
+@import url("mobile/base.css?v=20260922");
 
 /* 2. 主舞台大封面、动感歌词、歌曲元信息与动态音浪 */
-@import url("mobile/stage.css?v=20260920");
+@import url("mobile/stage.css?v=20260922");
 
 /* 3. 悬浮底栏控制台、进度条与等距正圆播放控件组 */
-@import url("mobile/controls.css?v=20260920");
+@import url("mobile/controls.css?v=20260922");
 
 /* 4. 纯净遮罩层、iOS 原生 Bottom Sheet 抽屉与高对比度列表 */
-@import url("mobile/sheet.css?v=20260920");
+@import url("mobile/sheet.css?v=20260922");
 
 /* 5. Spotlight 沉浸聚焦全屏搜索面板与搜索结果卡片 */
-@import url("mobile/search.css?v=20260920");
+@import url("mobile/search.css?v=20260922");
 
 /* 6. 系统通知微胶囊与设置弹窗适配 */
-@import url("mobile/modals.css?v=20260920");
+@import url("mobile/modals.css?v=20260922");

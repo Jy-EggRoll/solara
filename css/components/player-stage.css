@@ -57,6 +57,7 @@
     transition: transform 0.4s var(--spring-snappy), box-shadow 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     overflow: hidden;
     position: relative;
+    cursor: pointer;
 }
 
 .dark-mode .album-cover {
@@ -107,7 +108,7 @@ body.dark-mode.is-playing .album-cover:hover {
     height: 100%;
     object-fit: cover;
     border-radius: 50%;
-    animation: cover-spin 22s linear infinite;
+    animation: cover-spin 30s linear infinite;
     animation-play-state: paused;
     will-change: transform;
 }

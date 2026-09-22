@@ -89,7 +89,7 @@ docker compose up -d
 
 ### 🧯 前端缓存策略与构建路线图
 - **当前（无构建直发）**：`index.html`/`login.html` 里对本地 `css`/`js` 的引用、运行时注入的 `css/desktop.css`/`css/mobile.css`，以及 `css/style.css`、`css/mobile.css` 中的每条 `@import`，都带一个统一的版本后缀 `?v=YYYYMMDD`。**改动前端资源后，把这 4 处的日期串更新一次即可**让访客（含移动端，无法强刷时）拿到新文件。注意：`js/app.js` 通过相对 `import` 深链加载的子模块暂不受该后缀覆盖，仍可能需要硬刷。
-- **路线图（已埋 Vite 种子，休眠中）**：仓库已加入 `package.json`、`vite.config.ts`、`public/_headers` 作为脚手架，当前 Pages 未配置构建命令时完全不生效、零影响。待需要时可一步切换到自动内容哈希：在 Pages 后台设 Build command = `npm ci && npm run build`、Output = `dist`、Node ≥ 20，并按 `vite.config.ts` 顶部注释把 `favicon/manifest` 移入 `public/`、把 `desktop.css`/`mobile.css` 运行时注入改为普通 `<link>`、`mobile.js` 改动态 `import()`，之后即可移除手动 `?v=` 后缀。
+- **路线图（已埋 Vite 种子，休眠中）**：仓库已加入 `package.json`、`vite.config.ts`、`public/_headers` 作为脚手架（包管理器约定为 **pnpm**），当前 Pages 未配置构建命令时完全不生效、零影响。待需要时可一步切换到自动内容哈希：在 Pages 后台设 Build command = `pnpm install --frozen-lockfile && pnpm build`、Output = `dist`、Node ≥ 20，并按 `vite.config.ts` 顶部注释把 `favicon/manifest` 移入 `public/`、把 `desktop.css`/`mobile.css` 运行时注入改为普通 `<link>`、`mobile.js` 改动态 `import()`，之后即可移除手动 `?v=` 后缀。
 
 ## ⚙️ 配置提示
 - API 基地址定义在 `functions/proxy.ts` 中，可替换为自建接口域名。
