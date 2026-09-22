@@ -15,6 +15,11 @@ dist/
 package-lock.json
 yarn.lock
 
+# 环境变量与日志
+.env*
+!.env.example
+*.log
+
 # Local backups and temporary scripts
 *.backup.js
 

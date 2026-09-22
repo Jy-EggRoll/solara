@@ -12,6 +12,14 @@ data
 *.db-shm
 *.db-wal
 
+# 构建产物与体积较大的仓库示例图（不进镜像 / 不膨胀构建上下文）
+dist
+node_modules
+Preview.gif
+1.png
+2.png
+3.png
+
 # 敏感配置（运行时由 entrypoint 动态生成）
 .dev.vars
 

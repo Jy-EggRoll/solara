@@ -2,6 +2,7 @@
  * Solara 主应用总装入口 (App Assembly & Lifecycle Orchestrator)
  */
 
+import "./boot/viewport.js";
 import {
     API,
     DEFAULT_RADAR_GENRES,

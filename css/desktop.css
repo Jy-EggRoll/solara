@@ -108,7 +108,7 @@ html.desktop-view .search-results-toolbar .import-selected-btn {
 }
 
 html.desktop-view .search-results-toolbar .import-selected-btn:hover:not(:disabled) {
-    background: var(--apple-glass-hover);
+    background: var(--item-hover-bg);
     border-color: var(--apple-glass-border-top);
     transform: scale(1.03);
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);

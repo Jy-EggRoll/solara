@@ -24,114 +24,34 @@
     <link rel="stylesheet" href="css/mobile.css">
     <script src="js/i18n.js"></script>
     <script>
+        // 首帧前必须执行的极小逻辑：设备判定 + 主题/省电/视图类预置（防 FOUC）。
+        // 其余视口 / 键盘适配见 js/boot/viewport.js
         (function () {
-            const ua = navigator.userAgent || "";
-            const isMobileUA = /android|iphone|ipad|ipod|mobile|blackberry|phone|opera mini|windows phone/i.test(ua);
-            const isSmallScreen = typeof window.matchMedia === "function" && window.matchMedia("(max-width: 820px)").matches;
-            const isMobile = isMobileUA || isSmallScreen;
+            var ua = navigator.userAgent || "";
+            var isMobile = /android|iphone|ipad|ipod|mobile|blackberry|phone|opera mini|windows phone/i.test(ua)
+                || (typeof window.matchMedia === "function" && window.matchMedia("(max-width: 820px)").matches);
             window.__SOLARA_IS_MOBILE = isMobile;
-
+            var root = document.documentElement;
             try {
-                const savedTheme = localStorage.getItem("theme");
-                const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-                const isDark = savedTheme ? savedTheme === "dark" : prefersDark;
-                if (isDark) {
-                    document.documentElement.classList.add("dark-mode");
-                } else {
-                    document.documentElement.classList.remove("dark-mode");
-                }
+                var savedTheme = localStorage.getItem("theme");
+                var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+                var isDark = savedTheme ? savedTheme === "dark" : prefersDark;
+                root.classList.toggle("dark-mode", isDark);
                 if (isMobile) {
-                    const defaultColor = isDark ? "#06070a" : "#f5f7fa";
-                    const meta = document.getElementById("metaThemeColor");
+                    var defaultColor = isDark ? "#06070a" : "#f5f7fa";
+                    var meta = document.getElementById("metaThemeColor");
                     if (meta) meta.setAttribute("content", defaultColor);
-                    document.documentElement.style.backgroundColor = defaultColor;
+                    root.style.backgroundColor = defaultColor;
                 }
             } catch (_) {}
             try {
                 if (localStorage.getItem("solara_eco") === "1") {
-                    document.documentElement.classList.add("eco-mode");
+                    root.classList.add("eco-mode");
                 }
             } catch (_) {}
-            if (!isMobile) {
-                document.documentElement.classList.add("desktop-view");
-                return;
-            }
-            document.documentElement.classList.add("mobile-view");
-            const setViewportUnit = () => {
-                const vv = window.visualViewport;
-                const winH = window.innerHeight;
-                const currentH = vv ? vv.height : winH;
-
-                const isInputActive = Boolean(
-                    document.activeElement && 
-                    (document.activeElement.tagName === "INPUT" || document.activeElement.tagName === "TEXTAREA")
-                );
-                const keyboardHeight = Math.max(0, winH - currentH);
-                const isKeyboardOpen = isInputActive && keyboardHeight > 120;
-
-                if (document.body) {
-                    document.body.classList.toggle("keyboard-open", isKeyboardOpen);
-                }
-                document.documentElement.style.setProperty("--keyboard-height", `${keyboardHeight}px`);
-
-                if (isKeyboardOpen) {
-                    document.documentElement.style.setProperty("--mobile-vh", `${currentH}px`);
-                } else {
-                    document.documentElement.style.removeProperty("--mobile-vh");
-                }
-            };
-
-            const applyBodyClass = () => {
-                if (document.body) {
-                    document.body.classList.add("mobile-view");
-                    setViewportUnit();
-                }
-            };
-            if (document.readyState === "loading") {
-                document.addEventListener("DOMContentLoaded", applyBodyClass, { once: true });
-            } else {
-                applyBodyClass();
-            }
-
-            window.addEventListener("resize", setViewportUnit);
-            window.addEventListener("orientationchange", () => {
-                setViewportUnit();
-            });
-            if (window.visualViewport) {
-                window.visualViewport.addEventListener("resize", setViewportUnit);
-                window.visualViewport.addEventListener("scroll", setViewportUnit);
-            }
-            window.addEventListener("focusin", () => setTimeout(setViewportUnit, 100));
-            window.addEventListener("focusout", () => {
-                setTimeout(() => {
-                    if (document.body) document.body.classList.remove("keyboard-open");
-                    document.documentElement.style.setProperty("--keyboard-height", "0px");
-                    setViewportUnit();
-                }, 150);
-            });
-
-            setViewportUnit();
+            root.classList.add(isMobile ? "mobile-view" : "desktop-view");
         })();
     </script>
-    <style id="safari-ios-26-fix">
-        /* --- Safari iOS 26 Fix --- */
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        .login-shell {
-            position: relative;
-            left: 50%;
-            transform: translateX(-50%);
-            margin-inline: auto;
-        }
-        body:not(.mobile-view) {
-            padding-left: max(env(safe-area-inset-left), 16px);
-            padding-right: max(env(safe-area-inset-right), 16px);
-        }
-    </style>
 
 </head>
 <body>

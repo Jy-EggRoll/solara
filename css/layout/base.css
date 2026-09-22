@@ -1,3 +1,24 @@
+/* ─── Safari iOS 26 Fix（原 index.html 内联 <style> 外置）───────────── */
+html,
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.login-shell {
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-inline: auto;
+}
+
+body:not(.mobile-view) {
+    padding-left: max(env(safe-area-inset-left), 16px);
+    padding-right: max(env(safe-area-inset-right), 16px);
+}
+
 /* ─── Apple 全局零延迟按压反馈 (Kill Latency) ──────────────────── */
 button:active:not(:disabled),
 .transport-button:active:not(:disabled),

@@ -1,0 +1,8 @@
+dist
+node_modules
+pnpm-lock.yaml
+# classic 脚本，保持原样（非模块、独立分发）
+public/js/i18n.js
+# 第三方 vendor
+functions/lib/vendor
+*.min.*
