@@ -83,7 +83,7 @@ export function openSettingsModal(dom, state = null) {
                 toggleDebugBtn.classList.toggle("is-active", Boolean(state.debugMode));
             }
             if (toggleDebugText) {
-                toggleDebugText.textContent = state.debugMode ? "关闭调试模式" : "开启调试模式";
+                toggleDebugText.textContent = `调试模式：${state.debugMode ? "开" : "关"}`;
             }
         }
         dom.settingsModal.classList.add("show");
@@ -199,8 +199,9 @@ export function initLayoutMode(dom) {
         document.body.classList.toggle("layout-compact", isCompact);
         
         if (toggleBtn) {
-            toggleBtn.setAttribute("aria-label", isCompact ? "展开为全景沉浸模式" : "收拢为大留白小播放器");
-            toggleBtn.setAttribute("title", isCompact ? "展开为全景沉浸模式（双击Logo打开设置）" : "收拢为大留白小播放器（双击Logo打开设置）");
+            const layoutLabel = isCompact ? "布局：紧凑" : "布局：全景";
+            toggleBtn.setAttribute("aria-label", layoutLabel);
+            toggleBtn.setAttribute("title", `${layoutLabel}（双击Logo打开设置）`);
         }
         localStorage.setItem(STORAGE_KEY, mode);
 
@@ -270,11 +271,11 @@ export function initEcoMode(dom) {
             if (!target) continue;
             target.classList.toggle("is-active", on);
             target.setAttribute("aria-pressed", on ? "true" : "false");
-            const label = on ? "关闭极简省电模式" : "开启极简省电模式";
+            const label = `极简省电：${on ? "开" : "关"}`;
             target.setAttribute("aria-label", label);
             target.setAttribute("title", label);
         }
-        if (settingText) settingText.textContent = on ? "关闭极简省电模式" : "开启极简省电模式";
+        if (settingText) settingText.textContent = `极简省电：${on ? "开" : "关"}`;
         localStorage.setItem(STORAGE_KEY, on ? "1" : "0");
         const line = `[省电] 极简模式：${on ? "开" : "关"}（eco-mode class 已${on ? "加到" : "移出"} <html>）`;
         console.log(line);
@@ -333,7 +334,7 @@ export function initSettings(dom, state, callbacks = {}) {
         });
     }
 
-    // 绑定开启/关闭调试模式按钮
+    // 绑定调试模式开/关按钮
     const toggleDebugBtn = document.getElementById("toggleDebugBtn");
     if (toggleDebugBtn) {
         toggleDebugBtn.addEventListener("click", () => {

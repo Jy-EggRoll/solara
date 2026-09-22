@@ -366,7 +366,7 @@ body.dark-mode .playlist-action-btn {
 
 .playlist-action-btn:hover:not(:disabled),
 .playlist-action-btn:focus-visible:not(:disabled) {
-    transform: translateY(-1px);
+    transform: scale(1.03);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
     border-color: rgba(0, 0, 0, 0.16);
     color: var(--text-color);
@@ -382,7 +382,7 @@ body.dark-mode .playlist-action-btn:focus-visible:not(:disabled) {
 }
 
 .playlist-action-btn:active:not(:disabled) {
-    transform: scale(0.92);
+    transform: scale(0.95);
 }
 
 .playlist-action-btn:focus-visible {
@@ -558,7 +558,7 @@ body.dark-mode .playlist-tabs {
 }
 
 .playlist-tab:active {
-    transform: scale(0.96);
+    transform: scale(0.95);
 }
 
 .playlist-tab.active {

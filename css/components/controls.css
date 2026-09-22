@@ -48,7 +48,7 @@
 }
 
 .controls button:active { 
-    transform: scale(0.92); 
+    transform: scale(0.95); 
 }
 
 /* 主角播放 / 暂停按钮 (Hero Transport Button) */
@@ -71,7 +71,7 @@
 
 #playPauseBtn:active,
 .transport-button--play:active {
-    transform: scale(0.92) !important;
+    transform: scale(0.95) !important;
 }
 
 /* 播放图标光学对齐微调 */
@@ -105,7 +105,7 @@
     color: #ffffff !important;
     border-color: var(--primary-color) !important;
     box-shadow: 0 8px 22px var(--palette-glow);
-    transform: translateY(-1px);
+    transform: scale(1.03);
 }
 
 .dark-mode .controls button#loadOnlineBtn {
@@ -305,7 +305,7 @@ html:not(.mobile-view) .transport-controls {
 }
 
 .volume-icon-wrap:active {
-    transform: scale(0.88);
+    transform: scale(0.95);
 }
 
 .volume-container input[type="range"] {
@@ -404,11 +404,14 @@ input[type="range"]:active::-moz-range-thumb {
     border-color: var(--primary-color) !important;
     color: var(--primary-color) !important;
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12) !important;
-    transform: translateY(-1px);
+}
+
+.controls .player-quality-btn:hover {
+    transform: scale(1.03);
 }
 
 .controls .player-quality-btn:active {
-    transform: scale(0.94);
+    transform: scale(0.95);
 }
 
 .player-quality-menu {
@@ -512,7 +515,7 @@ input[type="range"]:active::-moz-range-thumb {
 
 .player-quality-option:active,
 .quality-option:active {
-    transform: scale(0.98);
+    transform: scale(0.95);
 }
 
 .player-quality-option small,
@@ -711,7 +714,7 @@ input[type="range"]:active::-moz-range-thumb {
 }
 
 .debug-tool-btn:active {
-    transform: scale(0.94);
+    transform: scale(0.95);
 }
 
 .debug-info-content {

@@ -28,7 +28,7 @@ function buttons() {
 }
 
 function render() {
-    const label = enabled ? "关闭播放防息屏" : "开启播放防息屏";
+    const label = `防息屏：${enabled ? "开" : "关"}`;
     for (const btn of buttons()) {
         btn.classList.toggle("is-active", enabled);
         btn.setAttribute("aria-pressed", enabled ? "true" : "false");
@@ -93,7 +93,7 @@ export function initWakeLock(dom, state) {
             target.setAttribute("title", tip);
         }
         const settingText = document.getElementById("wakeLockSettingText");
-        if (settingText) settingText.textContent = "防息屏不可用（需 HTTPS）";
+        if (settingText) settingText.textContent = "防息屏：不可用（需 HTTPS）";
         log(`不可用：Wake Lock 支持=${"wakeLock" in navigator}，安全上下文=${window.isSecureContext}`);
         return;
     }

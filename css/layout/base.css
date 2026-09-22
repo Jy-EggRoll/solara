@@ -5,7 +5,7 @@ button:active:not(:disabled),
 .action-btn:active,
 .source-select-btn:active,
 .import-selected-btn:active {
-    transform: scale(0.94) !important;
+    transform: scale(0.95) !important;
     transition: transform 80ms var(--spring-snappy) !important;
 }
 

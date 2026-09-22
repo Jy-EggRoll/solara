@@ -538,7 +538,7 @@ export function initTheme(dom, state) {
         }
         if (dom.themeToggleButton) {
             dom.themeToggleButton.classList.toggle("is-dark", isDark);
-            const label = isDark ? "切换为浅色模式" : "切换为深色模式";
+            const label = isDark ? "主题：深色" : "主题：浅色";
             dom.themeToggleButton.setAttribute("aria-label", label);
             dom.themeToggleButton.setAttribute("title", label);
         }

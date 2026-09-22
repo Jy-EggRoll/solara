@@ -110,12 +110,12 @@ html.desktop-view .search-results-toolbar .import-selected-btn {
 html.desktop-view .search-results-toolbar .import-selected-btn:hover:not(:disabled) {
     background: var(--apple-glass-hover);
     border-color: var(--apple-glass-border-top);
-    transform: translateY(-1px);
+    transform: scale(1.03);
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
 }
 
 html.desktop-view .search-results-toolbar .import-selected-btn:active:not(:disabled) {
-    transform: scale(0.96);
+    transform: scale(0.95);
 }
 
 /* 激活态（已选择歌曲）高亮主题色 */
@@ -175,12 +175,12 @@ html.desktop-view .container.search-mode .close-search-btn:hover {
     background: var(--item-hover-bg);
     border-color: var(--apple-glass-border-top);
     color: var(--text-color);
-    transform: translateY(-1px);
+    transform: scale(1.03);
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
 }
 
 html.desktop-view .container.search-mode .close-search-btn:active {
-    transform: scale(0.92);
+    transform: scale(0.95);
 }
 
 html.desktop-view .container.search-mode .close-search-btn .apple-svg-icon {

@@ -127,7 +127,7 @@
 }
 
 .search-clear-btn:active {
-    transform: scale(0.9);
+    transform: scale(0.95);
 }
 
 .dark-mode .search-clear-btn:hover {
@@ -313,7 +313,7 @@
 
 .source-option:active,
 .source-menu-item:active {
-    transform: scale(0.98);
+    transform: scale(0.95);
 }
 
 .source-option i {
@@ -355,7 +355,7 @@
 .search-btn:hover:not(:disabled) {
     background: var(--primary-color-dark);
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
-    transform: translateY(-1px);
+    transform: scale(1.03);
 }
 
 .search-btn:active:not(:disabled) {
@@ -484,7 +484,7 @@
 }
 
 .import-dropdown-item:active {
-    transform: scale(0.97);
+    transform: scale(0.95);
 }
 
 .import-dropdown-item:disabled {
@@ -837,7 +837,7 @@ body.dark-mode .container.search-mode .search-results-list:empty::before {
 
 .import-selected-btn:not(:disabled):hover,
 .import-selected-btn:not(:disabled):focus-visible {
-    transform: translateY(-1px);
+    transform: scale(1.03);
     box-shadow: 0 14px 30px rgba(26, 188, 156, 0.32);
     filter: brightness(1.05);
 }
@@ -869,7 +869,7 @@ body.dark-mode .container.search-mode .search-results-list:empty::before {
 
 .action-btn:hover {
     background: var(--primary-color-dark);
-    transform: translateY(-1px);
+    transform: scale(1.03);
     box-shadow: 0 4px 12px rgba(26, 188, 156, 0.3);
 }
 

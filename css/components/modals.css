@@ -100,7 +100,7 @@
 }
 
 .close-modal-btn:active {
-    transform: scale(0.92);
+    transform: scale(0.95);
 }
 
 .close-modal-btn svg {
@@ -189,7 +189,7 @@
 
 .genre-label:hover {
     background: rgba(0, 0, 0, 0.08);
-    transform: translateY(-1px);
+    transform: scale(1.03);
 }
 
 .dark-mode .genre-label:hover {
@@ -202,11 +202,10 @@
     color: #ffffff !important;
     font-weight: 600;
     box-shadow: 0 4px 14px -2px var(--palette-glow);
-    transform: translateY(-1px);
 }
 
 .genre-label:active {
-    transform: scale(0.96);
+    transform: scale(0.95);
 }
 
 .modal-footer {
@@ -236,11 +235,11 @@
 .save-settings-btn:hover {
     background: var(--primary-color-dark);
     box-shadow: 0 8px 20px -2px var(--palette-glow);
-    transform: translateY(-1px);
+    transform: scale(1.03);
 }
 
 .save-settings-btn:active {
-    transform: scale(0.96);
+    transform: scale(0.95);
 }
 
 /* 设置操作动作按钮组 */
@@ -278,7 +277,7 @@
 
 .settings-action-btn:hover {
     background: rgba(0, 0, 0, 0.08);
-    transform: translateY(-1px);
+    transform: scale(1.03);
 }
 
 .dark-mode .settings-action-btn:hover {
@@ -286,7 +285,7 @@
 }
 
 .settings-action-btn:active {
-    transform: scale(0.98);
+    transform: scale(0.95);
 }
 
 .settings-action-btn.is-active {

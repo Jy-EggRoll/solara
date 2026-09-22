@@ -116,7 +116,7 @@ export function toggleDebugMode(state, dom, debugLog = null) {
         toggleDebugBtn.classList.toggle("is-active", isEnabled);
     }
     if (toggleDebugText) {
-        toggleDebugText.textContent = isEnabled ? "关闭调试模式" : "开启调试模式";
+        toggleDebugText.textContent = `调试模式：${isEnabled ? "开" : "关"}`;
     }
 
     return isEnabled;

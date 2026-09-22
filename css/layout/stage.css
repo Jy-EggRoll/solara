@@ -290,11 +290,11 @@ body.layout-compact .playlist-item-title {
     color: var(--primary-color);
     border-color: var(--primary-color);
     box-shadow: 0 6px 18px rgba(0,0,0,0.1);
-    transform: translateY(-1px);
+    transform: scale(1.03);
 }
 
 .theme-toggle-button:active {
-    transform: scale(0.92);
+    transform: scale(0.95);
 }
 
 /* Eco / 防息屏开关激活态 */
