@@ -1,6 +1,7 @@
 /**
- * Solara 播放防息屏 (Wake Lock)
- * 语义：仅当「开关开启 且 正在播放 且 页面可见」时持有屏幕锁；暂停 / 关锁 / 切后台即释放。
+ * Solara 防息屏 (Wake Lock)
+ * 语义：用户手动开启后，只要停留在本页面（且页面可见）就一直持有屏幕锁，与音乐的播放/暂停无关；
+ *      仅当关闭开关、切到后台或离开页面时释放。浏览器在页面隐藏时会自动释放，回到前台自动重取。
  * 仅在安全上下文 (HTTPS 或 localhost) 生效；不支持时按钮置灰降级，不抛错。
  */
 
@@ -12,11 +13,6 @@ let domRef = null;
 function isSupported() {
     return typeof navigator !== "undefined" && "wakeLock" in navigator &&
         typeof window !== "undefined" && window.isSecureContext === true;
-}
-
-function isPlaying() {
-    const audio = domRef && domRef.audioPlayer;
-    return !!audio && !audio.paused && !audio.ended;
 }
 
 function buttons() {
@@ -58,12 +54,12 @@ async function release() {
 
 async function acquire() {
     if (!enabled || !isSupported()) return;
-    if (typeof document === "undefined" || document.hidden || !isPlaying()) return;
+    if (typeof document === "undefined" || document.hidden) return;
     try {
         await release();
         sentinel = await navigator.wakeLock.request("screen");
         sentinel.addEventListener("release", () => { sentinel = null; log("屏幕锁已被系统释放（切后台/锁屏）"); }, { once: true });
-        log("屏幕锁已获取（播放中，屏幕不会熄灭）");
+        log("屏幕锁已获取（停留页面中，屏幕不会熄灭）");
     } catch (err) {
         sentinel = null;
         log(`获取屏幕锁失败: ${err && err.name ? err.name : err}`);
@@ -71,7 +67,7 @@ async function acquire() {
 }
 
 async function refresh() {
-    if (enabled && !document.hidden && isPlaying()) {
+    if (enabled && !document.hidden) {
         await acquire();
     } else {
         await release();
@@ -119,14 +115,6 @@ export function initWakeLock(dom, state) {
     if (settingBtn && !settingBtn.__wakeLockBound) {
         settingBtn.__wakeLockBound = true;
         settingBtn.addEventListener("click", toggle);
-    }
-
-    const audio = domRef && domRef.audioPlayer;
-    if (audio && !audio.__wakeLockBound) {
-        audio.__wakeLockBound = true;
-        audio.addEventListener("play", () => { if (enabled) acquire(); });
-        audio.addEventListener("pause", () => { release(); });
-        audio.addEventListener("ended", () => { release(); });
     }
 
     if (!window.__wakeLockVisibilityBound) {
