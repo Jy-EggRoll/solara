@@ -94,6 +94,7 @@ export const dom = {
     layoutToggleBtn: document.getElementById("layoutToggleBtn"),
     ecoToggleButton: document.getElementById("ecoToggleBtn"),
     wakeLockBtn: document.getElementById("wakeLockBtn"),
+    fullscreenBtn: document.getElementById("fullscreenBtn"),
     radarGenreList: document.getElementById("radarGenreList"),
     logo: document.querySelector(".header h1"),
     brandWrap: document.querySelector(".header-brand-wrap"),

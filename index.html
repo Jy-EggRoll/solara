@@ -288,6 +288,29 @@
                             <rect x="10.2" y="8" width="3.6" height="4" rx="1" />
                         </svg>
                     </button>
+                    <button
+                        id="fullscreenBtn"
+                        class="theme-toggle-button fullscreen-btn"
+                        type="button"
+                        aria-label="全屏：关"
+                        title="全屏：关"
+                        aria-pressed="false"
+                    >
+                        <svg
+                            class="apple-svg-icon"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            aria-hidden="true"
+                        >
+                            <path
+                                d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"
+                            />
+                        </svg>
+                    </button>
                 </div>
             </div>
 
@@ -1349,7 +1372,7 @@
                         <h3>显示与性能</h3>
                         <p class="settings-hint">
                             开启极简省电模式可关闭动态背景与毛玻璃、显著降低 GPU
-                            占用；开启防息屏后，只要停留在本页面屏幕就会保持常亮（与是否播放无关）。
+                            占用；开启防息屏后，只要停留在本页面屏幕就会保持常亮（与是否播放无关）；全屏可进入沉浸浏览（部分浏览器/设备不支持）。
                         </p>
                         <div class="settings-actions-group">
                             <button
@@ -1396,6 +1419,28 @@
                                     <rect x="10.2" y="8" width="3.6" height="4" rx="1" />
                                 </svg>
                                 <span id="wakeLockSettingText">防息屏：关</span>
+                            </button>
+                            <button
+                                type="button"
+                                id="fullscreenSettingToggle"
+                                class="settings-action-btn fullscreen-btn"
+                                aria-pressed="false"
+                            >
+                                <svg
+                                    class="apple-svg-icon"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"
+                                    />
+                                </svg>
+                                <span id="fullscreenSettingText">全屏：关</span>
                             </button>
                         </div>
                     </section>

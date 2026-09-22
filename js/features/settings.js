@@ -6,6 +6,7 @@ import { EXPLORE_RADAR_GENRES, DEFAULT_RADAR_GENRES } from "../constants.js";
 import { safeGetLocalStorage, safeSetLocalStorage, persistStorageItems } from "../core/storage.js";
 import { toggleDebugMode } from "../visual/spotlight.js";
 import { initWakeLock } from "../core/wake-lock.js";
+import { initFullscreen } from "../core/fullscreen.js";
 import { updateAllTabsIndicators } from "./playlist.js";
 
 const NOTIFICATION_ICONS = {
@@ -383,4 +384,5 @@ export function initSettings(dom, state, callbacks = {}) {
     initLayoutMode(dom);
     initEcoMode(dom);
     initWakeLock(dom, state);
+    initFullscreen(dom);
 }
