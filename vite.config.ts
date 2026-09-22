@@ -23,6 +23,10 @@ export default defineConfig({
         outDir: "dist",
         emptyOutDir: true,
         assetsDir: "assets",
+        // 关键：不拆分 CSS。否则移动端覆盖（body.mobile-view …）会与基础/紧凑布局规则
+        // 被拆到不同 chunk，加载顺序被打乱，导致 body.layout-compact 反超 body.mobile-view
+        //（权重相同、后者需靠顺序取胜），引发封面非圆形、移动端容器高度错乱等问题。
+        cssCodeSplit: false,
         rollupOptions: {
             input: {
                 main: resolve(__dirname, "index.html"),

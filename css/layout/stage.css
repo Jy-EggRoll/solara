@@ -97,11 +97,11 @@ body.layout-compact .album-cover {
     width: 218px;
     height: 218px;
     min-height: 218px;
-    border-radius: 20px;
+    border-radius: 50%;
 }
 
 body.layout-compact .album-cover img {
-    border-radius: 19px;
+    border-radius: 50%;
 }
 
 /* 小播放器模式：播放列表头部及操作按钮彻底防裁切 */
