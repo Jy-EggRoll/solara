@@ -38,7 +38,7 @@ function setQualityAnchorState(anchor, expanded) {
 }
 
 export function updateQualityLabel(state, dom) {
-    const option = QUALITY_OPTIONS.find(item => item.value === state.playbackQuality) || QUALITY_OPTIONS[0];
+    const option = QUALITY_OPTIONS.find((item) => item.value === state.playbackQuality) || QUALITY_OPTIONS[0];
     if (!option) return;
     if (dom.qualityLabel) dom.qualityLabel.textContent = option.label;
     if (dom.qualityToggle) dom.qualityToggle.title = `音质: ${option.label} (${option.description})`;
@@ -51,7 +51,7 @@ export function updateQualityLabel(state, dom) {
 }
 
 export function updateSourceLabel(state, dom) {
-    const option = SOURCE_OPTIONS.find(item => item.value === state.searchSource) || SOURCE_OPTIONS[0];
+    const option = SOURCE_OPTIONS.find((item) => item.value === state.searchSource) || SOURCE_OPTIONS[0];
     if (dom.sourceSelectLabel) {
         dom.sourceSelectLabel.textContent = option.label;
     }
@@ -59,7 +59,7 @@ export function updateSourceLabel(state, dom) {
 
 export function buildQualityMenu(state, dom) {
     if (!dom.playerQualityMenu) return;
-    const optionsHtml = QUALITY_OPTIONS.map(option => {
+    const optionsHtml = QUALITY_OPTIONS.map((option) => {
         const isActive = option.value === state.playbackQuality;
         return `
             <div class="player-quality-option${isActive ? " active" : ""}" data-quality="${option.value}">
@@ -76,7 +76,7 @@ export function buildQualityMenu(state, dom) {
 
 export function buildSourceMenu(state, dom) {
     if (!dom.sourceMenu) return;
-    const optionsHtml = SOURCE_OPTIONS.map(option => {
+    const optionsHtml = SOURCE_OPTIONS.map((option) => {
         const isActive = option.value === state.searchSource;
         return `
             <button type="button" class="source-option source-menu-item${isActive ? " active" : ""}" data-source="${option.value}" role="option" aria-selected="${isActive}">
@@ -120,7 +120,8 @@ export function updatePlayerQualityMenuPosition(state, dom, isMobileView = false
         openUpwards = false;
     }
 
-    const isMobile = isMobileView ||
+    const isMobile =
+        isMobileView ||
         Boolean(window.__SOLARA_IS_MOBILE) ||
         document.body?.classList.contains("mobile-view") ||
         document.documentElement?.classList.contains("mobile-view") ||
@@ -368,8 +369,13 @@ export function ensureFloatingMenuListeners(state, dom, isMobileView = false) {
                 }
                 closePlayerQualityMenu(state, dom);
             }
-            if (state.sourceMenuOpen && dom.sourceMenu && dom.sourceSelectButton && 
-                !dom.sourceMenu.contains(e.target) && !dom.sourceSelectButton.contains(e.target)) {
+            if (
+                state.sourceMenuOpen &&
+                dom.sourceMenu &&
+                dom.sourceSelectButton &&
+                !dom.sourceMenu.contains(e.target) &&
+                !dom.sourceSelectButton.contains(e.target)
+            ) {
                 closeSourceMenu(state, dom);
             }
         };
@@ -387,10 +393,14 @@ export function ensureFloatingMenuListeners(state, dom, isMobileView = false) {
         if (state.sourceMenuOpen) scheduleSourceMenuPositionUpdate(dom);
         if (state.qualityMenuOpen) schedulePlayerQualityMenuPositionUpdate(state, dom, isMobileView);
     });
-    window.addEventListener("scroll", () => {
-        if (state.sourceMenuOpen) scheduleSourceMenuPositionUpdate(dom);
-        if (state.qualityMenuOpen) schedulePlayerQualityMenuPositionUpdate(state, dom, isMobileView);
-    }, { passive: true, capture: true });
+    window.addEventListener(
+        "scroll",
+        () => {
+            if (state.sourceMenuOpen) scheduleSourceMenuPositionUpdate(dom);
+            if (state.qualityMenuOpen) schedulePlayerQualityMenuPositionUpdate(state, dom, isMobileView);
+        },
+        { passive: true, capture: true },
+    );
     floatingMenuListenersAttached = true;
 }
 
@@ -420,8 +430,10 @@ export async function selectPlaybackQuality(quality, state, dom, callbacks = {})
     }
     closePlayerQualityMenu(state, dom);
 
-    const option = QUALITY_OPTIONS.find(item => item.value === normalized);
-    window.__solaraDebugLog?.(`[音质配置] 已设为: ${option ? option.label : normalized} (${option?.description || ''})`);
+    const option = QUALITY_OPTIONS.find((item) => item.value === normalized);
+    window.__solaraDebugLog?.(
+        `[音质配置] 已设为: ${option ? option.label : normalized} (${option?.description || ""})`,
+    );
     if (option && typeof callbacks.showNotification === "function") {
         callbacks.showNotification(`音质已切换为 ${option.label} (${option.description})`, "info", dom);
     }
@@ -453,7 +465,7 @@ export function selectSearchSource(source, state, dom, callbacks = {}) {
     buildSourceMenu(state, dom);
     closeSourceMenu(state, dom);
 
-    const option = SOURCE_OPTIONS.find(item => item.value === normalized);
+    const option = SOURCE_OPTIONS.find((item) => item.value === normalized);
     if (option && typeof callbacks.showNotification === "function") {
         callbacks.showNotification(`已切换音源为 ${option.label}`, "info", dom);
     }

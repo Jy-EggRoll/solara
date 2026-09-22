@@ -1,6 +1,8 @@
 :root {
-    --font-main: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
-    
+    --font-main:
+        -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang SC", "Hiragino Sans GB",
+        "Microsoft YaHei", "Noto Sans SC", sans-serif;
+
     /* 极光流体多色源（封面调色板动态覆盖） */
     --palette-c1: #4a90e2;
     --palette-c2: #50e3c2;
@@ -8,7 +10,7 @@
     --palette-c4: #7b92b2;
     --palette-accent: #1abc9c;
     --palette-glow: rgba(26, 188, 156, 0.45);
-    
+
     --bg-gradient: radial-gradient(circle at 20% 20%, #e2eae7 0%, #cbd9d4 40%, #b7cac4 100%);
     --bg-gradient-next: var(--bg-gradient);
 
@@ -97,10 +99,19 @@
     color: #ffffff;
 }
 
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--scrollbar-track-bg); }
-::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb-bg); border-radius: 999px; }
-::-webkit-scrollbar-thumb:hover { background: var(--primary-color); }
+::-webkit-scrollbar {
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    background: var(--scrollbar-track-bg);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb-bg);
+    border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-color);
+}
 
 body {
     font-family: var(--font-main);
@@ -172,8 +183,12 @@ body.background-transitioning .background-stage__layer--transition {
 
 /* 整层缓慢旋转：纯 transform 合成，不重绘模糊 */
 @keyframes bg-revolve {
-    from { transform: translateZ(0) rotate(0deg); }
-    to   { transform: translateZ(0) rotate(360deg); }
+    from {
+        transform: translateZ(0) rotate(0deg);
+    }
+    to {
+        transform: translateZ(0) rotate(360deg);
+    }
 }
 
 .aurora-orb {
@@ -219,27 +234,51 @@ body.background-transitioning .background-stage__layer--transition {
 }
 
 @keyframes aurora-flow-1 {
-    0%   { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
-    50%  { transform: translate3d(10vw, 8vh, 0) scale(1.15) rotate(110deg); }
-    100% { transform: translate3d(-6vw, 14vh, 0) scale(0.96) rotate(220deg); }
+    0% {
+        transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+    }
+    50% {
+        transform: translate3d(10vw, 8vh, 0) scale(1.15) rotate(110deg);
+    }
+    100% {
+        transform: translate3d(-6vw, 14vh, 0) scale(0.96) rotate(220deg);
+    }
 }
 
 @keyframes aurora-flow-2 {
-    0%   { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
-    50%  { transform: translate3d(-12vw, 10vh, 0) scale(1.12) rotate(-90deg); }
-    100% { transform: translate3d(6vw, -6vh, 0) scale(1.05) rotate(-190deg); }
+    0% {
+        transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+    }
+    50% {
+        transform: translate3d(-12vw, 10vh, 0) scale(1.12) rotate(-90deg);
+    }
+    100% {
+        transform: translate3d(6vw, -6vh, 0) scale(1.05) rotate(-190deg);
+    }
 }
 
 @keyframes aurora-flow-3 {
-    0%   { transform: translate3d(0, 0, 0) scale(1.04); }
-    50%  { transform: translate3d(-10vw, -8vh, 0) scale(0.92); }
-    100% { transform: translate3d(8vw, -10vh, 0) scale(1.16); }
+    0% {
+        transform: translate3d(0, 0, 0) scale(1.04);
+    }
+    50% {
+        transform: translate3d(-10vw, -8vh, 0) scale(0.92);
+    }
+    100% {
+        transform: translate3d(8vw, -10vh, 0) scale(1.16);
+    }
 }
 
 @keyframes aurora-flow-4 {
-    0%   { transform: translate3d(0, 0, 0) scale(0.94); }
-    50%  { transform: translate3d(12vw, -6vh, 0) scale(1.1); }
-    100% { transform: translate3d(-6vw, 8vh, 0) scale(1.02); }
+    0% {
+        transform: translate3d(0, 0, 0) scale(0.94);
+    }
+    50% {
+        transform: translate3d(12vw, -6vh, 0) scale(1.1);
+    }
+    100% {
+        transform: translate3d(-6vw, 8vh, 0) scale(1.02);
+    }
 }
 
 .aurora-noise {
@@ -247,7 +286,7 @@ body.background-transitioning .background-stage__layer--transition {
     inset: 0;
     opacity: 0.035;
     pointer-events: none;
-    background-image: radial-gradient(rgba(255,255,255,0.7) 1px, transparent 0);
+    background-image: radial-gradient(rgba(255, 255, 255, 0.7) 1px, transparent 0);
     background-size: 28px 28px;
 }
 
@@ -256,11 +295,11 @@ body.background-transitioning .background-stage__layer--transition {
     inset: 0;
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
-    background: radial-gradient(circle at 50% 40%, rgba(0,0,0,0.01) 0%, rgba(0,0,0,0.18) 100%);
+    background: radial-gradient(circle at 50% 40%, rgba(0, 0, 0, 0.01) 0%, rgba(0, 0, 0, 0.18) 100%);
 }
 
 .dark-mode .background-stage__glass-scrim {
-    background: radial-gradient(circle at 50% 40%, rgba(0,0,0,0.22) 0%, rgba(0,0,0,0.6) 100%);
+    background: radial-gradient(circle at 50% 40%, rgba(0, 0, 0, 0.22) 0%, rgba(0, 0, 0, 0.6) 100%);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -270,4 +309,3 @@ body.background-transitioning .background-stage__layer--transition {
         animation: none !important;
     }
 }
-

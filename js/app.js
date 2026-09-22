@@ -11,7 +11,7 @@ import {
     LAST_SEARCH_STATE_STORAGE_KEY,
     STORAGE_KEYS_TO_SYNC,
     normalizeQuality,
-    normalizeSource
+    normalizeSource,
 } from "./constants.js";
 import { dom } from "./dom.js";
 import { state, validateStateConsistency } from "./state.js";
@@ -23,7 +23,7 @@ import {
     setRemoteSyncEnabled,
     isRemoteSyncEnabled,
     syncLocalDataToCloud,
-    preferHttpsUrl
+    preferHttpsUrl,
 } from "./core/storage.js";
 import {
     showAlbumCoverPlaceholder,
@@ -32,26 +32,18 @@ import {
     applyDynamicGradient,
     cancelDeferredPaletteUpdate,
     attemptPaletteApplication,
-    initTheme
+    initTheme,
 } from "./visual/aurora.js";
-import {
-    initSpotlightEffect,
-    createDebugLogger,
-    initDebugShortcut
-} from "./visual/spotlight.js";
+import { initSpotlightEffect, createDebugLogger, initDebugShortcut } from "./visual/spotlight.js";
 import {
     loadLyrics,
     syncLyrics,
     clearLyricsIfLibraryEmpty,
     clearLyricsContent,
     scrollToCurrentLyric,
-    initDesktopLyricsInteractions
+    initDesktopLyricsInteractions,
 } from "./features/lyrics.js";
-import {
-    initSettings,
-    showNotification,
-    applySettingsToUI
-} from "./features/settings.js";
+import { initSettings, showNotification, applySettingsToUI } from "./features/settings.js";
 import {
     updateQualityLabel,
     updateSourceLabel,
@@ -64,7 +56,7 @@ import {
     closeSourceMenu,
     toggleSourceMenu,
     handlePlayerQualitySelection,
-    handleSourceSelection
+    handleSourceSelection,
 } from "./core/quality.js";
 import {
     getSongKey,
@@ -76,7 +68,7 @@ import {
     removeFromPlaylist,
     exportPlaylist,
     handleImportPlaylistChange,
-    updateAllTabsIndicators
+    updateAllTabsIndicators,
 } from "./features/playlist.js";
 import {
     ensureFavoriteSongsArray,
@@ -89,7 +81,7 @@ import {
     addAllFavoritesToPlaylist,
     clearFavorites,
     exportFavorites,
-    handleImportFavoritesChange
+    handleImportFavoritesChange,
 } from "./features/favorites.js";
 import {
     toggleSearchMode,
@@ -105,7 +97,7 @@ import {
     resetSelectedSearchResults,
     displaySearchResults,
     restoreLastSearchResults,
-    clearSearchResults
+    clearSearchResults,
 } from "./features/search.js";
 import {
     updatePlayModeUI,
@@ -123,7 +115,7 @@ import {
     downloadSong,
     formatTime,
     resetPlayerToIdle,
-    cancelPendingPlayback
+    cancelPendingPlayback,
 } from "./core/audio.js";
 import { initMediaSession } from "./core/media-session.js";
 
@@ -180,12 +172,14 @@ export async function updateCurrentSongInfo(song, options = {}) {
     dom.currentSongTitle.textContent = song.name || "未知歌曲";
     dom.currentSongArtist.textContent = Array.isArray(song.artist)
         ? song.artist.join(" / ")
-        : (song.artist || "未知艺术家");
+        : song.artist || "未知艺术家";
 
     if (loadArtwork) {
         try {
-            const cacheKey = `${song.source || 'netease'}_${song.pic_id || song.id}`;
-            const isDirectUrl = (val) => typeof val === "string" && (val.startsWith("http://") || val.startsWith("https://") || val.startsWith("//"));
+            const cacheKey = `${song.source || "netease"}_${song.pic_id || song.id}`;
+            const isDirectUrl = (val) =>
+                typeof val === "string" &&
+                (val.startsWith("http://") || val.startsWith("https://") || val.startsWith("//"));
 
             // 1. 优先命中前端内存缓存（0 网络请求）
             if (coverPicMemoryCache.has(cacheKey)) {
@@ -288,7 +282,7 @@ export function setSongAsPending(song, index, listType = "playlist") {
     if (dom.currentSongArtist) {
         dom.currentSongArtist.textContent = Array.isArray(song.artist)
             ? song.artist.join(" / ")
-            : (song.artist || "未知艺术家");
+            : song.artist || "未知艺术家";
     }
 
     // 同步爱心图标
@@ -366,7 +360,7 @@ export async function playSearchResult(index) {
     }
 
     // 检查歌曲是否已在播放列表中
-    let existingIndex = state.playlistSongs.findIndex(s => getSongKey(s) === getSongKey(song));
+    let existingIndex = state.playlistSongs.findIndex((s) => getSongKey(s) === getSongKey(song));
     if (existingIndex !== -1) {
         state.currentTrackIndex = existingIndex;
     } else {
@@ -412,7 +406,7 @@ function getAudioCallbacks() {
             } else {
                 run();
             }
-        }
+        },
     };
 }
 
@@ -424,12 +418,13 @@ function getPlaylistCallbacks() {
         setSongAsPending: (song, idx, type) => setSongAsPending(song, idx, type),
         showAlbumCoverPlaceholder: () => showAlbumCoverPlaceholder(dom, state),
         clearLyricsContent: () => clearLyricsContent(state, dom, isMobileView),
-        resetPlayerToIdle: () => resetPlayerToIdle(state, dom, {
-            showAlbumCoverPlaceholder: () => showAlbumCoverPlaceholder(dom, state),
-            clearLyricsContent: () => clearLyricsContent(state, dom, isMobileView),
-            updateFavoriteIcons: () => updateFavoriteIcons(state, dom),
-            savePlayerState,
-        }),
+        resetPlayerToIdle: () =>
+            resetPlayerToIdle(state, dom, {
+                showAlbumCoverPlaceholder: () => showAlbumCoverPlaceholder(dom, state),
+                clearLyricsContent: () => clearLyricsContent(state, dom, isMobileView),
+                updateFavoriteIcons: () => updateFavoriteIcons(state, dom),
+                savePlayerState,
+            }),
         updateFavoriteIcons: () => updateFavoriteIcons(state, dom),
         updateMobileClearPlaylistVisibility: () => {
             if (dom.mobileClearPlaylistBtn) {
@@ -438,7 +433,7 @@ function getPlaylistCallbacks() {
                 dom.mobileClearPlaylistBtn.setAttribute("aria-disabled", hasSongs ? "false" : "true");
             }
         },
-        clearLyricsIfLibraryEmpty: () => clearLyricsIfLibraryEmpty(state, dom, isMobileView)
+        clearLyricsIfLibraryEmpty: () => clearLyricsIfLibraryEmpty(state, dom, isMobileView),
     };
 }
 
@@ -493,7 +488,9 @@ function showQualityMenu(event, index, type) {
     });
 
     const button = event.target.closest("button") || event.target;
-    const rect = button ? button.getBoundingClientRect() : { bottom: event.clientY, right: event.clientX, left: event.clientX, top: event.clientY };
+    const rect = button
+        ? button.getBoundingClientRect()
+        : { bottom: event.clientY, right: event.clientX, left: event.clientX, top: event.clientY };
     const menuWidth = 196;
     let left = rect.right - menuWidth;
     if (left < 12) left = 12;
@@ -534,7 +531,7 @@ function getSearchCallbacks() {
         updateFavoriteIcons: () => updateFavoriteIcons(state, dom),
         toggleFavorite: (song) => toggleFavorite(song, state, dom, { saveFavoriteState }),
         playSearchResult,
-        showQualityMenu: (e, idx) => showQualityMenu(e, idx, "search")
+        showQualityMenu: (e, idx) => showQualityMenu(e, idx, "search"),
     };
 }
 
@@ -562,19 +559,22 @@ export async function exploreOnlineMusic() {
         setLoadingState(true);
 
         // 获取用户在设置中勾选的榜单（若未配置或空则默认全选默认三大榜单）
-        const selectedGenres = Array.isArray(state?.radarSettings?.genres) && state.radarSettings.genres.length > 0
-            ? state.radarSettings.genres
-            : DEFAULT_RADAR_GENRES;
+        const selectedGenres =
+            Array.isArray(state?.radarSettings?.genres) && state.radarSettings.genres.length > 0
+                ? state.radarSettings.genres
+                : DEFAULT_RADAR_GENRES;
 
-        const availablePlaylists = (Array.isArray(RADAR_PLAYLISTS) ? RADAR_PLAYLISTS : [])
-            .filter(p => selectedGenres.includes(p.name) || selectedGenres.includes(p.id));
+        const availablePlaylists = (Array.isArray(RADAR_PLAYLISTS) ? RADAR_PLAYLISTS : []).filter(
+            (p) => selectedGenres.includes(p.name) || selectedGenres.includes(p.id),
+        );
 
         const pool = availablePlaylists.length > 0 ? availablePlaylists : RADAR_PLAYLISTS;
-        const targetPlaylist = (pool.length > 0)
-            ? pool[Math.floor(Math.random() * pool.length)]
-            : { id: "3778678", name: "热歌榜" };
+        const targetPlaylist =
+            pool.length > 0 ? pool[Math.floor(Math.random() * pool.length)] : { id: "3778678", name: "热歌榜" };
 
-        debugLog(`[音乐雷达] 从设置榜单 [${selectedGenres.join(" / ")}] 随机抽选【${targetPlaylist.name}】(ID: ${targetPlaylist.id})，正在抓取 Top 20...`);
+        debugLog(
+            `[音乐雷达] 从设置榜单 [${selectedGenres.join(" / ")}] 随机抽选【${targetPlaylist.name}】(ID: ${targetPlaylist.id})，正在抓取 Top 20...`,
+        );
 
         const results = await API.getRadarPlaylist(targetPlaylist.id, { limit: 20 });
         if (!Array.isArray(results) || results.length === 0) {
@@ -586,7 +586,7 @@ export async function exploreOnlineMusic() {
         const normalizedSongs = results.map((song) => ({
             id: song.id,
             name: song.name,
-            artist: Array.isArray(song.artist) ? song.artist.join(" / ") : (song.artist || "未知艺术家"),
+            artist: Array.isArray(song.artist) ? song.artist.join(" / ") : song.artist || "未知艺术家",
             album: song.album || "",
             source: song.source || "netease",
             lyric_id: song.lyric_id || song.id,
@@ -621,7 +621,11 @@ export async function exploreOnlineMusic() {
         renderPlaylist(state, dom, getPlaylistCallbacks());
         updatePlaylistHighlight(state, dom);
 
-        showNotification(`探索雷达：已从【${targetPlaylist.name}】精选前20首，新增 ${appendedSongs.length} 首曲目`, "success", dom);
+        showNotification(
+            `探索雷达：已从【${targetPlaylist.name}】精选前20首，新增 ${appendedSongs.length} 首曲目`,
+            "success",
+            dom,
+        );
 
         if (existingSongs.length === 0 && state.playlistSongs.length > 0) {
             await playPlaylistSong(0);
@@ -641,9 +645,10 @@ export async function exploreOnlineMusic() {
 export async function togglePlayPause() {
     if (!state.currentSong) {
         if (state.playlistSongs.length > 0) {
-            const targetIndex = state.currentTrackIndex >= 0 && state.currentTrackIndex < state.playlistSongs.length
-                ? state.currentTrackIndex
-                : 0;
+            const targetIndex =
+                state.currentTrackIndex >= 0 && state.currentTrackIndex < state.playlistSongs.length
+                    ? state.currentTrackIndex
+                    : 0;
             await playPlaylistSong(targetIndex);
         } else {
             showNotification("播放列表为空，请先添加歌曲", "error", dom);
@@ -653,11 +658,18 @@ export async function togglePlayPause() {
 
     if (!dom.audioPlayer.src) {
         try {
-            await playSong(state.currentSong, {
-                autoplay: true,
-                startTime: state.currentPlaybackTime,
-                preserveProgress: true,
-            }, state, dom, getAudioCallbacks(), debugLog);
+            await playSong(
+                state.currentSong,
+                {
+                    autoplay: true,
+                    startTime: state.currentPlaybackTime,
+                    preserveProgress: true,
+                },
+                state,
+                dom,
+                getAudioCallbacks(),
+                debugLog,
+            );
         } catch (error) {
             console.error("恢复播放失败:", error);
             showNotification("播放失败，请稍后重试", "error", dom);
@@ -669,7 +681,7 @@ export async function togglePlayPause() {
         debugLog(`[播放控制] 恢复播放: ${state.currentSong?.name || "当前歌曲"}`);
         const playPromise = dom.audioPlayer.play();
         if (playPromise !== undefined) {
-            playPromise.catch(error => {
+            playPromise.catch((error) => {
                 console.error("播放失败:", error);
                 debugLog(`[播放异常] 恢复播放被浏览器限制: ${error?.message || error}`);
                 showNotification("播放失败，请检查网络连接", "error", dom);
@@ -704,15 +716,23 @@ function setupEventHandlers() {
 
     // 播放模式与随机
     if (dom.playModeBtn) {
-        dom.playModeBtn.addEventListener("click", () => togglePlayMode(state, dom, { savePlayerState, saveFavoriteState }, isMobileView));
+        dom.playModeBtn.addEventListener("click", () =>
+            togglePlayMode(state, dom, { savePlayerState, saveFavoriteState }, isMobileView),
+        );
     }
     if (dom.shuffleToggleBtn) {
-        dom.shuffleToggleBtn.addEventListener("click", () => toggleShuffleMode(state, dom, { savePlayerState, saveFavoriteState }));
+        dom.shuffleToggleBtn.addEventListener("click", () =>
+            toggleShuffleMode(state, dom, { savePlayerState, saveFavoriteState }),
+        );
     }
 
     // 音量与进度条
     const toggleMute = () => {
-        const currentVolume = Number.isFinite(state.volume) ? state.volume : (dom.audioPlayer ? dom.audioPlayer.volume : 0.8);
+        const currentVolume = Number.isFinite(state.volume)
+            ? state.volume
+            : dom.audioPlayer
+              ? dom.audioPlayer.volume
+              : 0.8;
         if (currentVolume > 0) {
             // 当前非静音 -> 静音并记住当前音量
             state.previousVolume = currentVolume;
@@ -725,7 +745,8 @@ function setupEventHandlers() {
             safeSetLocalStorage("playerVolume", "0");
         } else {
             // 当前静音 -> 恢复之前的音量
-            const restoreVolume = (Number.isFinite(state.previousVolume) && state.previousVolume > 0) ? state.previousVolume : 0.8;
+            const restoreVolume =
+                Number.isFinite(state.previousVolume) && state.previousVolume > 0 ? state.previousVolume : 0.8;
             if (dom.audioPlayer) dom.audioPlayer.volume = restoreVolume;
             state.volume = restoreVolume;
             if (dom.volumeSlider) dom.volumeSlider.value = String(restoreVolume);
@@ -867,7 +888,8 @@ function setupEventHandlers() {
 
                 // 检查 DOM 结果列表中是否已经渲染有条目
                 const listContainer = dom.searchResultsList || dom.searchResults;
-                const hasRenderedItems = listContainer && listContainer.querySelectorAll(".search-result-item").length > 0;
+                const hasRenderedItems =
+                    listContainer && listContainer.querySelectorAll(".search-result-item").length > 0;
                 if (!hasRenderedItems) {
                     restoreLastSearchResults(state, dom, getSearchCallbacks(), { showView: true });
                 } else if (listContainer) {
@@ -1030,12 +1052,15 @@ function setupEventHandlers() {
                         const exists = state.playlistSongs.some((item) => getSongKey(item) === key);
                         if (exists) {
                             if (typeof addBtn.animate === "function") {
-                                addBtn.animate([
-                                    { transform: "translateX(0)" },
-                                    { transform: "translateX(-4px)" },
-                                    { transform: "translateX(4px)" },
-                                    { transform: "translateX(0)" }
-                                ], { duration: 250, easing: "ease-in-out" });
+                                addBtn.animate(
+                                    [
+                                        { transform: "translateX(0)" },
+                                        { transform: "translateX(-4px)" },
+                                        { transform: "translateX(4px)" },
+                                        { transform: "translateX(0)" },
+                                    ],
+                                    { duration: 250, easing: "ease-in-out" },
+                                );
                             }
                             showNotification("播放列表已包含该歌曲", "warning", dom);
                             return;
@@ -1048,11 +1073,10 @@ function setupEventHandlers() {
                         const originalHtml = addBtn.innerHTML;
                         addBtn.innerHTML = '<i class="fas fa-check" style="color: #34c759;"></i>';
                         if (typeof addBtn.animate === "function") {
-                            addBtn.animate([
-                                { transform: "scale(0.8)" },
-                                { transform: "scale(1.2)" },
-                                { transform: "scale(1)" }
-                            ], { duration: 280, easing: "cubic-bezier(0.34, 1.56, 0.64, 1)" });
+                            addBtn.animate(
+                                [{ transform: "scale(0.8)" }, { transform: "scale(1.2)" }, { transform: "scale(1)" }],
+                                { duration: 280, easing: "cubic-bezier(0.34, 1.56, 0.64, 1)" },
+                            );
                         }
                         setTimeout(() => {
                             addBtn.innerHTML = originalHtml;
@@ -1070,13 +1094,14 @@ function setupEventHandlers() {
                         playFavoriteSong: (idx, opts) => playFavoriteSong(idx, opts),
                         setSongAsPending: (song, idx, type) => setSongAsPending(song, idx, type),
                         updatePlayModeUI: () => updatePlayModeUI(state, dom),
-                        resetPlayerToIdle: () => resetPlayerToIdle(state, dom, {
-                            showAlbumCoverPlaceholder: () => showAlbumCoverPlaceholder(dom, state),
-                            clearLyricsContent: () => clearLyricsContent(state, dom, isMobileView),
-                            updateFavoriteIcons: () => updateFavoriteIcons(state, dom),
-                            savePlayerState,
-                        }),
-                        clearLyricsIfLibraryEmpty: () => clearLyricsIfLibraryEmpty(state, dom, isMobileView)
+                        resetPlayerToIdle: () =>
+                            resetPlayerToIdle(state, dom, {
+                                showAlbumCoverPlaceholder: () => showAlbumCoverPlaceholder(dom, state),
+                                clearLyricsContent: () => clearLyricsContent(state, dom, isMobileView),
+                                updateFavoriteIcons: () => updateFavoriteIcons(state, dom),
+                                savePlayerState,
+                            }),
+                        clearLyricsIfLibraryEmpty: () => clearLyricsIfLibraryEmpty(state, dom, isMobileView),
                     });
                     return;
                 }
@@ -1144,7 +1169,7 @@ function setupEventHandlers() {
         dom.importPlaylistInput.addEventListener("change", (e) => {
             handleImportPlaylistChange(e, state, dom, {
                 savePlayerState,
-                renderPlaylist: () => renderPlaylist(state, dom, getPlaylistCallbacks())
+                renderPlaylist: () => renderPlaylist(state, dom, getPlaylistCallbacks()),
             });
         });
     }
@@ -1178,7 +1203,7 @@ function setupEventHandlers() {
         dom.importFavoritesInput.addEventListener("change", (e) => {
             handleImportFavoritesChange(e, state, dom, {
                 saveFavoriteState,
-                renderFavorites: () => renderFavorites(state, dom)
+                renderFavorites: () => renderFavorites(state, dom),
             });
         });
     }
@@ -1188,16 +1213,18 @@ function setupEventHandlers() {
     if (dom.mobileExportFavoritesBtn) {
         dom.mobileExportFavoritesBtn.addEventListener("click", () => exportFavorites(state, dom));
     }
-    const handleClearFavorites = () => clearFavorites(state, dom, {
-        saveFavoriteState,
-        resetPlayerToIdle: () => resetPlayerToIdle(state, dom, {
-            showAlbumCoverPlaceholder: () => showAlbumCoverPlaceholder(dom, state),
-            clearLyricsContent: () => clearLyricsContent(state, dom, isMobileView),
-            updateFavoriteIcons: () => updateFavoriteIcons(state, dom),
-            savePlayerState,
-        }),
-        clearLyricsIfLibraryEmpty: () => clearLyricsIfLibraryEmpty(state, dom, isMobileView)
-    });
+    const handleClearFavorites = () =>
+        clearFavorites(state, dom, {
+            saveFavoriteState,
+            resetPlayerToIdle: () =>
+                resetPlayerToIdle(state, dom, {
+                    showAlbumCoverPlaceholder: () => showAlbumCoverPlaceholder(dom, state),
+                    clearLyricsContent: () => clearLyricsContent(state, dom, isMobileView),
+                    updateFavoriteIcons: () => updateFavoriteIcons(state, dom),
+                    savePlayerState,
+                }),
+            clearLyricsIfLibraryEmpty: () => clearLyricsIfLibraryEmpty(state, dom, isMobileView),
+        });
     if (dom.clearFavoritesBtn) {
         dom.clearFavoritesBtn.addEventListener("click", handleClearFavorites);
     }
@@ -1207,16 +1234,20 @@ function setupEventHandlers() {
 
     // 全部添加到播放列表
     if (dom.addAllFavoritesBtn) {
-        dom.addAllFavoritesBtn.addEventListener("click", () => addAllFavoritesToPlaylist(state, dom, { 
-            renderPlaylist: () => renderPlaylist(state, dom, getPlaylistCallbacks()),
-            savePlayerState 
-        }));
+        dom.addAllFavoritesBtn.addEventListener("click", () =>
+            addAllFavoritesToPlaylist(state, dom, {
+                renderPlaylist: () => renderPlaylist(state, dom, getPlaylistCallbacks()),
+                savePlayerState,
+            }),
+        );
     }
     if (dom.mobileAddAllFavoritesBtn) {
-        dom.mobileAddAllFavoritesBtn.addEventListener("click", () => addAllFavoritesToPlaylist(state, dom, { 
-            renderPlaylist: () => renderPlaylist(state, dom, getPlaylistCallbacks()),
-            savePlayerState 
-        }));
+        dom.mobileAddAllFavoritesBtn.addEventListener("click", () =>
+            addAllFavoritesToPlaylist(state, dom, {
+                renderPlaylist: () => renderPlaylist(state, dom, getPlaylistCallbacks()),
+                savePlayerState,
+            }),
+        );
     }
 
     // 批量导入
@@ -1230,16 +1261,20 @@ function setupEventHandlers() {
         dom.importSelectedBtn.addEventListener("click", () => openImportSelectedMenu(dom));
     }
     if (dom.importToPlaylist) {
-        dom.importToPlaylist.addEventListener("click", () => importSelectedSearchResults("playlist", state, dom, {
-            savePlayerState,
-            renderPlaylist: () => renderPlaylist(state, dom, getPlaylistCallbacks())
-        }));
+        dom.importToPlaylist.addEventListener("click", () =>
+            importSelectedSearchResults("playlist", state, dom, {
+                savePlayerState,
+                renderPlaylist: () => renderPlaylist(state, dom, getPlaylistCallbacks()),
+            }),
+        );
     }
     if (dom.importToFavorites) {
-        dom.importToFavorites.addEventListener("click", () => importSelectedSearchResults("favorites", state, dom, {
-            saveFavoriteState,
-            renderFavorites: () => renderFavorites(state, dom)
-        }));
+        dom.importToFavorites.addEventListener("click", () =>
+            importSelectedSearchResults("favorites", state, dom, {
+                saveFavoriteState,
+                renderFavorites: () => renderFavorites(state, dom),
+            }),
+        );
     }
 
     // 监听移动端抽屉 Tab 切换事件，确保顶栏按钮与列表状态即时刷新
@@ -1258,12 +1293,14 @@ function setupEventHandlers() {
         dom.sourceSelectButton.addEventListener("click", (e) => toggleSourceMenu(e, state, dom, isMobileView));
     }
     if (dom.sourceMenu) {
-        dom.sourceMenu.addEventListener("click", (e) => handleSourceSelection(e, state, dom, {
-            showNotification,
-            onSourceChange: (newSource) => {
-                debugLog(`[音源配置] 已切换音源为: ${newSource} (不自动触发搜索)`);
-            }
-        }));
+        dom.sourceMenu.addEventListener("click", (e) =>
+            handleSourceSelection(e, state, dom, {
+                showNotification,
+                onSourceChange: (newSource) => {
+                    debugLog(`[音源配置] 已切换音源为: ${newSource} (不自动触发搜索)`);
+                },
+            }),
+        );
     }
     if (dom.qualityToggle) {
         dom.qualityToggle.addEventListener("click", (e) => togglePlayerQualityMenu(e, state, dom, isMobileView));
@@ -1272,30 +1309,39 @@ function setupEventHandlers() {
         dom.mobileQualityToggle.addEventListener("click", (e) => togglePlayerQualityMenu(e, state, dom, isMobileView));
     }
     if (dom.playerQualityMenu) {
-        dom.playerQualityMenu.addEventListener("click", (e) => handlePlayerQualitySelection(e, state, dom, {
-            savePlayerState,
-            showNotification,
-            reloadCurrentSong: async () => {
-                if (!state.currentSong) return true;
-                const wasPlaying = !dom.audioPlayer.paused;
-                const targetTime = dom.audioPlayer.currentTime || state.currentPlaybackTime || 0;
-                try {
-                    await playSong(state.currentSong, {
-                        autoplay: wasPlaying,
-                        startTime: targetTime,
-                        preserveProgress: true,
-                    }, state, dom, getAudioCallbacks(), debugLog);
-                    if (!wasPlaying) {
-                        dom.audioPlayer.pause();
-                        updatePlayPauseButton(dom);
+        dom.playerQualityMenu.addEventListener("click", (e) =>
+            handlePlayerQualitySelection(e, state, dom, {
+                savePlayerState,
+                showNotification,
+                reloadCurrentSong: async () => {
+                    if (!state.currentSong) return true;
+                    const wasPlaying = !dom.audioPlayer.paused;
+                    const targetTime = dom.audioPlayer.currentTime || state.currentPlaybackTime || 0;
+                    try {
+                        await playSong(
+                            state.currentSong,
+                            {
+                                autoplay: wasPlaying,
+                                startTime: targetTime,
+                                preserveProgress: true,
+                            },
+                            state,
+                            dom,
+                            getAudioCallbacks(),
+                            debugLog,
+                        );
+                        if (!wasPlaying) {
+                            dom.audioPlayer.pause();
+                            updatePlayPauseButton(dom);
+                        }
+                        return true;
+                    } catch (err) {
+                        console.error("切换音质失败:", err);
+                        return false;
                     }
-                    return true;
-                } catch (err) {
-                    console.error("切换音质失败:", err);
-                    return false;
-                }
-            }
-        }));
+                },
+            }),
+        );
     }
 
     // 关闭搜索结果交互（收起面板，保留输入框关键词与搜索结果缓存）
@@ -1319,16 +1365,21 @@ function setupEventHandlers() {
     document.addEventListener("click", (e) => {
         if (!state.isSearchMode) return;
 
-        const isMobile = isMobileView || document.body?.classList.contains("mobile-view") || document.documentElement?.classList.contains("mobile-view");
+        const isMobile =
+            isMobileView ||
+            document.body?.classList.contains("mobile-view") ||
+            document.documentElement?.classList.contains("mobile-view");
         if (isMobile) {
             return;
         }
 
         // 若点击发生在搜索核心控件内部，不关闭
-        if (e.target.closest(".search-controls-wrapper") ||
+        if (
+            e.target.closest(".search-controls-wrapper") ||
             e.target.closest(".source-menu") ||
             e.target.closest(".import-dropdown-menu") ||
-            e.target.closest(".quality-menu")) {
+            e.target.closest(".quality-menu")
+        ) {
             return;
         }
 
@@ -1352,14 +1403,16 @@ function setupEventHandlers() {
     // 搜索模式快捷键：Ctrl+A / Cmd+A 全选或反选；Escape 优先关闭菜单与清空选择
     document.addEventListener("keydown", (e) => {
         const activeEl = document.activeElement;
-        const isInputActive = activeEl && (
-            activeEl.tagName === "INPUT" ||
-            activeEl.tagName === "TEXTAREA" ||
-            activeEl.isContentEditable
-        );
+        const isInputActive =
+            activeEl && (activeEl.tagName === "INPUT" || activeEl.tagName === "TEXTAREA" || activeEl.isContentEditable);
 
         if ((e.ctrlKey || e.metaKey) && (e.key === "a" || e.key === "A")) {
-            if (!isInputActive && state.isSearchMode && Array.isArray(state.searchResults) && state.searchResults.length > 0) {
+            if (
+                !isInputActive &&
+                state.isSearchMode &&
+                Array.isArray(state.searchResults) &&
+                state.searchResults.length > 0
+            ) {
                 e.preventDefault();
                 toggleSelectAllSearchResults(state, dom);
                 return;
@@ -1388,7 +1441,8 @@ window.hideSearchResults = () => hideSearchResults(state, dom);
 window.playNext = () => playNext(state, dom, getAudioCallbacks());
 window.playPrevious = () => playPrevious(state, dom, getAudioCallbacks());
 window.autoPlayNext = () => autoPlayNext(state, dom, getAudioCallbacks());
-window.restoreLastSearchResults = (options = { showView: true }) => restoreLastSearchResults(state, dom, getSearchCallbacks(), options);
+window.restoreLastSearchResults = (options = { showView: true }) =>
+    restoreLastSearchResults(state, dom, getSearchCallbacks(), options);
 
 // 从云端 D1 数据库应用快照至本地应用状态与 UI
 export async function applyPersistentSnapshotFromRemote(data) {
@@ -1533,7 +1587,7 @@ export async function applyPersistentSnapshotFromRemote(data) {
     validateStateConsistency(dom, {
         debugLog,
         showAlbumCoverPlaceholder: () => showAlbumCoverPlaceholder(dom, state),
-        updatePlayPauseButton: () => updatePlayPauseButton(dom)
+        updatePlayPauseButton: () => updatePlayPauseButton(dom),
     });
 
     // 刷新 UI 渲染
@@ -1550,9 +1604,8 @@ export async function applyPersistentSnapshotFromRemote(data) {
 
     // 恢复当前歌曲与封面
     if (state.currentSong) {
-        const savedTime = state.currentList === "favorite"
-            ? (state.favoritePlaybackTime || 0)
-            : (state.currentPlaybackTime || 0);
+        const savedTime =
+            state.currentList === "favorite" ? state.favoritePlaybackTime || 0 : state.currentPlaybackTime || 0;
 
         if (dom.progressBar) {
             dom.progressBar.value = savedTime;
@@ -1563,11 +1616,18 @@ export async function applyPersistentSnapshotFromRemote(data) {
         updateProgressBarBackground(dom, savedTime, Number(dom.progressBar?.max || 1));
 
         try {
-            await playSong(state.currentSong, {
-                autoplay: false,
-                startTime: savedTime,
-                preserveProgress: true
-            }, state, dom, getAudioCallbacks(), debugLog);
+            await playSong(
+                state.currentSong,
+                {
+                    autoplay: false,
+                    startTime: savedTime,
+                    preserveProgress: true,
+                },
+                state,
+                dom,
+                getAudioCallbacks(),
+                debugLog,
+            );
         } catch (err) {
             console.warn("云端同步后恢复歌曲待播失败，降级展示封面:", err);
             updateCurrentSongInfo(state.currentSong, { loadArtwork: true });
@@ -1589,9 +1649,10 @@ export async function handleManualCloudSync() {
     }
     setRemoteSyncEnabled(true);
     const cloudData = snapshot.data;
-    const hasCloudData = cloudData && typeof cloudData === "object" && Boolean(
-        cloudData.playlistSongs || cloudData.currentSong || cloudData.favoriteSongs
-    );
+    const hasCloudData =
+        cloudData &&
+        typeof cloudData === "object" &&
+        Boolean(cloudData.playlistSongs || cloudData.currentSong || cloudData.favoriteSongs);
 
     if (hasCloudData) {
         await applyPersistentSnapshotFromRemote(cloudData);
@@ -1606,7 +1667,11 @@ window.syncFromCloud = handleManualCloudSync;
 
 // 应用启动引导
 export async function bootstrap() {
-    validateStateConsistency(dom, { debugLog, showAlbumCoverPlaceholder: () => showAlbumCoverPlaceholder(dom, state), updatePlayPauseButton: () => updatePlayPauseButton(dom) });
+    validateStateConsistency(dom, {
+        debugLog,
+        showAlbumCoverPlaceholder: () => showAlbumCoverPlaceholder(dom, state),
+        updatePlayPauseButton: () => updatePlayPauseButton(dom),
+    });
 
     setupEventHandlers();
     initTheme(dom, state);
@@ -1616,7 +1681,7 @@ export async function bootstrap() {
         playNext: () => playNext(state, dom, getAudioCallbacks()),
         playPrevious: () => playPrevious(state, dom, getAudioCallbacks()),
         autoPlayNext: () => autoPlayNext(state, dom, getAudioCallbacks()),
-        updatePlayPauseButton: () => updatePlayPauseButton(dom)
+        updatePlayPauseButton: () => updatePlayPauseButton(dom),
     });
 
     // 渲染初始界面
@@ -1649,9 +1714,8 @@ export async function bootstrap() {
     }
 
     if (state.currentSong) {
-        const savedTime = state.currentList === "favorite"
-            ? (state.favoritePlaybackTime || 0)
-            : (state.currentPlaybackTime || 0);
+        const savedTime =
+            state.currentList === "favorite" ? state.favoritePlaybackTime || 0 : state.currentPlaybackTime || 0;
 
         dom.progressBar.value = savedTime;
         dom.currentTimeDisplay.textContent = formatTime(savedTime);
@@ -1684,9 +1748,10 @@ export async function bootstrap() {
         if (snapshot && snapshot.d1Available) {
             setRemoteSyncEnabled(true);
             const cloudData = snapshot.data;
-            const hasCloudData = cloudData && typeof cloudData === "object" && Boolean(
-                cloudData.playlistSongs || cloudData.currentSong || cloudData.favoriteSongs
-            );
+            const hasCloudData =
+                cloudData &&
+                typeof cloudData === "object" &&
+                Boolean(cloudData.playlistSongs || cloudData.currentSong || cloudData.favoriteSongs);
 
             if (hasCloudData) {
                 debugLog("检测到 D1 云端数据库快照，正在漫游恢复播放状态与歌曲列表...");

@@ -8,7 +8,7 @@ import {
     LAST_SEARCH_STATE_STORAGE_KEY,
     SOURCE_OPTIONS,
     EXPLORE_RADAR_GENRES,
-    DEFAULT_RADAR_GENRES
+    DEFAULT_RADAR_GENRES,
 } from "./constants.js";
 import {
     safeGetLocalStorage,
@@ -16,7 +16,7 @@ import {
     safeRemoveLocalStorage,
     parseJSON,
     cloneSearchResults,
-    sanitizeStoredSearchState
+    sanitizeStoredSearchState,
 } from "./core/storage.js";
 
 // 1. 初始化读取本地缓存状态
@@ -111,7 +111,7 @@ const savedRadarSettings = (() => {
     const stored = safeGetLocalStorage("radarSettings");
     const parsed = parseJSON(stored, null);
     if (parsed && Array.isArray(parsed.genres)) {
-        const valid = parsed.genres.filter(g => EXPLORE_RADAR_GENRES.includes(g));
+        const valid = parsed.genres.filter((g) => EXPLORE_RADAR_GENRES.includes(g));
         if (valid.length > 0) return { genres: valid };
     }
     return { genres: [...DEFAULT_RADAR_GENRES] };
@@ -166,7 +166,7 @@ export const state = {
     pendingPaletteImmediate: false,
     pendingPaletteReady: false,
     audioReadyForPalette: true,
-    currentGradient: '',
+    currentGradient: "",
     isMobileInlineLyricsOpen: false,
     selectedSearchResults: new Set(),
 };
@@ -177,10 +177,10 @@ export const state = {
  */
 export function validateStateConsistency(dom = null, callbacks = {}) {
     const isPlaylistEmpty = () => {
-        if (state.currentPlaylist === 'playlist') return state.playlistSongs.length === 0;
-        if (state.currentPlaylist === 'favorites') return state.favoriteSongs.length === 0;
-        if (state.currentPlaylist === 'search') return state.searchResults.length === 0;
-        if (state.currentPlaylist === 'online') return state.onlineSongs.length === 0;
+        if (state.currentPlaylist === "playlist") return state.playlistSongs.length === 0;
+        if (state.currentPlaylist === "favorites") return state.favoriteSongs.length === 0;
+        if (state.currentPlaylist === "search") return state.searchResults.length === 0;
+        if (state.currentPlaylist === "online") return state.onlineSongs.length === 0;
         return false;
     };
 
@@ -190,10 +190,10 @@ export function validateStateConsistency(dom = null, callbacks = {}) {
         state.currentTrackIndex = -1;
         state.currentAudioUrl = null;
         state.currentPlaybackTime = 0;
-        
+
         safeRemoveLocalStorage("currentSong", { skipRemote: true });
         safeSetLocalStorage("currentTrackIndex", "-1", { skipRemote: true });
-        
+
         if (dom) {
             if (dom.currentSongTitle) dom.currentSongTitle.textContent = "选择一首歌曲开始播放";
             if (dom.currentSongArtist) dom.currentSongArtist.textContent = "未知艺术家";

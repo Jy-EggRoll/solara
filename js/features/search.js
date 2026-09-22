@@ -3,7 +3,12 @@
  */
 
 import { API, normalizeSource, LAST_SEARCH_STATE_STORAGE_KEY } from "../constants.js";
-import { safeSetLocalStorage, safeGetLocalStorage, cloneSearchResults, sanitizeStoredSearchState } from "../core/storage.js";
+import {
+    safeSetLocalStorage,
+    safeGetLocalStorage,
+    cloneSearchResults,
+    sanitizeStoredSearchState,
+} from "../core/storage.js";
 import { getSongKey, sanitizeImportedSong } from "./playlist.js";
 import { ensureFavoriteSongsArray } from "./favorites.js";
 import { showNotification } from "./settings.js";
@@ -64,10 +69,16 @@ export function restoreLastSearchResults(state, dom, callbacks = {}, options = {
             }
         }
 
-        displaySearchResults(restored.results, {
-            reset: true,
-            totalCount: restored.results.length
-        }, state, dom, callbacks);
+        displaySearchResults(
+            restored.results,
+            {
+                reset: true,
+                totalCount: restored.results.length,
+            },
+            state,
+            dom,
+            callbacks,
+        );
 
         // 如果未指定展开视图（例如页面启动静默数据恢复），绝不切换到 search-mode 隐藏封面主舞台
         const shouldShowView = options.showView !== false;
@@ -162,7 +173,9 @@ export function updateSelectAllMenuItem(state, dom) {
 
     const badge = dom.selectAllShortcutBadge;
     if (badge) {
-        const isMac = typeof navigator !== "undefined" && /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform || navigator.userAgent);
+        const isMac =
+            typeof navigator !== "undefined" &&
+            /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform || navigator.userAgent);
         badge.textContent = isMac ? "⌘A" : "Ctrl+A";
     }
 }
@@ -221,7 +234,7 @@ export function resetSelectedSearchResults(state, dom) {
     }
     const indices = Array.from(state.selectedSearchResults);
     state.selectedSearchResults.clear();
-    indices.forEach(idx => updateSearchResultSelectionUI(idx, state, dom));
+    indices.forEach((idx) => updateSearchResultSelectionUI(idx, state, dom));
     updateImportSelectedButton(state, dom);
 }
 
@@ -304,9 +317,7 @@ export function createSearchResultItem(song, index, state, dom, callbacks = {}) 
 
     const artist = document.createElement("div");
     artist.className = "search-result-artist";
-    const artistName = Array.isArray(song.artist)
-        ? song.artist.join(', ')
-        : (song.artist || "未知艺术家");
+    const artistName = Array.isArray(song.artist) ? song.artist.join(", ") : song.artist || "未知艺术家";
     const albumText = song.album ? ` - ${song.album}` : "";
     artist.textContent = `${artistName}${albumText}`;
 
@@ -400,7 +411,8 @@ export function displaySearchResults(results, options = {}, state, dom, callback
         loadMoreBtn.id = "loadMoreBtn";
         loadMoreBtn.className = "load-more-btn";
         loadMoreBtn.type = "button";
-        loadMoreBtn.innerHTML = '<svg class="apple-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span>加载更多</span>';
+        loadMoreBtn.innerHTML =
+            '<svg class="apple-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span>加载更多</span>';
         loadMoreBtn.addEventListener("click", (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -466,7 +478,8 @@ export async function performSearch(isLiveSearch = false, state, dom, callbacks 
         }
         const log = (msg) => {
             if (typeof debugLogger === "function") debugLogger(msg);
-            else if (typeof window !== "undefined" && typeof window.__solaraDebugLog === "function") window.__solaraDebugLog(msg);
+            else if (typeof window !== "undefined" && typeof window.__solaraDebugLog === "function")
+                window.__solaraDebugLog(msg);
         };
 
         log(`[搜索发起] 关键词: "${query}", 音源: ${source}, 页码: ${state.searchPage}`);
@@ -486,10 +499,16 @@ export async function performSearch(isLiveSearch = false, state, dom, callbacks 
 
         state.hasMoreResults = results.length === 20;
 
-        displaySearchResults(results, {
-            reset: state.searchPage === 1,
-            totalCount: state.searchResults.length,
-        }, state, dom, callbacks);
+        displaySearchResults(
+            results,
+            {
+                reset: state.searchPage === 1,
+                totalCount: state.searchResults.length,
+            },
+            state,
+            dom,
+            callbacks,
+        );
         persistLastSearchState(state);
         log(`[搜索完成] 当前已呈现 ${state.searchResults.length} 首歌曲结果`);
 
@@ -503,7 +522,8 @@ export async function performSearch(isLiveSearch = false, state, dom, callbacks 
         hideSearchResults(state, dom);
         const logErr = (msg) => {
             if (typeof debugLogger === "function") debugLogger(msg);
-            else if (typeof window !== "undefined" && typeof window.__solaraDebugLog === "function") window.__solaraDebugLog(msg);
+            else if (typeof window !== "undefined" && typeof window.__solaraDebugLog === "function")
+                window.__solaraDebugLog(msg);
         };
         logErr(`[搜索异常] 出错: ${error.message || error}`);
     } finally {
@@ -511,7 +531,8 @@ export async function performSearch(isLiveSearch = false, state, dom, callbacks 
             listContainer.classList.remove("is-searching");
         }
         dom.searchBtn.disabled = false;
-        dom.searchBtn.innerHTML = '<svg class="apple-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg><span>搜索</span>';
+        dom.searchBtn.innerHTML =
+            '<svg class="apple-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg><span>搜索</span>';
     }
 }
 
@@ -538,9 +559,15 @@ export async function loadMoreResults(state, dom, callbacks = {}, debugLogger = 
         if (results.length > 0) {
             state.searchResults = [...state.searchResults, ...results];
             state.hasMoreResults = results.length === 20;
-            displaySearchResults(results, {
-                totalCount: state.searchResults.length,
-            }, state, dom, callbacks);
+            displaySearchResults(
+                results,
+                {
+                    totalCount: state.searchResults.length,
+                },
+                state,
+                dom,
+                callbacks,
+            );
             persistLastSearchState(state);
         } else {
             state.hasMoreResults = false;
@@ -553,7 +580,8 @@ export async function loadMoreResults(state, dom, callbacks = {}, debugLogger = 
     } finally {
         if (loadMoreBtn) {
             loadMoreBtn.disabled = false;
-            loadMoreBtn.innerHTML = '<svg class="apple-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span>加载更多</span>';
+            loadMoreBtn.innerHTML =
+                '<svg class="apple-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span>加载更多</span>';
         }
     }
 }
@@ -581,14 +609,12 @@ export function importSelectedSearchResults(target = "playlist", state, dom, cal
 
     const processedIndices = [...indices];
     state.selectedSearchResults.clear();
-    processedIndices.forEach(idx => updateSearchResultSelectionUI(idx, state, dom));
+    processedIndices.forEach((idx) => updateSearchResultSelectionUI(idx, state, dom));
     updateImportSelectedButton(state, dom);
 
     if (target === "favorites") {
         const favorites = ensureFavoriteSongsArray(state);
-        const existingKeys = new Set(
-            favorites.map(getSongKey).filter((key) => typeof key === "string" && key !== "")
-        );
+        const existingKeys = new Set(favorites.map(getSongKey).filter((key) => typeof key === "string" && key !== ""));
 
         let added = 0;
         let duplicates = 0;
@@ -620,7 +646,7 @@ export function importSelectedSearchResults(target = "playlist", state, dom, cal
             state.playlistSongs = [];
         }
         const existingKeys = new Set(
-            state.playlistSongs.map(getSongKey).filter((key) => typeof key === "string" && key !== "")
+            state.playlistSongs.map(getSongKey).filter((key) => typeof key === "string" && key !== ""),
         );
 
         let added = 0;
@@ -684,4 +710,3 @@ export function clearSearchResults(state, dom) {
         dom.searchClearBtn.style.display = "none";
     }
 }
-

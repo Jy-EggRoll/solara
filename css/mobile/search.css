@@ -41,7 +41,9 @@ body.mobile-view .search-area {
     transform: translateY(-100%);
     opacity: 0;
     pointer-events: none;
-    transition: transform 0.34s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.22s ease;
+    transition:
+        transform 0.34s cubic-bezier(0.16, 1, 0.3, 1),
+        opacity 0.22s ease;
     overflow: hidden;
 }
 
@@ -115,7 +117,9 @@ body.mobile-view .mobile-close-btn {
     justify-content: center;
     cursor: pointer;
     touch-action: manipulation;
-    transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), background 0.15s ease;
+    transition:
+        transform 0.15s cubic-bezier(0.16, 1, 0.3, 1),
+        background 0.15s ease;
     box-shadow: none !important;
     flex-shrink: 0;
 }
@@ -158,7 +162,10 @@ body.mobile-view .search-bar-unified {
     padding: 0 8px 0 12px !important;
     box-sizing: border-box;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
     gap: 8px;
 }
 
@@ -253,7 +260,9 @@ body.mobile-view .search-clear-btn {
     cursor: pointer;
     padding: 0;
     flex-shrink: 0;
-    transition: transform 0.15s ease, color 0.15s ease;
+    transition:
+        transform 0.15s ease,
+        color 0.15s ease;
 }
 
 body.mobile-view .search-clear-btn:active {
@@ -347,8 +356,14 @@ body.mobile-view .source-menu.show {
 }
 
 @keyframes mobileMenuFadeIn {
-    from { opacity: 0; transform: translateY(-6px) scale(0.96); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
+    from {
+        opacity: 0;
+        transform: translateY(-6px) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 body.mobile-view .source-menu-item,
@@ -368,7 +383,9 @@ body.mobile-view .source-option {
     -webkit-tap-highlight-color: transparent;
     user-select: none;
     -webkit-user-select: none;
-    transition: background 0.15s ease, color 0.15s ease;
+    transition:
+        background 0.15s ease,
+        color 0.15s ease;
     text-align: left;
 }
 
@@ -496,7 +513,9 @@ body.mobile-view .search-result-item {
     touch-action: manipulation;
     user-select: none;
     -webkit-user-select: none;
-    transition: transform 0.16s cubic-bezier(0.16, 1, 0.3, 1), background 0.15s ease;
+    transition:
+        transform 0.16s cubic-bezier(0.16, 1, 0.3, 1),
+        background 0.15s ease;
 }
 
 body.mobile-view.dark-mode .search-result-item {
@@ -621,7 +640,9 @@ body.mobile-view .search-result-actions .action-btn {
     cursor: pointer;
     touch-action: manipulation;
     padding: 0;
-    transition: transform 0.16s cubic-bezier(0.16, 1, 0.3, 1), background 0.15s ease;
+    transition:
+        transform 0.16s cubic-bezier(0.16, 1, 0.3, 1),
+        background 0.15s ease;
 }
 
 body.mobile-view.dark-mode .search-result-actions .action-btn {
@@ -729,10 +750,14 @@ body.mobile-view .import-selected-btn {
     justify-content: center;
     gap: 8px;
     border: none !important;
-    box-shadow: 0 6px 20px rgba(253, 126, 20, 0.35), 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+    box-shadow:
+        0 6px 20px rgba(253, 126, 20, 0.35),
+        0 2px 6px rgba(0, 0, 0, 0.08) !important;
     cursor: pointer;
     touch-action: manipulation;
-    transition: transform 0.16s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+    transition:
+        transform 0.16s cubic-bezier(0.16, 1, 0.3, 1),
+        box-shadow 0.2s ease;
 }
 
 body.mobile-view .import-selected-btn:active {
@@ -809,7 +834,9 @@ body.mobile-view .import-dropdown-item {
     justify-content: center;
     cursor: pointer;
     touch-action: manipulation;
-    transition: background 0.15s ease, color 0.15s ease;
+    transition:
+        background 0.15s ease,
+        color 0.15s ease;
 }
 
 body.mobile-view.dark-mode .import-dropdown-item {
@@ -820,8 +847,6 @@ body.mobile-view .import-dropdown-item:active {
     background: var(--primary-color, #10a37f) !important;
     color: #ffffff !important;
 }
-
-
 
 /* 单首歌曲卡片 */
 body.mobile-view .search-result-item {
@@ -837,7 +862,11 @@ body.mobile-view .search-result-item {
     touch-action: manipulation;
     user-select: none;
     -webkit-user-select: none;
-    transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    transition:
+        transform 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+        background 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
 body.mobile-view.dark-mode .search-result-item {
@@ -962,7 +991,10 @@ body.mobile-view .search-result-actions .action-btn {
     cursor: pointer;
     touch-action: manipulation;
     padding: 0;
-    transition: transform 0.16s cubic-bezier(0.16, 1, 0.3, 1), background 0.15s ease, color 0.15s ease;
+    transition:
+        transform 0.16s cubic-bezier(0.16, 1, 0.3, 1),
+        background 0.15s ease,
+        color 0.15s ease;
 }
 
 body.mobile-view.dark-mode .search-result-actions .action-btn {
@@ -1005,7 +1037,9 @@ body.mobile-view .load-more-btn {
     margin-top: 4px;
     /* 底部留直确保可被滚动到导入按鈕上方 */
     margin-bottom: 8px;
-    transition: transform 0.15s ease, background 0.15s ease;
+    transition:
+        transform 0.15s ease,
+        background 0.15s ease;
 }
 
 body.mobile-view.dark-mode .load-more-btn {
@@ -1035,7 +1069,9 @@ body.mobile-view .import-dropdown-item {
     justify-content: center;
     cursor: pointer;
     touch-action: manipulation;
-    transition: background 0.15s ease, color 0.15s ease;
+    transition:
+        background 0.15s ease,
+        color 0.15s ease;
 }
 
 body.mobile-view.dark-mode .import-dropdown-item {
@@ -1046,7 +1082,6 @@ body.mobile-view .import-dropdown-item:active {
     background: var(--primary-color, #10a37f);
     color: #ffffff;
 }
-
 
 /* ─── 搜索面板底部原生 Apple 药丸抓手 (Bottom Dismiss Handle) ───────────── */
 
@@ -1090,7 +1125,10 @@ body.mobile-view .mobile-search-handle::after {
     height: 4.5px;
     border-radius: 999px;
     background: rgba(120, 120, 128, 0.35);
-    transition: width 0.22s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease, opacity 0.2s ease;
+    transition:
+        width 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+        background-color 0.2s ease,
+        opacity 0.2s ease;
 }
 
 body.mobile-view.dark-mode .mobile-search-handle::after {

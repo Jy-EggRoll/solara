@@ -2,24 +2,9 @@
  * Solara Apple Music 极光流体舞台与动态材质渐变渲染引擎
  */
 
-import {
-    BACKGROUND_TRANSITION_DURATION,
-    PALETTE_APPLY_DELAY,
-    themeDefaults,
-    PLACEHOLDER_HTML
-} from "../constants.js";
-import {
-    preferHttpsUrl,
-    toAbsoluteUrl,
-    safeGetLocalStorage,
-    safeSetLocalStorage
-} from "../core/storage.js";
-import {
-    paletteCache,
-    persistPaletteCache,
-    fetchPaletteData,
-    extractPaletteFromCanvas
-} from "./palette.js";
+import { BACKGROUND_TRANSITION_DURATION, PALETTE_APPLY_DELAY, themeDefaults, PLACEHOLDER_HTML } from "../constants.js";
+import { preferHttpsUrl, toAbsoluteUrl, safeGetLocalStorage, safeSetLocalStorage } from "../core/storage.js";
+import { paletteCache, persistPaletteCache, fetchPaletteData, extractPaletteFromCanvas } from "./palette.js";
 
 let paletteAbortController = null;
 let backgroundTransitionTimer = null;
@@ -54,14 +39,16 @@ export function captureThemeDefaults(state) {
         return;
     }
 
-    const initialIsDark = document.documentElement.classList.contains("dark-mode") || (document.body && document.body.classList.contains("dark-mode"));
+    const initialIsDark =
+        document.documentElement.classList.contains("dark-mode") ||
+        (document.body && document.body.classList.contains("dark-mode"));
     document.documentElement.classList.remove("dark-mode");
     if (document.body) document.body.classList.remove("dark-mode");
 
     const oldBg = document.documentElement.style.getPropertyValue("--bg-gradient");
     const oldPrimary = document.documentElement.style.getPropertyValue("--primary-color");
     const oldPrimaryDark = document.documentElement.style.getPropertyValue("--primary-color-dark");
-    
+
     document.documentElement.style.removeProperty("--bg-gradient");
     document.documentElement.style.removeProperty("--primary-color");
     document.documentElement.style.removeProperty("--primary-color-dark");
@@ -201,13 +188,7 @@ export function applyDynamicGradient(state, dom, options = {}) {
         if (gradientInfo && Array.isArray(gradientInfo.colors) && gradientInfo.colors.length >= 3) {
             const colors = gradientInfo.colors;
             const accent = palette.accentColor || palette.baseColor || colors[0];
-            targetColors = [
-                colors[0],
-                colors[1],
-                colors[2],
-                palette.averageColor || colors[0],
-                accent
-            ];
+            targetColors = [colors[0], colors[1], colors[2], palette.averageColor || colors[0], accent];
         }
 
         if (palette.tokens) {
@@ -218,7 +199,8 @@ export function applyDynamicGradient(state, dom, options = {}) {
     const syncSystemThemeColor = () => {
         const themeColor = isDark ? "#06070a" : "#f5f7fa";
         try {
-            let metaTheme = document.getElementById("metaThemeColor") || document.querySelector('meta[name="theme-color"]');
+            let metaTheme =
+                document.getElementById("metaThemeColor") || document.querySelector('meta[name="theme-color"]');
             if (!metaTheme) {
                 metaTheme = document.createElement("meta");
                 metaTheme.name = "theme-color";
@@ -385,7 +367,8 @@ export async function updateDynamicBackground(imageUrl, state, dom, debugLogger 
 
     const log = (msg) => {
         if (typeof debugLogger === "function") debugLogger(msg);
-        else if (typeof window !== "undefined" && typeof window.__solaraDebugLog === "function") window.__solaraDebugLog(msg);
+        else if (typeof window !== "undefined" && typeof window.__solaraDebugLog === "function")
+            window.__solaraDebugLog(msg);
     };
 
     log(`[极光背景] 准备提取封面色彩: ${imageUrl.slice(0, 50)}...`);
@@ -510,9 +493,9 @@ export function scheduleDeferredPaletteUpdate(imageUrl, state, dom, options = {}
 export function showAlbumCoverPlaceholder(dom, state) {
     dom.albumCover.innerHTML = PLACEHOLDER_HTML;
     dom.albumCover.classList.remove("loading");
-    state.currentArtworkUrl = toAbsoluteUrl('/favicon.png');
+    state.currentArtworkUrl = toAbsoluteUrl("/favicon.png");
     queueDefaultPalette(state, dom);
-    if (typeof window.__SOLARA_UPDATE_MEDIA_METADATA === 'function') {
+    if (typeof window.__SOLARA_UPDATE_MEDIA_METADATA === "function") {
         window.__SOLARA_UPDATE_MEDIA_METADATA();
     }
 }
@@ -522,7 +505,7 @@ export function setAlbumCoverImage(url, dom, state) {
     state.currentArtworkUrl = safeUrl;
     dom.albumCover.innerHTML = `<img src="${safeUrl}" alt="专辑封面">`;
     dom.albumCover.classList.remove("loading");
-    if (typeof window.__SOLARA_UPDATE_MEDIA_METADATA === 'function') {
+    if (typeof window.__SOLARA_UPDATE_MEDIA_METADATA === "function") {
         window.__SOLARA_UPDATE_MEDIA_METADATA();
     }
 }

@@ -40,10 +40,12 @@ export function initBottomSheetGestures() {
     function onPointerDown(e) {
         if (e.pointerType === "mouse" && e.button !== 0) return;
         // 关键：阻断按钮、输入框、分段控制器Tab栏以及顶部操作栏的手势拖拽，防止点击误捕获
-        if (e.target.closest("button") || 
-            e.target.closest("input") || 
-            e.target.closest(".playlist-tabs") || 
-            e.target.closest(".mobile-panel-actions")) {
+        if (
+            e.target.closest("button") ||
+            e.target.closest("input") ||
+            e.target.closest(".playlist-tabs") ||
+            e.target.closest(".mobile-panel-actions")
+        ) {
             return;
         }
 
@@ -80,7 +82,7 @@ export function initBottomSheetGestures() {
 
         const scrim = $("mobileOverlayScrim");
         if (scrim && newTranslateY > 0) {
-            const ratio = Math.max(0, 1 - (newTranslateY / (panel.clientHeight * 0.7)));
+            const ratio = Math.max(0, 1 - newTranslateY / (panel.clientHeight * 0.7));
             scrim.style.opacity = String(ratio);
         }
     }
@@ -110,7 +112,7 @@ export function initBottomSheetGestures() {
 
         // Apple 指数衰减动量投射落点 (Momentum Projection)
         const projectedDisplacement = (releaseVelocity / 1000) * (0.998 / (1 - 0.998));
-        const projectedLanding = currentPos + (projectedDisplacement * 0.05);
+        const projectedLanding = currentPos + projectedDisplacement * 0.05;
 
         panel.style.transition = "transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)";
         const scrim = $("mobileOverlayScrim");
@@ -121,11 +123,11 @@ export function initBottomSheetGestures() {
 
         // 关键手势门限：总位移必须大于 48px 的有效向下滑动，杜绝原地轻敲微颤被速度误杀
         const hasEffectiveDownwardDrag = totalDeltaY > 48;
-        const shouldClose = hasEffectiveDownwardDrag && (
-            releaseVelocity > 600 || 
-            (releaseVelocity > 0 && currentPos > panelHeight * 0.35) ||
-            (projectedLanding > panelHeight * 0.5)
-        );
+        const shouldClose =
+            hasEffectiveDownwardDrag &&
+            (releaseVelocity > 600 ||
+                (releaseVelocity > 0 && currentPos > panelHeight * 0.35) ||
+                projectedLanding > panelHeight * 0.5);
 
         if (shouldClose) {
             closeMobilePanel();
@@ -248,4 +250,3 @@ export function initSearchPanelGestures() {
     handle.addEventListener("pointerup", onPointerUp, { passive: true });
     handle.addEventListener("pointercancel", onPointerUp, { passive: true });
 }
-

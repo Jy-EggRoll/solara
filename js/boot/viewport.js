@@ -15,7 +15,7 @@
 
         const isInputActive = Boolean(
             document.activeElement &&
-                (document.activeElement.tagName === "INPUT" || document.activeElement.tagName === "TEXTAREA"),
+            (document.activeElement.tagName === "INPUT" || document.activeElement.tagName === "TEXTAREA"),
         );
         const keyboardHeight = Math.max(0, winH - currentH);
         const isKeyboardOpen = isInputActive && keyboardHeight > 120;

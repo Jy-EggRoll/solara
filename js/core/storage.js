@@ -2,12 +2,7 @@
  * Solara 本地与云端持久化存储层 (LocalStorage + Cloudflare D1 / SQLite Storage API)
  */
 
-import {
-    REMOTE_STORAGE_ENDPOINT,
-    STORAGE_KEYS_TO_SYNC,
-    PALETTE_STORAGE_KEY,
-    API
-} from "../constants.js";
+import { REMOTE_STORAGE_ENDPOINT, STORAGE_KEYS_TO_SYNC, PALETTE_STORAGE_KEY, API } from "../constants.js";
 
 let remoteSyncEnabled = false;
 

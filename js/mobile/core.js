@@ -24,7 +24,7 @@ export function updateMobileOverlayScrim() {
     if (!scrim || !document.body) {
         return;
     }
-    const hasOverlay = document.body.classList.contains("mobile-search-open") ||
-        document.body.classList.contains("mobile-panel-open");
+    const hasOverlay =
+        document.body.classList.contains("mobile-search-open") || document.body.classList.contains("mobile-panel-open");
     scrim.setAttribute("aria-hidden", hasOverlay ? "false" : "true");
 }

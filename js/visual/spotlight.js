@@ -9,22 +9,26 @@ export function initSpotlightEffect() {
     }
 
     let ticking = false;
-    window.addEventListener("mousemove", (e) => {
-        if (!ticking) {
-            window.requestAnimationFrame(() => {
-                const elements = document.querySelectorAll(".spotlight-card, .container");
-                elements.forEach((el) => {
-                    const rect = el.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    const y = e.clientY - rect.top;
-                    el.style.setProperty("--mouse-x", `${x}px`);
-                    el.style.setProperty("--mouse-y", `${y}px`);
+    window.addEventListener(
+        "mousemove",
+        (e) => {
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    const elements = document.querySelectorAll(".spotlight-card, .container");
+                    elements.forEach((el) => {
+                        const rect = el.getBoundingClientRect();
+                        const x = e.clientX - rect.left;
+                        const y = e.clientY - rect.top;
+                        el.style.setProperty("--mouse-x", `${x}px`);
+                        el.style.setProperty("--mouse-y", `${y}px`);
+                    });
+                    ticking = false;
                 });
-                ticking = false;
-            });
-            ticking = true;
-        }
-    }, { passive: true });
+                ticking = true;
+            }
+        },
+        { passive: true },
+    );
 }
 
 function formatDebugEntry(container, message) {
@@ -134,9 +138,7 @@ function setupDraggableAndCollapsible(dom) {
 
     // 1. 折叠 / 展开横条逻辑
     const toggleMinimize = (forceState) => {
-        const isMinimized = typeof forceState === "boolean" 
-            ? forceState 
-            : !debugBox.classList.contains("minimized");
+        const isMinimized = typeof forceState === "boolean" ? forceState : !debugBox.classList.contains("minimized");
 
         debugBox.classList.toggle("minimized", isMinimized);
         if (minimizeBtn) {

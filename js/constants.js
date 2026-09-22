@@ -2,11 +2,7 @@
  * Solara 全局常量与配置
  */
 
-export const DEFAULT_RADAR_GENRES = [
-    "热歌榜",
-    "新歌榜",
-    "飙升榜",
-];
+export const DEFAULT_RADAR_GENRES = ["热歌榜", "新歌榜", "飙升榜"];
 
 export const EXPLORE_RADAR_GENRES = [
     "热歌榜",
@@ -22,7 +18,7 @@ export const SOURCE_OPTIONS = [
     { value: "netease", label: "网易云音乐" },
     { value: "kuwo", label: "酷我音乐" },
     { value: "joox", label: "JOOX音乐" },
-    { value: "bilibili", label: "哔哩哔哩" }
+    { value: "bilibili", label: "哔哩哔哩" },
 ];
 
 export const RADAR_PLAYLISTS = [
@@ -32,11 +28,11 @@ export const RADAR_PLAYLISTS = [
     { id: "13372522766", name: "潮流风向榜", description: "网易云音乐官方潮流风向榜" },
     { id: "2884035", name: "原创榜", description: "网易云音乐官方原创榜" },
     { id: "14028249541", name: "网易云全球说唱榜", description: "网易云音乐全球说唱榜" },
-    { id: "60198", name: "美国Billboard榜", description: "网易云音乐美国Billboard榜" }
+    { id: "60198", name: "美国Billboard榜", description: "网易云音乐美国Billboard榜" },
 ];
 
 export function normalizeSource(value) {
-    const allowed = SOURCE_OPTIONS.map(option => option.value);
+    const allowed = SOURCE_OPTIONS.map((option) => option.value);
     return allowed.includes(value) ? value : SOURCE_OPTIONS[0].value;
 }
 
@@ -44,11 +40,11 @@ export const QUALITY_OPTIONS = [
     { value: "128", label: "标准音质", description: "128 kbps" },
     { value: "192", label: "高品音质", description: "192 kbps" },
     { value: "320", label: "极高音质", description: "320 kbps" },
-    { value: "999", label: "无损音质", description: "FLAC" }
+    { value: "999", label: "无损音质", description: "FLAC" },
 ];
 
 export function normalizeQuality(value) {
-    const match = QUALITY_OPTIONS.find(option => option.value === value);
+    const match = QUALITY_OPTIONS.find((option) => option.value === value);
     return match ? match.value : "320";
 }
 
@@ -95,7 +91,7 @@ export const themeDefaults = {
         gradient: "",
         primaryColor: "",
         primaryColorDark: "",
-    }
+    },
 };
 
 /**
@@ -112,7 +108,7 @@ export const API = {
         try {
             const response = await fetch(url, {
                 headers: {
-                    "Accept": "application/json",
+                    Accept: "application/json",
                 },
             });
 
@@ -155,7 +151,7 @@ export const API = {
 
             if (!Array.isArray(data)) throw new Error("搜索结果格式错误");
 
-            return data.map(song => ({
+            return data.map((song) => ({
                 id: song.id,
                 name: song.name,
                 artist: song.artist,
@@ -204,18 +200,23 @@ export const API = {
 
         try {
             const data = await API.fetchJson(url);
-            const tracks = data && data.playlist && Array.isArray(data.playlist.tracks)
-                ? data.playlist.tracks.slice(0, limit)
-                : [];
+            const tracks =
+                data && data.playlist && Array.isArray(data.playlist.tracks)
+                    ? data.playlist.tracks.slice(0, limit)
+                    : [];
 
             if (tracks.length === 0) throw new Error("No tracks found");
 
-            return tracks.map(track => {
-                const directPicUrl = track.al?.picUrl || (typeof track.al?.pic === "string" && track.al.pic.startsWith("http") ? track.al.pic : "");
+            return tracks.map((track) => {
+                const directPicUrl =
+                    track.al?.picUrl ||
+                    (typeof track.al?.pic === "string" && track.al.pic.startsWith("http") ? track.al.pic : "");
                 return {
                     id: track.id,
                     name: track.name,
-                    artist: Array.isArray(track.ar) ? track.ar.map(artist => artist.name).join(" / ") : (track.ar?.name || "未知艺术家"),
+                    artist: Array.isArray(track.ar)
+                        ? track.ar.map((artist) => artist.name).join(" / ")
+                        : track.ar?.name || "未知艺术家",
                     album: track.al?.name || "",
                     source: "netease",
                     lyric_id: track.id,
@@ -243,7 +244,7 @@ export const API = {
     getPicUrl: (song) => {
         const signature = API.generateSignature();
         return `${API.baseUrl}?types=pic&id=${song.pic_id}&source=${song.source || "netease"}&size=300&s=${signature}`;
-    }
+    },
 };
 
 Object.freeze(API);

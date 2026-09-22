@@ -26,15 +26,19 @@ body.mobile-view #notification {
     overflow-wrap: anywhere;
     color: #1d1d1f;
     z-index: 1000;
-    
+
     background: rgba(255, 255, 255, 0.92);
     backdrop-filter: blur(28px) saturate(190%);
     -webkit-backdrop-filter: blur(28px) saturate(190%);
     border: 1px solid rgba(0, 0, 0, 0.08);
     border-top: 1px solid rgba(255, 255, 255, 0.95);
-    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.16), inset 0 1px 1px rgba(255, 255, 255, 0.9);
-    
-    transition: transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease;
+    box-shadow:
+        0 14px 34px rgba(0, 0, 0, 0.16),
+        inset 0 1px 1px rgba(255, 255, 255, 0.9);
+
+    transition:
+        transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1),
+        opacity 0.25s ease;
     opacity: 0;
     pointer-events: none;
 }
@@ -43,7 +47,9 @@ body.mobile-view.dark-mode #notification {
     background: rgba(30, 32, 38, 0.94);
     border-color: rgba(255, 255, 255, 0.12);
     border-top: 1px solid rgba(255, 255, 255, 0.22);
-    box-shadow: 0 16px 38px rgba(0, 0, 0, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+    box-shadow:
+        0 16px 38px rgba(0, 0, 0, 0.55),
+        inset 0 1px 1px rgba(255, 255, 255, 0.15);
     color: #f5f5f7;
 }
 

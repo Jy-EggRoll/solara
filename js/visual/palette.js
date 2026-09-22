@@ -2,15 +2,8 @@
  * Solara 图像调色板提取引擎 (Canvas 像素级颜色采样与色彩空间转换算法)
  */
 
-import {
-    PALETTE_MAX_DIMENSION,
-    PALETTE_TARGET_SAMPLE_COUNT,
-    PALETTE_STORAGE_KEY
-} from "../constants.js";
-import {
-    safeGetLocalStorage,
-    safeSetLocalStorage
-} from "../core/storage.js";
+import { PALETTE_MAX_DIMENSION, PALETTE_TARGET_SAMPLE_COUNT, PALETTE_STORAGE_KEY } from "../constants.js";
+import { safeGetLocalStorage, safeSetLocalStorage } from "../core/storage.js";
 
 export const paletteCache = new Map();
 
@@ -70,16 +63,14 @@ export function paletteHslToRgb(h, s, l) {
     const saturation = paletteClamp(s, 0, 1);
     const lightness = paletteClamp(l, 0, 1);
 
-    const normalizedHue = ((h % 360) + 360) % 360 / 360;
+    const normalizedHue = (((h % 360) + 360) % 360) / 360;
 
     if (saturation === 0) {
         const value = lightness * 255;
         return { r: value, g: value, b: value };
     }
 
-    const q = lightness < 0.5
-        ? lightness * (1 + saturation)
-        : lightness + saturation - lightness * saturation;
+    const q = lightness < 0.5 ? lightness * (1 + saturation) : lightness + saturation - lightness * saturation;
     const p = 2 * lightness - q;
 
     const r = paletteHueToRgb(p, q, normalizedHue + 1 / 3) * 255;
@@ -97,9 +88,7 @@ export function paletteHslToHex(color) {
 export function paletteRelativeLuminance(r, g, b) {
     const normalize = (value) => {
         const channel = paletteClamp(value / 255, 0, 1);
-        return channel <= 0.03928
-            ? channel / 12.92
-            : Math.pow((channel + 0.055) / 1.055, 2.4);
+        return channel <= 0.03928 ? channel / 12.92 : Math.pow((channel + 0.055) / 1.055, 2.4);
     };
 
     const rLin = normalize(r);
@@ -241,9 +230,9 @@ export function buildPaletteFromAccent(accent, average, isMonochrome = false) {
     if (isMonochrome) {
         // 黑白/单色封面：纯净高级的冷石墨浅灰银白，彻底杜绝泛黄与大白墙刺眼感
         lightColors = ["#dde1e7", "#d3d8df", "#c6cdd6"];
-        darkColors  = ["#181a20", "#121418", "#0d0f12"];
+        darkColors = ["#181a20", "#121418", "#0d0f12"];
     } else {
-        const isRedFamily = (accent.h >= 335 || accent.h <= 24);
+        const isRedFamily = accent.h >= 335 || accent.h <= 24;
 
         if (isRedFamily) {
             // 红色/暗红/洋红防变粉机制：
@@ -252,17 +241,25 @@ export function buildPaletteFromAccent(accent, average, isMonochrome = false) {
             const warmH = (accent.h + 14) % 360;
             const redS = paletteClamp(accent.s * 0.28 + 0.06, 0.16, 0.28);
             lightColors = [
-                paletteHslToHex({ h: warmH, s: redS, l: 0.70 }),
+                paletteHslToHex({ h: warmH, s: redS, l: 0.7 }),
                 paletteHslToHex({ h: (warmH + 10) % 360, s: Math.max(0.12, redS - 0.03), l: 0.73 }),
-                paletteHslToHex({ h: warmH, s: Math.max(0.10, redS - 0.05), l: 0.76 }),
+                paletteHslToHex({ h: warmH, s: Math.max(0.1, redS - 0.05), l: 0.76 }),
             ];
         } else {
             // 常规彩色封面（如海蓝、青绿、深琥珀）：适度降低浅色模式明度（0.72~0.79），消除发白过曝死光
-            const lightS = paletteClamp(accent.s * 0.26 + 0.06, 0.14, 0.30);
+            const lightS = paletteClamp(accent.s * 0.26 + 0.06, 0.14, 0.3);
             lightColors = [
-                paletteHslToHex({ h: accent.h, s: lightS, l: paletteClamp(accent.l * 0.10 + 0.72, 0.72, 0.79) }),
-                paletteHslToHex({ h: (accent.h + 16) % 360, s: Math.max(0.11, lightS - 0.03), l: paletteClamp(accent.l * 0.08 + 0.75, 0.74, 0.81) }),
-                paletteHslToHex({ h: accent.h, s: Math.max(0.09, lightS - 0.05), l: paletteClamp(accent.l * 0.06 + 0.77, 0.76, 0.83) }),
+                paletteHslToHex({ h: accent.h, s: lightS, l: paletteClamp(accent.l * 0.1 + 0.72, 0.72, 0.79) }),
+                paletteHslToHex({
+                    h: (accent.h + 16) % 360,
+                    s: Math.max(0.11, lightS - 0.03),
+                    l: paletteClamp(accent.l * 0.08 + 0.75, 0.74, 0.81),
+                }),
+                paletteHslToHex({
+                    h: accent.h,
+                    s: Math.max(0.09, lightS - 0.05),
+                    l: paletteClamp(accent.l * 0.06 + 0.77, 0.76, 0.83),
+                }),
             ];
         }
 
@@ -270,8 +267,16 @@ export function buildPaletteFromAccent(accent, average, isMonochrome = false) {
         const darkS = paletteClamp(accent.s * 0.34, 0.14, 0.28);
         darkColors = [
             paletteHslToHex({ h: accent.h, s: darkS, l: paletteClamp(accent.l * 0.08 + 0.15, 0.13, 0.22) }),
-            paletteHslToHex({ h: (accent.h + 12) % 360, s: Math.max(0.10, darkS - 0.04), l: paletteClamp(accent.l * 0.06 + 0.12, 0.10, 0.18) }),
-            paletteHslToHex({ h: accent.h, s: Math.max(0.08, darkS - 0.06), l: paletteClamp(accent.l * 0.05 + 0.09, 0.08, 0.14) }),
+            paletteHslToHex({
+                h: (accent.h + 12) % 360,
+                s: Math.max(0.1, darkS - 0.04),
+                l: paletteClamp(accent.l * 0.06 + 0.12, 0.1, 0.18),
+            }),
+            paletteHslToHex({
+                h: accent.h,
+                s: Math.max(0.08, darkS - 0.06),
+                l: paletteClamp(accent.l * 0.05 + 0.09, 0.08, 0.14),
+            }),
         ];
     }
 
@@ -295,12 +300,28 @@ export function buildPaletteFromAccent(accent, average, isMonochrome = false) {
         },
         tokens: {
             light: {
-                primaryColor: paletteHslToHex({ h: accent.h, s: paletteClamp(accent.s * 0.40 + 0.08, 0.18, 0.45), l: paletteClamp(accent.l * 0.16 + 0.34, 0.30, 0.42) }),
-                primaryColorDark: paletteHslToHex({ h: accent.h, s: paletteClamp(accent.s * 0.45 + 0.05, 0.20, 0.50), l: paletteClamp(accent.l * 0.12 + 0.24, 0.22, 0.34) }),
+                primaryColor: paletteHslToHex({
+                    h: accent.h,
+                    s: paletteClamp(accent.s * 0.4 + 0.08, 0.18, 0.45),
+                    l: paletteClamp(accent.l * 0.16 + 0.34, 0.3, 0.42),
+                }),
+                primaryColorDark: paletteHslToHex({
+                    h: accent.h,
+                    s: paletteClamp(accent.s * 0.45 + 0.05, 0.2, 0.5),
+                    l: paletteClamp(accent.l * 0.12 + 0.24, 0.22, 0.34),
+                }),
             },
             dark: {
-                primaryColor: paletteHslToHex({ h: accent.h, s: paletteClamp(accent.s * 0.36 + 0.06, 0.18, 0.38), l: paletteClamp(accent.l * 0.12 + 0.36, 0.32, 0.44) }),
-                primaryColorDark: paletteHslToHex({ h: accent.h, s: paletteClamp(accent.s * 0.40 + 0.04, 0.20, 0.42), l: paletteClamp(accent.l * 0.08 + 0.26, 0.22, 0.32) }),
+                primaryColor: paletteHslToHex({
+                    h: accent.h,
+                    s: paletteClamp(accent.s * 0.36 + 0.06, 0.18, 0.38),
+                    l: paletteClamp(accent.l * 0.12 + 0.36, 0.32, 0.44),
+                }),
+                primaryColorDark: paletteHslToHex({
+                    h: accent.h,
+                    s: paletteClamp(accent.s * 0.4 + 0.04, 0.2, 0.42),
+                    l: paletteClamp(accent.l * 0.08 + 0.26, 0.22, 0.32),
+                }),
             },
         },
     };
@@ -314,21 +335,21 @@ export async function extractPaletteFromCanvas(imageUrl) {
             try {
                 const canvas = document.createElement("canvas");
                 const ctx = canvas.getContext("2d");
-                
+
                 const maxSide = Math.max(img.width, img.height);
                 const scale = PALETTE_MAX_DIMENSION / maxSide;
                 const w = Math.max(1, Math.round(img.width * scale));
                 const h = Math.max(1, Math.round(img.height * scale));
-                
+
                 canvas.width = w;
                 canvas.height = h;
                 ctx.drawImage(img, 0, 0, w, h);
-                
+
                 const imageData = ctx.getImageData(0, 0, w, h);
                 const analyzed = analyzeImageDataColors(imageData);
                 const palette = buildPaletteFromAccent(analyzed.accent, analyzed.average, analyzed.isMonochrome);
                 palette.source = imageUrl;
-                
+
                 resolve(palette);
             } catch (err) {
                 reject(err);

@@ -13,7 +13,7 @@ body.mobile-view .controls {
     border-radius: 26px;
     border: 1px solid var(--apple-glass-border);
     border-top: 1px solid var(--apple-glass-border-top);
-    box-shadow: 
+    box-shadow:
         0 14px 40px -10px rgba(0, 0, 0, 0.15),
         0 0 1px 1px rgba(255, 255, 255, 0.2) inset;
     padding: 14px 18px 16px;
@@ -23,7 +23,9 @@ body.mobile-view .controls {
     gap: 12px;
     z-index: 10;
     flex-shrink: 0;
-    transition: opacity 0.26s cubic-bezier(0.16, 1, 0.3, 1), transform 0.26s cubic-bezier(0.16, 1, 0.3, 1);
+    transition:
+        opacity 0.26s cubic-bezier(0.16, 1, 0.3, 1),
+        transform 0.26s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* 当播放列表抽屉或全屏搜索展开时，底栏控制台优雅沉退并禁用点击，杜绝误触与层级遮挡 */
@@ -35,7 +37,7 @@ body.mobile-view.mobile-search-open .controls {
 }
 
 body.mobile-view.dark-mode .controls {
-    box-shadow: 
+    box-shadow:
         0 18px 48px -10px rgba(0, 0, 0, 0.65),
         0 0 1px 1px rgba(255, 255, 255, 0.08) inset;
 }
@@ -116,8 +118,8 @@ body.mobile-view .transport-controls {
 
 /* 5 键严格对称黄金规格：全部显式设定 1:1 正圆与 ID 级高权重覆盖，杜绝被压扁为横向椭圆 */
 body.mobile-view #playModeBtn,
-body.mobile-view .transport-button--mode { 
-    order: 1; 
+body.mobile-view .transport-button--mode {
+    order: 1;
     width: 42px !important;
     height: 42px !important;
     min-width: 42px !important;
@@ -130,8 +132,8 @@ body.mobile-view .transport-button--mode {
     margin: 0 !important;
 }
 
-body.mobile-view .transport-button--prev { 
-    order: 2; 
+body.mobile-view .transport-button--prev {
+    order: 2;
     width: 44px !important;
     height: 44px !important;
     min-width: 44px !important;
@@ -146,8 +148,8 @@ body.mobile-view .transport-button--prev {
 
 /* 核心播放大按钮：使用 #playPauseBtn 保证最高特异性权重，严格 56x56 1:1 纯正圆 */
 body.mobile-view #playPauseBtn,
-body.mobile-view .transport-button--play { 
-    order: 3; 
+body.mobile-view .transport-button--play {
+    order: 3;
     width: 56px !important;
     height: 56px !important;
     min-width: 56px !important;
@@ -162,10 +164,12 @@ body.mobile-view .transport-button--play {
     box-sizing: border-box !important;
     background: var(--primary-color) !important;
     color: #ffffff !important;
-    box-shadow: 
+    box-shadow:
         0 8px 24px -2px var(--palette-glow),
         0 4px 12px rgba(0, 0, 0, 0.18) !important;
-    transition: transform 0.15s var(--spring-bounce), box-shadow 0.25s ease !important;
+    transition:
+        transform 0.15s var(--spring-bounce),
+        box-shadow 0.25s ease !important;
 }
 
 body.mobile-view #playPauseBtn .apple-svg-icon,
@@ -180,8 +184,8 @@ body.mobile-view .transport-button--play:active {
     transform: scale(0.92) !important;
 }
 
-body.mobile-view .transport-button--next { 
-    order: 4; 
+body.mobile-view .transport-button--next {
+    order: 4;
     width: 44px !important;
     height: 44px !important;
     min-width: 44px !important;
@@ -195,8 +199,8 @@ body.mobile-view .transport-button--next {
 }
 
 body.mobile-view #mobileQueueToggle,
-body.mobile-view .transport-button--queue { 
-    order: 5; 
+body.mobile-view .transport-button--queue {
+    order: 5;
     width: 42px !important;
     height: 42px !important;
     min-width: 42px !important;
@@ -221,7 +225,10 @@ body.mobile-view .transport-button {
     padding: 0 !important;
     box-sizing: border-box !important;
     box-shadow: none;
-    transition: transform 0.15s var(--spring-snappy), color 0.2s ease, opacity 0.2s ease;
+    transition:
+        transform 0.15s var(--spring-snappy),
+        color 0.2s ease,
+        opacity 0.2s ease;
     flex-shrink: 0 !important;
     aspect-ratio: 1 / 1 !important;
 }

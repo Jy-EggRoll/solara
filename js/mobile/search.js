@@ -34,7 +34,8 @@ export function openMobileSearch() {
     if (searchInput) {
         if (!searchInput.value.trim()) {
             try {
-                const raw = localStorage.getItem(LAST_SEARCH_STATE_STORAGE_KEY) || localStorage.getItem("lastSearchState");
+                const raw =
+                    localStorage.getItem(LAST_SEARCH_STATE_STORAGE_KEY) || localStorage.getItem("lastSearchState");
                 if (raw) {
                     const parsed = JSON.parse(raw);
                     if (parsed && parsed.keyword) {

@@ -12,7 +12,7 @@ const NOTIFICATION_ICONS = {
     success: `<svg class="notification-svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg>`,
     error: `<svg class="notification-svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd"/></svg>`,
     warning: `<svg class="notification-svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/></svg>`,
-    info: `<svg class="notification-svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z" clip-rule="evenodd"/></svg>`
+    info: `<svg class="notification-svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z" clip-rule="evenodd"/></svg>`,
 };
 
 let notificationHideTimer = null;
@@ -100,14 +100,15 @@ export function closeSettingsModal(dom) {
 
 export function renderGenreList(dom, state = null) {
     if (!dom || !dom.radarGenreList) return;
-    
-    const selectedGenres = Array.isArray(state?.radarSettings?.genres) && state.radarSettings.genres.length > 0
-        ? state.radarSettings.genres
-        : DEFAULT_RADAR_GENRES;
 
-    dom.radarGenreList.innerHTML = EXPLORE_RADAR_GENRES.map(genre => {
+    const selectedGenres =
+        Array.isArray(state?.radarSettings?.genres) && state.radarSettings.genres.length > 0
+            ? state.radarSettings.genres
+            : DEFAULT_RADAR_GENRES;
+
+    dom.radarGenreList.innerHTML = EXPLORE_RADAR_GENRES.map((genre) => {
         const isChecked = selectedGenres.includes(genre) ? "checked" : "";
-        const label = (typeof window !== "undefined" && typeof window.t === "function") ? window.t(genre) : genre;
+        const label = typeof window !== "undefined" && typeof window.t === "function" ? window.t(genre) : genre;
         return `
         <div class="genre-item">
             <input type="checkbox" id="genre-${genre}" value="${genre}" ${isChecked}>
@@ -119,13 +120,14 @@ export function renderGenreList(dom, state = null) {
 
 export function applySettingsToUI(dom, state) {
     if (!dom || !dom.radarGenreList) return;
-    
-    const selectedGenres = Array.isArray(state?.radarSettings?.genres) && state.radarSettings.genres.length > 0
-        ? state.radarSettings.genres
-        : DEFAULT_RADAR_GENRES;
+
+    const selectedGenres =
+        Array.isArray(state?.radarSettings?.genres) && state.radarSettings.genres.length > 0
+            ? state.radarSettings.genres
+            : DEFAULT_RADAR_GENRES;
 
     const checkboxes = dom.radarGenreList.querySelectorAll("input[type='checkbox']");
-    checkboxes.forEach(cb => {
+    checkboxes.forEach((cb) => {
         cb.checked = selectedGenres.includes(cb.value);
     });
 }
@@ -137,7 +139,7 @@ export async function loadSettings(dom, state) {
             state.radarSettings = JSON.parse(localSettings);
             // 兼容迁移：若包含旧曲风（如“流行”、“摇滚”等），过滤只保留有效榜单；若全无效则回退至默认三大官方榜单
             if (Array.isArray(state.radarSettings?.genres)) {
-                const validGenres = state.radarSettings.genres.filter(g => EXPLORE_RADAR_GENRES.includes(g));
+                const validGenres = state.radarSettings.genres.filter((g) => EXPLORE_RADAR_GENRES.includes(g));
                 state.radarSettings.genres = validGenres.length > 0 ? validGenres : [...DEFAULT_RADAR_GENRES];
             } else {
                 state.radarSettings = { genres: [...DEFAULT_RADAR_GENRES] };
@@ -156,31 +158,31 @@ export async function loadSettings(dom, state) {
 
 export async function saveSettings(dom, state) {
     if (!dom.radarGenreList) return;
-    const selectedGenres = Array.from(dom.radarGenreList.querySelectorAll("input:checked")).map(cb => cb.value);
-    
+    const selectedGenres = Array.from(dom.radarGenreList.querySelectorAll("input:checked")).map((cb) => cb.value);
+
     if (selectedGenres.length === 0) {
-        const tip = (typeof window !== "undefined" && typeof window.t === "function") 
-            ? window.t("请至少选择一个榜单") 
-            : "请至少选择一个榜单";
+        const tip =
+            typeof window !== "undefined" && typeof window.t === "function"
+                ? window.t("请至少选择一个榜单")
+                : "请至少选择一个榜单";
         showNotification(tip, "warning", dom);
         return;
     }
 
     state.radarSettings = {
-        genres: selectedGenres
+        genres: selectedGenres,
     };
 
     safeSetLocalStorage("radarSettings", JSON.stringify(state.radarSettings));
 
     if (typeof persistStorageItems === "function") {
         persistStorageItems({
-            radarSettings: JSON.stringify(state.radarSettings)
+            radarSettings: JSON.stringify(state.radarSettings),
         });
     }
 
-    const successTip = (typeof window !== "undefined" && typeof window.t === "function") 
-        ? window.t("设置已保存") 
-        : "设置已保存";
+    const successTip =
+        typeof window !== "undefined" && typeof window.t === "function" ? window.t("设置已保存") : "设置已保存";
     showNotification(successTip, "success", dom);
     closeSettingsModal(dom);
 }
@@ -188,7 +190,7 @@ export async function saveSettings(dom, state) {
 export function initLayoutMode(dom) {
     const STORAGE_KEY = "solara_layout_mode";
     const toggleBtn = dom?.layoutToggleBtn || document.getElementById("layoutToggleBtn");
-    
+
     let currentMode = localStorage.getItem(STORAGE_KEY);
     if (!currentMode) {
         currentMode = "compact";
@@ -197,7 +199,7 @@ export function initLayoutMode(dom) {
     const applyLayoutMode = (mode) => {
         const isCompact = mode === "compact";
         document.body.classList.toggle("layout-compact", isCompact);
-        
+
         if (toggleBtn) {
             const layoutLabel = isCompact ? "布局：紧凑" : "布局：全景";
             toggleBtn.setAttribute("aria-label", layoutLabel);
@@ -221,7 +223,12 @@ export function initLayoutMode(dom) {
     if (stageContainer && !stageContainer.__tabsTransitionBound) {
         stageContainer.__tabsTransitionBound = true;
         stageContainer.addEventListener("transitionend", (e) => {
-            if (e.target === stageContainer && (e.propertyName === "width" || e.propertyName === "height" || e.propertyName === "grid-template-columns")) {
+            if (
+                e.target === stageContainer &&
+                (e.propertyName === "width" ||
+                    e.propertyName === "height" ||
+                    e.propertyName === "grid-template-columns")
+            ) {
                 if (typeof updateAllTabsIndicators === "function") {
                     updateAllTabsIndicators();
                 }
@@ -303,7 +310,7 @@ export function initSettings(dom, state, callbacks = {}) {
     if (dom.logo) {
         dom.logo.addEventListener("dblclick", () => openSettingsModal(dom, state));
     }
-    
+
     let lastToolbarClick = 0;
     const handleDoubleTap = (e) => {
         const now = Date.now();
@@ -350,13 +357,18 @@ export function initSettings(dom, state, callbacks = {}) {
             if (typeof callbacks.manualSync === "function") {
                 manualSyncBtn.disabled = true;
                 const origHtml = manualSyncBtn.innerHTML;
-                manualSyncBtn.innerHTML = '<span class="loader" style="width:14px;height:14px;border-width:2px;"></span><span>正在同步中...</span>';
+                manualSyncBtn.innerHTML =
+                    '<span class="loader" style="width:14px;height:14px;border-width:2px;"></span><span>正在同步中...</span>';
                 try {
                     await callbacks.manualSync();
                     showNotification("云端数据漫游同步成功", "success", dom);
                 } catch (e) {
                     console.error("手动同步失败:", e);
-                    showNotification(e.message ? `同步失败: ${e.message}` : "云端同步失败，请检查网络或服务端", "error", dom);
+                    showNotification(
+                        e.message ? `同步失败: ${e.message}` : "云端同步失败，请检查网络或服务端",
+                        "error",
+                        dom,
+                    );
                 } finally {
                     manualSyncBtn.disabled = false;
                     manualSyncBtn.innerHTML = origHtml;

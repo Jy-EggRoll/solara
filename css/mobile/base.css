@@ -163,7 +163,8 @@ body.mobile-view .container {
     border: none;
     border-radius: 0;
     box-shadow: none;
-    padding: calc(env(safe-area-inset-top, 0px) + 8px) clamp(16px, 4.5vw, 24px) calc(env(safe-area-inset-bottom, 0px) + 12px);
+    padding: calc(env(safe-area-inset-top, 0px) + 8px) clamp(16px, 4.5vw, 24px)
+        calc(env(safe-area-inset-bottom, 0px) + 12px);
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -249,7 +250,10 @@ body.mobile-view .mobile-toolbar__button {
     justify-content: center;
     cursor: pointer;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    transition: transform 0.15s var(--spring-snappy), background 0.25s ease, border-color 0.25s ease;
+    transition:
+        transform 0.15s var(--spring-snappy),
+        background 0.25s ease,
+        border-color 0.25s ease;
     position: relative;
 }
 

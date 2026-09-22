@@ -5,7 +5,13 @@
 
 import { $, updateMobileOverlayScrim } from "./mobile/core.js";
 import { openMobileSearch, closeMobileSearch, toggleMobileSearch } from "./mobile/search.js";
-import { openMobilePanel, closeMobilePanel, toggleMobilePanel, switchMobilePanelTab, closeAllMobileOverlays } from "./mobile/sheet.js";
+import {
+    openMobilePanel,
+    closeMobilePanel,
+    toggleMobilePanel,
+    switchMobilePanelTab,
+    closeAllMobileOverlays,
+} from "./mobile/sheet.js";
 import { toggleMobileLyrics, initMobileLyricsInteractions } from "./mobile/stage.js";
 import { initBottomSheetGestures, initSearchPanelGestures } from "./mobile/gestures.js";
 import { bindMobileToolbar } from "./mobile/toolbar.js";
@@ -116,8 +122,11 @@ import { bindMobileToolbar } from "./mobile/toolbar.js";
             }
 
             // 点击了队列切换按钮本身，由自身的 toggle 逻辑处理
-            if (target && typeof target.closest === "function" && 
-                (target.closest("#mobileQueueToggle") || target.closest(".transport-button--queue"))) {
+            if (
+                target &&
+                typeof target.closest === "function" &&
+                (target.closest("#mobileQueueToggle") || target.closest(".transport-button--queue"))
+            ) {
                 return;
             }
 

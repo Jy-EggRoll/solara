@@ -5,15 +5,15 @@
 import { API } from "../constants.js";
 
 export function parseLyrics(lyricText, state) {
-    const lines = lyricText.split('\n');
+    const lines = lyricText.split("\n");
     const lyrics = [];
 
-    lines.forEach(line => {
+    lines.forEach((line) => {
         const match = line.match(/\[(\d{2}):(\d{2})\.(\d{2,3})\](.*)/);
         if (match) {
             const minutes = parseInt(match[1]);
             const seconds = parseInt(match[2]);
-            const milliseconds = parseInt(match[3].padEnd(3, '0'));
+            const milliseconds = parseInt(match[3].padEnd(3, "0"));
             const time = minutes * 60 + seconds + milliseconds / 1000;
             const text = match[4].trim();
 
@@ -91,10 +91,11 @@ export function scrollToCurrentLyric(element, containerOverride, dom, smooth = t
     }
 
     const elementHeight = element.offsetHeight || element.getBoundingClientRect().height;
-    const isMobile = container.id === "mobileInlineLyricsScroll" || container.classList?.contains("mobile-inline-lyrics__scroll");
+    const isMobile =
+        container.id === "mobileInlineLyricsScroll" || container.classList?.contains("mobile-inline-lyrics__scroll");
     // 视觉焦点比例：移动端 0.48（正中心微上浮黄金点），桌面端 0.5（正中间）
     const focalRatio = isMobile ? 0.48 : 0.5;
-    const targetScrollTop = elementOffsetTop - (containerHeight * focalRatio) + (elementHeight / 2);
+    const targetScrollTop = elementOffsetTop - containerHeight * focalRatio + elementHeight / 2;
     const maxScrollTop = Math.max(0, container.scrollHeight - containerHeight);
     const finalScrollTop = Math.max(0, Math.min(targetScrollTop, maxScrollTop));
 
@@ -112,7 +113,7 @@ export function scrollToCurrentLyric(element, containerOverride, dom, smooth = t
         if (smooth && typeof container.scrollTo === "function") {
             container.scrollTo({
                 top: finalScrollTop,
-                behavior: 'smooth'
+                behavior: "smooth",
             });
         } else {
             container.scrollTop = finalScrollTop;
@@ -121,9 +122,9 @@ export function scrollToCurrentLyric(element, containerOverride, dom, smooth = t
 }
 
 export function displayLyrics(state, dom) {
-    const lyricsHtml = state.lyricsData.map((lyric, index) =>
-        `<div data-time="${lyric.time}" data-index="${index}">${lyric.text}</div>`
-    ).join("");
+    const lyricsHtml = state.lyricsData
+        .map((lyric, index) => `<div data-time="${lyric.time}" data-index="${index}">${lyric.text}</div>`)
+        .join("");
     setLyricsContentHtml(lyricsHtml, dom);
     if (dom.lyrics) {
         dom.lyrics.dataset.placeholder = "default";
@@ -186,11 +187,12 @@ const lyricsMemoryCache = new Map();
 export async function loadLyrics(song, state, dom, debugLogger = null) {
     const log = (msg) => {
         if (typeof debugLogger === "function") debugLogger(msg);
-        else if (typeof window !== "undefined" && typeof window.__solaraDebugLog === "function") window.__solaraDebugLog(msg);
+        else if (typeof window !== "undefined" && typeof window.__solaraDebugLog === "function")
+            window.__solaraDebugLog(msg);
     };
 
     if (!song) return;
-    const cacheKey = `${song.source || 'netease'}_${song.lyric_id || song.id}`;
+    const cacheKey = `${song.source || "netease"}_${song.lyric_id || song.id}`;
 
     // 1. 优先命中前端内存缓存（0 网络请求）
     if (lyricsMemoryCache.has(cacheKey)) {
@@ -268,18 +270,22 @@ export function initDesktopLyricsInteractions(state, dom) {
     // 2. 滚轮防打扰机制（用户手动翻看歌词时暂停自动居中跟随 5 秒，超时后主动复位）
     const scrollContainer = dom.lyricsScroll || dom.lyrics;
     if (scrollContainer) {
-        scrollContainer.addEventListener("wheel", () => {
-            state.userScrolledLyrics = true;
-            if (state.lyricsScrollTimeout) {
-                clearTimeout(state.lyricsScrollTimeout);
-            }
-            state.lyricsScrollTimeout = setTimeout(() => {
-                state.userScrolledLyrics = false;
-                const currentLyric = dom.lyricsContent?.querySelector(".current");
-                if (currentLyric && (!dom.audioPlayer || !dom.audioPlayer.paused)) {
-                    scrollToCurrentLyric(currentLyric, scrollContainer, dom, true);
+        scrollContainer.addEventListener(
+            "wheel",
+            () => {
+                state.userScrolledLyrics = true;
+                if (state.lyricsScrollTimeout) {
+                    clearTimeout(state.lyricsScrollTimeout);
                 }
-            }, 5000);
-        }, { passive: true });
+                state.lyricsScrollTimeout = setTimeout(() => {
+                    state.userScrolledLyrics = false;
+                    const currentLyric = dom.lyricsContent?.querySelector(".current");
+                    if (currentLyric && (!dom.audioPlayer || !dom.audioPlayer.paused)) {
+                        scrollToCurrentLyric(currentLyric, scrollContainer, dom, true);
+                    }
+                }, 5000);
+            },
+            { passive: true },
+        );
     }
 }

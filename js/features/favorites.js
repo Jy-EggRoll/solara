@@ -85,7 +85,7 @@ export function updateFavoriteHighlight(state, dom) {
     }
 
     items.forEach((item, index) => {
-        const isCurrent = (index === targetIndex);
+        const isCurrent = index === targetIndex;
         item.classList.toggle("current", isCurrent);
         item.setAttribute("aria-current", isCurrent ? "true" : "false");
         item.setAttribute("aria-pressed", isCurrent ? "true" : "false");
@@ -94,31 +94,27 @@ export function updateFavoriteHighlight(state, dom) {
 
 export function updateFavoriteIcons(state, dom) {
     const favorites = ensureFavoriteSongsArray(state);
-    const favoriteKeys = new Set(
-        favorites
-            .map(getSongKey)
-            .filter((key) => typeof key === "string" && key !== "")
-    );
+    const favoriteKeys = new Set(favorites.map(getSongKey).filter((key) => typeof key === "string" && key !== ""));
 
-    const toggleButtons = document.querySelectorAll('.favorite-toggle[data-favorite-key]');
+    const toggleButtons = document.querySelectorAll(".favorite-toggle[data-favorite-key]");
     toggleButtons.forEach((button) => {
         const key = button.dataset.favoriteKey;
         const isActive = key && favoriteKeys.has(key);
-        button.classList.toggle('is-active', Boolean(isActive));
-        button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
-        const icon = button.querySelector('i');
+        button.classList.toggle("is-active", Boolean(isActive));
+        button.setAttribute("aria-pressed", isActive ? "true" : "false");
+        const icon = button.querySelector("i");
         if (icon) {
-            icon.classList.toggle('fas', Boolean(isActive));
-            icon.classList.toggle('far', !isActive);
-            icon.classList.toggle('fa-solid', Boolean(isActive));
-            icon.classList.toggle('fa-regular', !isActive);
+            icon.classList.toggle("fas", Boolean(isActive));
+            icon.classList.toggle("far", !isActive);
+            icon.classList.toggle("fa-solid", Boolean(isActive));
+            icon.classList.toggle("fa-regular", !isActive);
         }
         if (isActive) {
-            button.setAttribute('title', '取消收藏');
-            button.setAttribute('aria-label', '取消收藏');
+            button.setAttribute("title", "取消收藏");
+            button.setAttribute("aria-label", "取消收藏");
         } else {
-            button.setAttribute('title', '收藏');
-            button.setAttribute('aria-label', '收藏');
+            button.setAttribute("title", "收藏");
+            button.setAttribute("aria-label", "收藏");
         }
     });
 
@@ -127,18 +123,18 @@ export function updateFavoriteIcons(state, dom) {
         const key = currentSong ? getSongKey(currentSong) : null;
         const isActive = key && favoriteKeys.has(key);
         dom.currentFavoriteToggle.disabled = !currentSong;
-        dom.currentFavoriteToggle.setAttribute('aria-disabled', currentSong ? 'false' : 'true');
-        dom.currentFavoriteToggle.classList.toggle('is-active', Boolean(isActive));
-        dom.currentFavoriteToggle.setAttribute('aria-pressed', isActive ? 'true' : 'false');
-        const label = isActive ? '取消收藏当前歌曲' : '收藏当前歌曲';
-        dom.currentFavoriteToggle.setAttribute('aria-label', label);
-        dom.currentFavoriteToggle.setAttribute('title', label);
-        const icon = dom.currentFavoriteToggle.querySelector('i');
+        dom.currentFavoriteToggle.setAttribute("aria-disabled", currentSong ? "false" : "true");
+        dom.currentFavoriteToggle.classList.toggle("is-active", Boolean(isActive));
+        dom.currentFavoriteToggle.setAttribute("aria-pressed", isActive ? "true" : "false");
+        const label = isActive ? "取消收藏当前歌曲" : "收藏当前歌曲";
+        dom.currentFavoriteToggle.setAttribute("aria-label", label);
+        dom.currentFavoriteToggle.setAttribute("title", label);
+        const icon = dom.currentFavoriteToggle.querySelector("i");
         if (icon) {
-            icon.classList.toggle('fas', Boolean(isActive));
-            icon.classList.toggle('far', !isActive);
-            icon.classList.toggle('fa-solid', Boolean(isActive));
-            icon.classList.toggle('fa-regular', !isActive);
+            icon.classList.toggle("fas", Boolean(isActive));
+            icon.classList.toggle("far", !isActive);
+            icon.classList.toggle("fa-solid", Boolean(isActive));
+            icon.classList.toggle("fa-regular", !isActive);
         }
     }
 }
@@ -159,13 +155,12 @@ export function renderFavorites(state, dom) {
     }
 
     dom.favorites.classList.remove("empty");
-    const favoritesHtml = favorites.map((song, index) => {
-        const artistValue = Array.isArray(song.artist)
-            ? song.artist.join(", ")
-            : (song.artist || "未知艺术家");
-        const isCurrent = state.currentList === "favorite" && index === state.currentFavoriteIndex;
-        const songKey = getSongKey(song) || `favorite-${index}`;
-        return `
+    const favoritesHtml = favorites
+        .map((song, index) => {
+            const artistValue = Array.isArray(song.artist) ? song.artist.join(", ") : song.artist || "未知艺术家";
+            const isCurrent = state.currentList === "favorite" && index === state.currentFavoriteIndex;
+            const songKey = getSongKey(song) || `favorite-${index}`;
+            return `
         <div class="playlist-item${isCurrent ? " current" : ""}" data-index="${index}" role="button" tabindex="0" aria-label="播放 ${song.name}" data-favorite-key="${songKey}">
             <div class="playlist-item-info">
                 <span class="playlist-item-title">${song.name}</span>
@@ -183,7 +178,8 @@ export function renderFavorites(state, dom) {
                 </button>
             </div>
         </div>`;
-    }).join("");
+        })
+        .join("");
 
     dom.favoriteItems.innerHTML = favoritesHtml;
     updateFavoriteHighlight(state, dom);
@@ -209,7 +205,7 @@ export function removeFavoriteAtIndex(index, state, dom, callbacks = {}) {
     const isSameSong = Boolean(
         (removingKey && currentKey && removingKey === currentKey) ||
         (removingSong?.id && state.currentSong?.id && String(removingSong.id) === String(state.currentSong.id)) ||
-        (removingSong?.name && state.currentSong?.name && removingSong.name === state.currentSong.name)
+        (removingSong?.name && state.currentSong?.name && removingSong.name === state.currentSong.name),
     );
     const removingCurrent = (isPlayingFavorites && state.currentFavoriteIndex === index) || isSameSong;
 
@@ -304,9 +300,7 @@ export function addAllFavoritesToPlaylist(state, dom, callbacks = {}) {
     }
 
     const existingKeys = new Set(
-        state.playlistSongs
-            .map(getSongKey)
-            .filter((key) => typeof key === "string" && key !== "")
+        state.playlistSongs.map(getSongKey).filter((key) => typeof key === "string" && key !== ""),
     );
 
     let addedCount = 0;
@@ -406,7 +400,11 @@ export function handleImportFavoritesChange(event, state, dom, callbacks = {}) {
 
             const items = Array.isArray(payload.favorites)
                 ? payload.favorites
-                : (Array.isArray(payload.items) ? payload.items : (Array.isArray(payload.songs) ? payload.songs : []));
+                : Array.isArray(payload.items)
+                  ? payload.items
+                  : Array.isArray(payload.songs)
+                    ? payload.songs
+                    : [];
 
             if (!Array.isArray(items) || items.length === 0) {
                 throw new Error("NO_SONGS");
@@ -414,9 +412,7 @@ export function handleImportFavoritesChange(event, state, dom, callbacks = {}) {
 
             const favorites = ensureFavoriteSongsArray(state);
             const existingKeys = new Set(
-                favorites
-                    .map(getSongKey)
-                    .filter((key) => typeof key === "string" && key !== "")
+                favorites.map(getSongKey).filter((key) => typeof key === "string" && key !== ""),
             );
 
             let added = 0;

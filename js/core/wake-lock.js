@@ -11,8 +11,12 @@ let enabled = false;
 let domRef = null;
 
 function isSupported() {
-    return typeof navigator !== "undefined" && "wakeLock" in navigator &&
-        typeof window !== "undefined" && window.isSecureContext === true;
+    return (
+        typeof navigator !== "undefined" &&
+        "wakeLock" in navigator &&
+        typeof window !== "undefined" &&
+        window.isSecureContext === true
+    );
 }
 
 function buttons() {
@@ -48,7 +52,9 @@ async function release() {
     try {
         await sentinel.release();
         log("屏幕锁已释放");
-    } catch (_) { /* 已被浏览器释放，忽略 */ }
+    } catch (_) {
+        /* 已被浏览器释放，忽略 */
+    }
     sentinel = null;
 }
 
@@ -58,7 +64,14 @@ async function acquire() {
     try {
         await release();
         sentinel = await navigator.wakeLock.request("screen");
-        sentinel.addEventListener("release", () => { sentinel = null; log("屏幕锁已被系统释放（切后台/锁屏）"); }, { once: true });
+        sentinel.addEventListener(
+            "release",
+            () => {
+                sentinel = null;
+                log("屏幕锁已被系统释放（切后台/锁屏）");
+            },
+            { once: true },
+        );
         log("屏幕锁已获取（停留页面中，屏幕不会熄灭）");
     } catch (err) {
         sentinel = null;
@@ -119,7 +132,9 @@ export function initWakeLock(dom, state) {
 
     if (!window.__wakeLockVisibilityBound) {
         window.__wakeLockVisibilityBound = true;
-        document.addEventListener("visibilitychange", () => { refresh(); });
+        document.addEventListener("visibilitychange", () => {
+            refresh();
+        });
     }
 
     if (enabled) refresh();

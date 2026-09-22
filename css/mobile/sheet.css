@@ -111,7 +111,10 @@ body.mobile-view .mobile-panel-handle::after {
     height: 4.5px;
     border-radius: 999px;
     background: rgba(120, 120, 128, 0.35);
-    transition: width 0.22s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease, opacity 0.2s ease;
+    transition:
+        width 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+        background-color 0.2s ease,
+        opacity 0.2s ease;
 }
 
 body.mobile-view.dark-mode .mobile-panel-handle::after {
@@ -158,10 +161,14 @@ body.mobile-view .mobile-panel-header .playlist-tabs-indicator {
     left: 0;
     border-radius: 999px;
     background: #ffffff;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.16), 0 1px 3px rgba(0, 0, 0, 0.08);
+    box-shadow:
+        0 3px 10px rgba(0, 0, 0, 0.16),
+        0 1px 3px rgba(0, 0, 0, 0.08);
     pointer-events: none;
     z-index: 1;
-    transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1), width 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+    transition:
+        transform 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+        width 0.32s cubic-bezier(0.22, 1, 0.36, 1);
     will-change: transform, width;
 }
 
@@ -183,7 +190,9 @@ body.mobile-view .mobile-panel-header .playlist-tab {
     color: var(--text-secondary-color);
     cursor: pointer;
     white-space: nowrap;
-    transition: color 0.22s ease, transform 0.12s ease;
+    transition:
+        color 0.22s ease,
+        transform 0.12s ease;
     user-select: none;
     -webkit-user-select: none;
     touch-action: manipulation;
@@ -226,7 +235,9 @@ body.mobile-view .mobile-close-btn {
     justify-content: center;
     cursor: pointer;
     flex-shrink: 0;
-    transition: transform 0.15s var(--spring-snappy), background 0.2s ease;
+    transition:
+        transform 0.15s var(--spring-snappy),
+        background 0.2s ease;
 }
 
 /* 关闭按鈕细微区分 — 更小光锐，用于收起抽屉 */
@@ -334,7 +345,9 @@ body.mobile-view .playlist-item {
     background: rgba(0, 0, 0, 0.035);
     border: 1px solid rgba(0, 0, 0, 0.06);
     color: #1d1d1f;
-    transition: transform 0.15s var(--spring-snappy), background 0.2s ease;
+    transition:
+        transform 0.15s var(--spring-snappy),
+        background 0.2s ease;
     cursor: pointer;
     position: relative;
     touch-action: manipulation;
@@ -402,7 +415,9 @@ body.mobile-view .playlist-item-action {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: transform 0.15s var(--spring-snappy), color 0.2s ease;
+    transition:
+        transform 0.15s var(--spring-snappy),
+        color 0.2s ease;
 }
 
 body.mobile-view .playlist-item-action:active {
@@ -419,14 +434,22 @@ body.mobile-view .playlist-item.current::before {
     margin-right: 10px;
     flex-shrink: 0;
     background-color: var(--primary-color);
-    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='2' y='8' width='3.5' height='12' rx='1.5'/%3E%3Crect x='8.5' y='3' width='3.5' height='17' rx='1.5'/%3E%3Crect x='15' y='10' width='3.5' height='10' rx='1.5'/%3E%3C/svg%3E") no-repeat center / contain;
-    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='2' y='8' width='3.5' height='12' rx='1.5'/%3E%3Crect x='8.5' y='3' width='3.5' height='17' rx='1.5'/%3E%3Crect x='15' y='10' width='3.5' height='10' rx='1.5'/%3E%3C/svg%3E") no-repeat center / contain;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='2' y='8' width='3.5' height='12' rx='1.5'/%3E%3Crect x='8.5' y='3' width='3.5' height='17' rx='1.5'/%3E%3Crect x='15' y='10' width='3.5' height='10' rx='1.5'/%3E%3C/svg%3E")
+        no-repeat center / contain;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='2' y='8' width='3.5' height='12' rx='1.5'/%3E%3Crect x='8.5' y='3' width='3.5' height='17' rx='1.5'/%3E%3Crect x='15' y='10' width='3.5' height='10' rx='1.5'/%3E%3C/svg%3E")
+        no-repeat center / contain;
     animation: mobileEqWave 1.1s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
 }
 
 @keyframes mobileEqWave {
-    0% { transform: scaleY(0.4); opacity: 0.7; }
-    100% { transform: scaleY(1); opacity: 1; }
+    0% {
+        transform: scaleY(0.4);
+        opacity: 0.7;
+    }
+    100% {
+        transform: scaleY(1);
+        opacity: 1;
+    }
 }
 
 /* ─── 4. 列表空状态提示 ─────────────────────────────────────────────────── */

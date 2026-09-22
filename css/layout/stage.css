@@ -22,7 +22,7 @@
     grid-template-rows: auto auto 1fr auto;
     grid-template-columns: 330px 360px 1fr;
     gap: 14px;
-    transition: 
+    transition:
         width 0.65s cubic-bezier(0.16, 1, 0.3, 1),
         height 0.65s cubic-bezier(0.16, 1, 0.3, 1),
         max-width 0.65s cubic-bezier(0.16, 1, 0.3, 1),
@@ -47,11 +47,17 @@ body.layout-compact .container {
     padding: 22px 28px 20px;
     grid-template-columns: 250px 360px 1fr;
     gap: 16px;
-    box-shadow: 0 30px 80px -12px rgba(0, 0, 0, 0.38), 0 12px 28px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(255, 255, 255, 0.14);
+    box-shadow:
+        0 30px 80px -12px rgba(0, 0, 0, 0.38),
+        0 12px 28px rgba(0, 0, 0, 0.18),
+        0 0 0 1px rgba(255, 255, 255, 0.14);
 }
 
 body.dark-mode.layout-compact .container {
-    box-shadow: 0 36px 92px -16px rgba(0, 0, 0, 0.65), 0 14px 34px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.16);
+    box-shadow:
+        0 36px 92px -16px rgba(0, 0, 0, 0.65),
+        0 14px 34px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.16);
 }
 
 body.layout-compact .header {
@@ -165,7 +171,7 @@ body.layout-compact .playlist-item-title {
 
 /* 搜索模式下的容器布局 */
 .container.search-mode {
-    grid-template-areas: 
+    grid-template-areas:
         "header header header"
         "search search search"
         "search search search"
@@ -173,12 +179,12 @@ body.layout-compact .playlist-item-title {
 }
 
 /* ─── 顶栏 Header ─────────────────────────────────────────────── */
-.header { 
+.header {
     grid-area: header;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    position: relative; 
+    position: relative;
     padding: 0 4px;
     min-height: 48px;
     width: 100%;
@@ -207,16 +213,16 @@ body.layout-compact .playlist-item-title {
     cursor: pointer;
     flex-shrink: 0;
     white-space: nowrap;
-    transition: 
+    transition:
         left 0.65s cubic-bezier(0.16, 1, 0.3, 1),
         top 0.65s cubic-bezier(0.16, 1, 0.3, 1),
         transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.header-logo { 
-    margin: 0; 
-    font-size: 1.7em; 
-    font-weight: 700; 
+.header-logo {
+    margin: 0;
+    font-size: 1.7em;
+    font-weight: 700;
     color: var(--text-color);
     letter-spacing: -0.03em;
     user-select: none;
@@ -246,7 +252,7 @@ body.layout-compact .playlist-item-title {
     letter-spacing: 0.03em;
     user-select: none;
     white-space: nowrap;
-    transition: 
+    transition:
         left 0.65s cubic-bezier(0.16, 1, 0.3, 1),
         top 0.65s cubic-bezier(0.16, 1, 0.3, 1),
         transform 0.65s cubic-bezier(0.16, 1, 0.3, 1),
@@ -283,13 +289,13 @@ body.layout-compact .playlist-item-title {
     backdrop-filter: var(--apple-glass-blur);
     -webkit-backdrop-filter: var(--apple-glass-blur);
     transition: all 0.25s var(--spring-smooth);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .theme-toggle-button:hover {
     color: var(--primary-color);
     border-color: var(--primary-color);
-    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
     transform: scale(1.03);
 }
 
@@ -331,7 +337,9 @@ body.layout-compact .playlist-item-title {
     position: absolute;
     width: 17px;
     height: 17px;
-    transition: transform 0.45s var(--spring-bounce), opacity 0.3s ease;
+    transition:
+        transform 0.45s var(--spring-bounce),
+        opacity 0.3s ease;
 }
 
 /* 默认（全景模式）：显示 minimize 图标，提示收拢 */
@@ -359,4 +367,3 @@ body.layout-compact .layout-toggle-btn .layout-icon--maximize {
 .layout-toggle-btn:hover .layout-icon {
     color: var(--primary-color);
 }
-

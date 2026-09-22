@@ -6,7 +6,7 @@ import { $, triggerLightHaptic, updateMobileOverlayScrim } from "./core.js";
 import { closeMobileSearch } from "./search.js";
 
 export function normalizePanelView(view) {
-    return view === "lyrics" ? "playlist" : (view || "playlist");
+    return view === "lyrics" ? "playlist" : view || "playlist";
 }
 
 export function switchMobilePanelTab(targetTab) {

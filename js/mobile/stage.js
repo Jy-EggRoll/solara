@@ -9,9 +9,8 @@ let userScrollTimeout = null;
 
 export function toggleMobileLyrics(forceState = null) {
     if (!document.body) return;
-    const willOpen = typeof forceState === "boolean" 
-        ? forceState 
-        : !document.body.classList.contains("mobile-inline-lyrics-open");
+    const willOpen =
+        typeof forceState === "boolean" ? forceState : !document.body.classList.contains("mobile-inline-lyrics-open");
 
     triggerLightHaptic();
     document.body.classList.toggle("mobile-inline-lyrics-open", willOpen);
@@ -129,48 +128,68 @@ export function initMobileLyricsInteractions() {
             }, 5000);
         };
 
-        lyricsScroll.addEventListener("touchstart", () => {
-            isTouching = true;
-            const state = window.SolaraState;
-            if (state) {
-                state.userScrolledLyrics = true;
-            }
-            if (userScrollTimeout) {
-                clearTimeout(userScrollTimeout);
-                userScrollTimeout = null;
-            }
-        }, { passive: true });
+        lyricsScroll.addEventListener(
+            "touchstart",
+            () => {
+                isTouching = true;
+                const state = window.SolaraState;
+                if (state) {
+                    state.userScrolledLyrics = true;
+                }
+                if (userScrollTimeout) {
+                    clearTimeout(userScrollTimeout);
+                    userScrollTimeout = null;
+                }
+            },
+            { passive: true },
+        );
 
-        lyricsScroll.addEventListener("touchend", () => {
-            isTouching = false;
-            scheduleRecenter();
-        }, { passive: true });
-
-        lyricsScroll.addEventListener("touchcancel", () => {
-            isTouching = false;
-            scheduleRecenter();
-        }, { passive: true });
-
-        lyricsScroll.addEventListener("wheel", () => {
-            const state = window.SolaraState;
-            if (state) {
-                state.userScrolledLyrics = true;
-            }
-            scheduleRecenter();
-        }, { passive: true });
-
-        lyricsScroll.addEventListener("scroll", () => {
-            // 忽略程序触发的平滑滚动
-            if (window.__solaraIsProgrammaticScrolling) return;
-
-            const state = window.SolaraState;
-            if (!state) return;
-            state.userScrolledLyrics = true;
-
-            if (!isTouching) {
+        lyricsScroll.addEventListener(
+            "touchend",
+            () => {
+                isTouching = false;
                 scheduleRecenter();
-            }
-        }, { passive: true });
+            },
+            { passive: true },
+        );
+
+        lyricsScroll.addEventListener(
+            "touchcancel",
+            () => {
+                isTouching = false;
+                scheduleRecenter();
+            },
+            { passive: true },
+        );
+
+        lyricsScroll.addEventListener(
+            "wheel",
+            () => {
+                const state = window.SolaraState;
+                if (state) {
+                    state.userScrolledLyrics = true;
+                }
+                scheduleRecenter();
+            },
+            { passive: true },
+        );
+
+        lyricsScroll.addEventListener(
+            "scroll",
+            () => {
+                // 忽略程序触发的平滑滚动
+                if (window.__solaraIsProgrammaticScrolling) return;
+
+                const state = window.SolaraState;
+                if (!state) return;
+                state.userScrolledLyrics = true;
+
+                if (!isTouching) {
+                    scheduleRecenter();
+                }
+            },
+            { passive: true },
+        );
     }
 
     // 4. Apple 原生级下拉收起手势 (Pull-down to Dismiss)
@@ -178,40 +197,48 @@ export function initMobileLyricsInteractions() {
     let currentDeltaY = 0;
     let isDragging = false;
 
-    lyricsContainer.addEventListener("touchstart", (e) => {
-        if (!document.body.classList.contains("mobile-inline-lyrics-open")) return;
-        
-        // 判定触控区域：碰触顶部 header 区域（Handle/胶囊），或歌词内容滚至最顶部 (scrollTop <= 4)
-        const isScrollAtTop = !lyricsScroll || lyricsScroll.scrollTop <= 4;
-        const isHeaderTouch = lyricsHeader && (lyricsHeader === e.target || lyricsHeader.contains(e.target));
+    lyricsContainer.addEventListener(
+        "touchstart",
+        (e) => {
+            if (!document.body.classList.contains("mobile-inline-lyrics-open")) return;
 
-        if (isScrollAtTop || isHeaderTouch) {
-            startY = e.touches[0].clientY;
-            currentDeltaY = 0;
-            isDragging = true;
-            lyricsContainer.style.transition = "none";
-        }
-    }, { passive: true });
+            // 判定触控区域：碰触顶部 header 区域（Handle/胶囊），或歌词内容滚至最顶部 (scrollTop <= 4)
+            const isScrollAtTop = !lyricsScroll || lyricsScroll.scrollTop <= 4;
+            const isHeaderTouch = lyricsHeader && (lyricsHeader === e.target || lyricsHeader.contains(e.target));
 
-    lyricsContainer.addEventListener("touchmove", (e) => {
-        if (!isDragging) return;
+            if (isScrollAtTop || isHeaderTouch) {
+                startY = e.touches[0].clientY;
+                currentDeltaY = 0;
+                isDragging = true;
+                lyricsContainer.style.transition = "none";
+            }
+        },
+        { passive: true },
+    );
 
-        const touchY = e.touches[0].clientY;
-        const deltaY = touchY - startY;
+    lyricsContainer.addEventListener(
+        "touchmove",
+        (e) => {
+            if (!isDragging) return;
 
-        // 仅处理向下位移（下拉手势）
-        if (deltaY > 0) {
-            currentDeltaY = deltaY;
-            // 物理橡皮筋阻尼跟随
-            const dampedY = Math.pow(deltaY, 0.86);
-            lyricsContainer.style.transform = `translateY(${dampedY}px)`;
-            lyricsContainer.style.opacity = Math.max(0.6, 1 - (deltaY / 300)).toString();
-        } else {
-            currentDeltaY = 0;
-            lyricsContainer.style.transform = "";
-            lyricsContainer.style.opacity = "";
-        }
-    }, { passive: true });
+            const touchY = e.touches[0].clientY;
+            const deltaY = touchY - startY;
+
+            // 仅处理向下位移（下拉手势）
+            if (deltaY > 0) {
+                currentDeltaY = deltaY;
+                // 物理橡皮筋阻尼跟随
+                const dampedY = Math.pow(deltaY, 0.86);
+                lyricsContainer.style.transform = `translateY(${dampedY}px)`;
+                lyricsContainer.style.opacity = Math.max(0.6, 1 - deltaY / 300).toString();
+            } else {
+                currentDeltaY = 0;
+                lyricsContainer.style.transform = "";
+                lyricsContainer.style.opacity = "";
+            }
+        },
+        { passive: true },
+    );
 
     const handleTouchEnd = () => {
         if (!isDragging) return;
@@ -241,4 +268,3 @@ export function initMobileLyricsInteractions() {
     lyricsContainer.addEventListener("touchend", handleTouchEnd, { passive: true });
     lyricsContainer.addEventListener("touchcancel", handleTouchEnd, { passive: true });
 }
-

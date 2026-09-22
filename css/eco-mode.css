@@ -37,33 +37,34 @@ html.eco-mode {
     --backdrop-blur: 0px;
 }
 html.eco-mode.dark-mode {
-    --container-bg: rgba(18, 22, 28, 0.90);
-    --component-bg: rgba(255, 255, 255, 0.10);
+    --container-bg: rgba(18, 22, 28, 0.9);
+    --component-bg: rgba(255, 255, 255, 0.1);
 }
 
 /* 3. 去毛玻璃 —— 桌面常驻面板与交互菜单（单类特异性已高于基础单类规则） */
-html.eco-mode :is(
-    .container,
-    .theme-toggle-button,
-    .cover-area,
-    .playlist,
-    .lyrics,
-    .playlist-tabs,
-    .playlist-action-btn,
-    .controls,
-    .search-area,
-    .search-result-item,
-    .source-menu,
-    .import-dropdown-menu,
-    .dynamic-quality-menu,
-    .player-quality-menu,
-    .load-more-btn,
-    .modal-overlay,
-    .modal-content,
-    .import-selected-btn,
-    .close-search-btn,
-    .notification
-) {
+html.eco-mode
+    :is(
+        .container,
+        .theme-toggle-button,
+        .cover-area,
+        .playlist,
+        .lyrics,
+        .playlist-tabs,
+        .playlist-action-btn,
+        .controls,
+        .search-area,
+        .search-result-item,
+        .source-menu,
+        .import-dropdown-menu,
+        .dynamic-quality-menu,
+        .player-quality-menu,
+        .load-more-btn,
+        .modal-overlay,
+        .modal-content,
+        .import-selected-btn,
+        .close-search-btn,
+        .notification
+    ) {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
 }
@@ -79,15 +80,17 @@ html.eco-mode #qualityToggle {
    以下为使用字面 blur() 的规则，按真实选择器精确命中。
    前缀 html.eco-mode body.eco-mode.mobile-view 取得 (0,4,2)/(1,4,2) 特异性，
    稳定压制运行时注入的 mobile.css，不依赖加载顺序与深浅色变体） */
-html.eco-mode body.eco-mode.mobile-view :is(
-    .mobile-panel,
-    .mobile-quality-chip,
-    .mobile-inline-lyrics__hint,
-    #notification,
-    .settings-content,
-    .import-dropdown-menu,
-    .mobile-panel-header .playlist-tabs
-),
+html.eco-mode
+    body.eco-mode.mobile-view
+    :is(
+        .mobile-panel,
+        .mobile-quality-chip,
+        .mobile-inline-lyrics__hint,
+        #notification,
+        .settings-content,
+        .import-dropdown-menu,
+        .mobile-panel-header .playlist-tabs
+    ),
 html.eco-mode body.eco-mode.mobile-view .album-cover::after {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;

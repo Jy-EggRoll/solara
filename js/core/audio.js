@@ -9,9 +9,9 @@ import { getSongKey } from "../features/playlist.js";
 import { ensureFavoriteSongsArray } from "../features/favorites.js";
 
 export const playModeTexts = {
-    "list": "列表循环",
-    "single": "单曲循环",
-    "random": "随机播放"
+    list: "列表循环",
+    single: "单曲循环",
+    random: "随机播放",
 };
 
 // 短期音频地址内存缓存（15分钟 TTL），避免用户在播放列表内切歌反复请求 types=url
@@ -23,7 +23,7 @@ export const APPLE_SVG_ICONS = {
     pause: `<svg class="apple-svg-icon icon-pause" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 5a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h1zm11 0a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h1z"/></svg>`,
     repeatList: `<svg class="apple-svg-icon icon-repeat-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg>`,
     repeatSingle: `<svg class="apple-svg-icon icon-repeat-single" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/><text x="12" y="15.5" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif" font-size="9.5" font-weight="900" text-anchor="middle" fill="currentColor" stroke="none">1</text></svg>`,
-    shuffle: `<svg class="apple-svg-icon shuffle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l6.6-8.6c.8-1.1 2-1.7 3.3-1.7H22"/><path d="m18 2 4 4-4 4"/><path d="M2 6h1.4c1.3 0 2.5.6 3.3 1.7l1.8 2.3"/><path d="M14.9 14.7l1.8 2.3c.8 1.1 2 1.7 3.3 1.7H22"/><path d="m18 22 4-4-4-4"/></svg>`
+    shuffle: `<svg class="apple-svg-icon shuffle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l6.6-8.6c.8-1.1 2-1.7 3.3-1.7H22"/><path d="m18 2 4 4-4 4"/><path d="M2 6h1.4c1.3 0 2.5.6 3.3 1.7l1.8 2.3"/><path d="M14.9 14.7l1.8 2.3c.8 1.1 2 1.7 3.3 1.7H22"/><path d="m18 22 4-4-4-4"/></svg>`,
 };
 
 export function getActivePlayMode(state) {
@@ -81,8 +81,8 @@ export function updatePlayModeUI(state, dom) {
         dom.playModeBtn.classList.toggle("is-single", isSingle);
         dom.playModeBtn.classList.toggle("is-random", isRandom);
         dom.playModeBtn.classList.toggle("active", isSingle || isRandom);
-        dom.playModeBtn.setAttribute("aria-pressed", (isSingle || isRandom) ? "true" : "false");
-        const label = isSingle ? "当前模式：单曲循环" : (isRandom ? "当前模式：随机播放" : "当前模式：列表循环");
+        dom.playModeBtn.setAttribute("aria-pressed", isSingle || isRandom ? "true" : "false");
+        const label = isSingle ? "当前模式：单曲循环" : isRandom ? "当前模式：随机播放" : "当前模式：列表循环";
         dom.playModeBtn.title = label;
         dom.playModeBtn.setAttribute("aria-label", label);
     }
@@ -179,7 +179,11 @@ export function updatePlayPauseButton(dom) {
     }
 }
 
-export function updateProgressBarBackground(dom, value = Number(dom.progressBar?.value), max = Number(dom.progressBar?.max)) {
+export function updateProgressBarBackground(
+    dom,
+    value = Number(dom.progressBar?.value),
+    max = Number(dom.progressBar?.max),
+) {
     if (!dom.progressBar) return;
     const duration = Number.isFinite(max) && max > 0 ? max : 0;
     const progressValue = Number.isFinite(value) ? Math.max(value, 0) : 0;
@@ -196,18 +200,21 @@ export function updateVolumeSliderBackground(dom, volume = dom.audioPlayer?.volu
 export function updateVolumeIcon(dom, volume) {
     if (!dom.volumeIcon) return;
     const clamped = Math.min(Math.max(Number.isFinite(volume) ? volume : 0, 0), 1);
-    
+
     // 如果是 SVG 图标（Apple 矢量图标），动态更新内部矢量路径
     if (dom.volumeIcon.tagName && dom.volumeIcon.tagName.toLowerCase() === "svg") {
         if (clamped === 0) {
             // 静音状态 (扬声器 + 叉号)
-            dom.volumeIcon.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/><line x1="22" y1="9" x2="16" y2="15"/><line x1="16" y1="9" x2="22" y2="15"/>';
+            dom.volumeIcon.innerHTML =
+                '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/><line x1="22" y1="9" x2="16" y2="15"/><line x1="16" y1="9" x2="22" y2="15"/>';
         } else if (clamped < 0.4) {
             // 低音量状态 (扬声器 + 单波纹)
-            dom.volumeIcon.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>';
+            dom.volumeIcon.innerHTML =
+                '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>';
         } else {
             // 高音量状态 (扬声器 + 双波纹)
-            dom.volumeIcon.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>';
+            dom.volumeIcon.innerHTML =
+                '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>';
         }
         return;
     }
@@ -248,8 +255,8 @@ export function waitForAudioReady(player) {
     }
     return new Promise((resolve, reject) => {
         const cleanup = () => {
-            player.removeEventListener('loadedmetadata', onLoaded);
-            player.removeEventListener('error', onError);
+            player.removeEventListener("loadedmetadata", onLoaded);
+            player.removeEventListener("error", onError);
         };
         const onLoaded = () => {
             cleanup();
@@ -257,10 +264,10 @@ export function waitForAudioReady(player) {
         };
         const onError = () => {
             cleanup();
-            reject(new Error('音频加载失败'));
+            reject(new Error("音频加载失败"));
         };
-        player.addEventListener('loadedmetadata', onLoaded, { once: true });
-        player.addEventListener('error', onError, { once: true });
+        player.addEventListener("loadedmetadata", onLoaded, { once: true });
+        player.addEventListener("error", onError, { once: true });
     });
 }
 
@@ -278,7 +285,8 @@ export async function playSong(song, options = {}, state, dom, callbacks = {}, d
 
     const log = (msg) => {
         if (typeof debugLogger === "function") debugLogger(msg);
-        else if (typeof window !== "undefined" && typeof window.__solaraDebugLog === "function") window.__solaraDebugLog(msg);
+        else if (typeof window !== "undefined" && typeof window.__solaraDebugLog === "function")
+            window.__solaraDebugLog(msg);
     };
 
     try {
@@ -286,10 +294,10 @@ export async function playSong(song, options = {}, state, dom, callbacks = {}, d
             callbacks.updateCurrentSongInfo(song, { loadArtwork: false });
         }
 
-        const quality = state.playbackQuality || '320';
-        log(`[音频播放] 准备加载: ${song.name || "未知歌曲"} (音质: ${quality}k, 来源: ${song.source || 'netease'})`);
+        const quality = state.playbackQuality || "320";
+        log(`[音频播放] 准备加载: ${song.name || "未知歌曲"} (音质: ${quality}k, 来源: ${song.source || "netease"})`);
 
-        const cacheKey = `${song.source || 'netease'}_${song.id}_${quality}`;
+        const cacheKey = `${song.source || "netease"}_${song.id}_${quality}`;
         let originalAudioUrl = null;
 
         // 1. 优先命中前端内存短期直链缓存（0 网络请求）
@@ -307,7 +315,7 @@ export async function playSong(song, options = {}, state, dom, callbacks = {}, d
         if (!originalAudioUrl) {
             let audioUrl = API.getSongUrl(song, quality);
             if (isRetry) {
-                audioUrl += '&nocache=true';
+                audioUrl += "&nocache=true";
                 log(`[音频重试] 正在通过非缓存链路重试请求...`);
             }
             log(`[音频解析] 请求接口: ${audioUrl}`);
@@ -318,14 +326,14 @@ export async function playSong(song, options = {}, state, dom, callbacks = {}, d
             }
 
             if (!audioData || !audioData.url) {
-                throw new Error('无法获取音频播放地址');
+                throw new Error("无法获取音频播放地址");
             }
 
             originalAudioUrl = audioData.url;
             // 存入短期缓存（15分钟有效）
             audioUrlMemoryCache.set(cacheKey, {
                 url: originalAudioUrl,
-                timestamp: Date.now()
+                timestamp: Date.now(),
             });
         }
 
@@ -333,7 +341,7 @@ export async function playSong(song, options = {}, state, dom, callbacks = {}, d
         const proxiedAudioUrl = buildAudioProxyUrl(originalAudioUrl);
         const preferredAudioUrl = preferHttpsUrl(originalAudioUrl);
         const candidateAudioUrls = Array.from(
-            new Set([proxiedAudioUrl, preferredAudioUrl, originalAudioUrl].filter(Boolean))
+            new Set([proxiedAudioUrl, preferredAudioUrl, originalAudioUrl].filter(Boolean)),
         );
 
         state.currentSong = song;
@@ -344,7 +352,7 @@ export async function playSong(song, options = {}, state, dom, callbacks = {}, d
             if (!preserveProgress) {
                 state.favoritePlaybackTime = 0;
                 state.favoriteLastSavedPlaybackTime = 0;
-                safeSetLocalStorage('favoritePlaybackTime', '0');
+                safeSetLocalStorage("favoritePlaybackTime", "0");
             } else if (startTime > 0) {
                 state.favoritePlaybackTime = startTime;
                 state.favoriteLastSavedPlaybackTime = startTime;
@@ -353,7 +361,7 @@ export async function playSong(song, options = {}, state, dom, callbacks = {}, d
             if (!preserveProgress) {
                 state.currentPlaybackTime = 0;
                 state.lastSavedPlaybackTime = 0;
-                safeSetLocalStorage('currentPlaybackTime', '0');
+                safeSetLocalStorage("currentPlaybackTime", "0");
             } else if (startTime > 0) {
                 state.currentPlaybackTime = startTime;
                 state.lastSavedPlaybackTime = startTime;
@@ -383,7 +391,7 @@ export async function playSong(song, options = {}, state, dom, callbacks = {}, d
         }
 
         if (!selectedAudioUrl) {
-            throw lastAudioError || new Error('音频加载失败');
+            throw lastAudioError || new Error("音频加载失败");
         }
 
         if (myToken !== currentPlaybackToken) {
@@ -402,22 +410,22 @@ export async function playSong(song, options = {}, state, dom, callbacks = {}, d
         state.lastSavedPlaybackTime = state.currentPlaybackTime;
 
         let playPromise = null;
-        log(`[音频解码] 缓冲就绪 (${autoplay ? '开始自动播放' : '静音待播'})`);
+        log(`[音频解码] 缓冲就绪 (${autoplay ? "开始自动播放" : "静音待播"})`);
 
         if (autoplay) {
             playPromise = dom.audioPlayer.play();
             if (playPromise !== undefined) {
-                playPromise.catch(async error => {
-                    console.error('播放失败:', error);
+                playPromise.catch(async (error) => {
+                    console.error("播放失败:", error);
                     log(`[音频异常] 播放失败: ${error?.message || error}`);
                     if (!isRetry) {
                         try {
                             await playSong(song, { ...options, isRetry: true }, state, dom, callbacks, debugLogger);
                         } catch (retryError) {
-                            showNotification('播放失败，请检查网络连接', 'error', dom);
+                            showNotification("播放失败，请检查网络连接", "error", dom);
                         }
                     } else {
-                        showNotification('播放失败，请检查网络连接', 'error', dom);
+                        showNotification("播放失败，请检查网络连接", "error", dom);
                     }
                 });
             }
@@ -431,11 +439,11 @@ export async function playSong(song, options = {}, state, dom, callbacks = {}, d
             callbacks.scheduleDeferredSongAssets(song, playPromise);
         }
 
-        if (typeof window.__SOLARA_UPDATE_MEDIA_METADATA === 'function') {
+        if (typeof window.__SOLARA_UPDATE_MEDIA_METADATA === "function") {
             window.__SOLARA_UPDATE_MEDIA_METADATA();
         }
     } catch (error) {
-        console.error('播放歌曲失败:', error);
+        console.error("播放歌曲失败:", error);
         if (!isRetry) {
             return playSong(song, { ...options, isRetry: true }, state, dom, callbacks, debugLogger);
         }
@@ -448,7 +456,7 @@ export async function playSong(song, options = {}, state, dom, callbacks = {}, d
 }
 
 export function autoPlayNext(state, dom, callbacks = {}) {
-    if (dom.audioPlayer && dom.audioPlayer.__solaraMediaSessionHandledEnded === 'skip') {
+    if (dom.audioPlayer && dom.audioPlayer.__solaraMediaSessionHandledEnded === "skip") {
         dom.audioPlayer.__solaraMediaSessionHandledEnded = false;
         return;
     }
@@ -701,4 +709,3 @@ export function resetPlayerToIdle(state, dom, callbacks = {}) {
         callbacks.savePlayerState();
     }
 }
-

@@ -24,7 +24,7 @@ export function resolveSongId(rawSong) {
         "copyrightId",
         "copyright_id",
         "rid",
-        "bvid"
+        "bvid",
     ];
     for (const key of candidateKeys) {
         const val = rawSong[key];
@@ -40,15 +40,17 @@ export function resolveSongId(rawSong) {
 
 export function normalizeArtistValue(value) {
     if (Array.isArray(value)) {
-        const names = value.map((item) => {
-            if (typeof item === "string") {
-                return item.trim();
-            }
-            if (item && typeof item === "object" && typeof item.name === "string") {
-                return item.name.trim();
-            }
-            return "";
-        }).filter(Boolean);
+        const names = value
+            .map((item) => {
+                if (typeof item === "string") {
+                    return item.trim();
+                }
+                if (item && typeof item === "object" && typeof item.name === "string") {
+                    return item.name.trim();
+                }
+                return "";
+            })
+            .filter(Boolean);
         return names.length > 0 ? names.join(", ") : undefined;
     }
     if (value && typeof value === "object" && typeof value.name === "string") {
@@ -66,11 +68,12 @@ export function getSongKey(song) {
     if (!song || typeof song !== "object") {
         return null;
     }
-    const source = typeof song.source === "string" && song.source.trim() !== ""
-        ? song.source.trim().toLowerCase()
-        : (typeof song.platform === "string" && song.platform.trim() !== ""
-            ? song.platform.trim().toLowerCase()
-            : "netease");
+    const source =
+        typeof song.source === "string" && song.source.trim() !== ""
+            ? song.source.trim().toLowerCase()
+            : typeof song.platform === "string" && song.platform.trim() !== ""
+              ? song.platform.trim().toLowerCase()
+              : "netease";
     const id = resolveSongId(song);
     if (id) {
         return `${source}:${id}`;
@@ -82,15 +85,18 @@ export function getSongKey(song) {
     const artistValue = song.artist ?? song.artists ?? song.singers ?? song.singer;
     let artistText = "";
     if (Array.isArray(artistValue)) {
-        artistText = artistValue.map((item) => {
-            if (typeof item === "string") {
-                return item.trim().toLowerCase();
-            }
-            if (item && typeof item === "object" && typeof item.name === "string") {
-                return item.name.trim().toLowerCase();
-            }
-            return "";
-        }).filter(Boolean).join(",");
+        artistText = artistValue
+            .map((item) => {
+                if (typeof item === "string") {
+                    return item.trim().toLowerCase();
+                }
+                if (item && typeof item === "object" && typeof item.name === "string") {
+                    return item.name.trim().toLowerCase();
+                }
+                return "";
+            })
+            .filter(Boolean)
+            .join(",");
     } else if (artistValue && typeof artistValue === "object" && typeof artistValue.name === "string") {
         artistText = artistValue.name.trim().toLowerCase();
     } else if (typeof artistValue === "string") {
@@ -110,9 +116,8 @@ export function sanitizeImportedSong(rawSong) {
 
     const normalized = { ...rawSong, name };
     const sourceCandidate = rawSong.source || rawSong.platform || rawSong.provider || rawSong.vendor;
-    normalized.source = typeof sourceCandidate === "string" && sourceCandidate.trim() !== ""
-        ? sourceCandidate.trim()
-        : "netease";
+    normalized.source =
+        typeof sourceCandidate === "string" && sourceCandidate.trim() !== "" ? sourceCandidate.trim() : "netease";
 
     const resolvedId = resolveSongId(rawSong);
     if (resolvedId) {
@@ -199,7 +204,7 @@ export function updatePlaylistHighlight(state, dom) {
     }
 
     items.forEach((item, index) => {
-        const isCurrent = (index === targetIndex);
+        const isCurrent = index === targetIndex;
         item.classList.toggle("current", isCurrent);
         item.setAttribute("aria-current", isCurrent ? "true" : "false");
         item.setAttribute("aria-pressed", isCurrent ? "true" : "false");
@@ -215,18 +220,18 @@ export function renderPlaylist(state, dom, callbacks = {}) {
         if (typeof callbacks.savePlayerState === "function") callbacks.savePlayerState();
         if (typeof callbacks.updateFavoriteIcons === "function") callbacks.updateFavoriteIcons();
         updatePlaylistHighlight(state, dom);
-        if (typeof callbacks.updateMobileClearPlaylistVisibility === "function") callbacks.updateMobileClearPlaylistVisibility();
+        if (typeof callbacks.updateMobileClearPlaylistVisibility === "function")
+            callbacks.updateMobileClearPlaylistVisibility();
         updatePlaylistActionStates(state, dom);
         return;
     }
 
     if (dom.playlist) dom.playlist.classList.remove("empty");
-    const playlistHtml = state.playlistSongs.map((song, index) => {
-        const artistValue = Array.isArray(song.artist)
-            ? song.artist.join(", ")
-            : (song.artist || "未知艺术家");
-        const songKey = getSongKey(song) || `playlist-${index}`;
-        return `
+    const playlistHtml = state.playlistSongs
+        .map((song, index) => {
+            const artistValue = Array.isArray(song.artist) ? song.artist.join(", ") : song.artist || "未知艺术家";
+            const songKey = getSongKey(song) || `playlist-${index}`;
+            return `
         <div class="playlist-item" data-index="${index}" role="button" tabindex="0" aria-label="播放 ${song.name}" data-favorite-key="${songKey}">
             <div class="playlist-item-info">
                 <span class="playlist-item-title">${song.name}</span>
@@ -244,13 +249,15 @@ export function renderPlaylist(state, dom, callbacks = {}) {
                 </button>
             </div>
         </div>`;
-    }).join("");
+        })
+        .join("");
 
     dom.playlistItems.innerHTML = playlistHtml;
     if (typeof callbacks.savePlayerState === "function") callbacks.savePlayerState();
     if (typeof callbacks.updateFavoriteIcons === "function") callbacks.updateFavoriteIcons();
     updatePlaylistHighlight(state, dom);
-    if (typeof callbacks.updateMobileClearPlaylistVisibility === "function") callbacks.updateMobileClearPlaylistVisibility();
+    if (typeof callbacks.updateMobileClearPlaylistVisibility === "function")
+        callbacks.updateMobileClearPlaylistVisibility();
     updatePlaylistActionStates(state, dom);
 }
 
@@ -271,9 +278,9 @@ export function observeTabsResize() {
             }
         });
     }
-    document.querySelectorAll(".playlist-tabs").forEach(tabs => {
+    document.querySelectorAll(".playlist-tabs").forEach((tabs) => {
         tabsResizeObserver.observe(tabs);
-        tabs.querySelectorAll(".playlist-tab").forEach(tab => {
+        tabs.querySelectorAll(".playlist-tab").forEach((tab) => {
             tabsResizeObserver.observe(tab);
         });
     });
@@ -302,7 +309,7 @@ export function updateTabsIndicator(tabsContainer) {
 
 export function updateAllTabsIndicators() {
     requestAnimationFrame(() => {
-        document.querySelectorAll(".playlist-tabs").forEach(tabs => {
+        document.querySelectorAll(".playlist-tabs").forEach((tabs) => {
             updateTabsIndicator(tabs);
         });
     });
@@ -379,13 +386,15 @@ export function removeFromPlaylist(index, state, dom, callbacks = {}) {
     const isSameSong = Boolean(
         (removingKey && currentKey && removingKey === currentKey) ||
         (removingSong?.id && state.currentSong?.id && String(removingSong.id) === String(state.currentSong.id)) ||
-        (removingSong?.name && state.currentSong?.name && removingSong.name === state.currentSong.name)
+        (removingSong?.name && state.currentSong?.name && removingSong.name === state.currentSong.name),
     );
     const removingCurrent = (state.currentPlaylist === "playlist" && state.currentTrackIndex === index) || isSameSong;
 
     // 2. 从本地数组中安全移除
     state.playlistSongs.splice(index, 1);
-    window.__solaraDebugLog?.(`[播放列表] 移除曲目: ${removingSong.name || "未知歌曲"} (剩余: ${state.playlistSongs.length} 首)`);
+    window.__solaraDebugLog?.(
+        `[播放列表] 移除曲目: ${removingSong.name || "未知歌曲"} (剩余: ${state.playlistSongs.length} 首)`,
+    );
 
     // 3. 场景 A：列表已经被彻底删空了
     if (state.playlistSongs.length === 0) {
@@ -460,9 +469,11 @@ export function clearPlaylist(state, dom, callbacks = {}) {
 
     // 检查当前是否正在播放属于播放列表的歌曲
     const currentKey = state.currentSong ? getSongKey(state.currentSong) : null;
-    const isPlayingFromPlaylist = state.currentPlaylist === "playlist" ||
+    const isPlayingFromPlaylist =
+        state.currentPlaylist === "playlist" ||
         (currentKey && state.playlistSongs.some((song) => getSongKey(song) === currentKey)) ||
-        (state.currentSong?.id && state.playlistSongs.some((song) => String(song.id) === String(state.currentSong.id))) ||
+        (state.currentSong?.id &&
+            state.playlistSongs.some((song) => String(song.id) === String(state.currentSong.id))) ||
         (state.currentSong?.name && state.playlistSongs.some((song) => song.name === state.currentSong.name));
 
     const oldCount = state.playlistSongs.length;
@@ -544,9 +555,7 @@ export function handleImportPlaylistChange(event, state, dom, callbacks = {}) {
             }
 
             const existingKeys = new Set(
-                state.playlistSongs
-                    .map(getSongKey)
-                    .filter((key) => typeof key === "string" && key !== "")
+                state.playlistSongs.map(getSongKey).filter((key) => typeof key === "string" && key !== ""),
             );
 
             let added = 0;

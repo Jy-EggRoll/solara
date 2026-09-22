@@ -37,7 +37,10 @@ button:active:not(:disabled),
     display: inline-block;
     vertical-align: middle;
     flex-shrink: 0;
-    transition: transform 0.2s var(--spring-smooth), fill 0.2s ease, stroke 0.2s ease;
+    transition:
+        transform 0.2s var(--spring-smooth),
+        fill 0.2s ease,
+        stroke 0.2s ease;
 }
 
 /* ─── Spotlight 鼠标跟随聚光灯动效 (React-Bits / Impeccable) ───── */
@@ -47,11 +50,15 @@ button:active:not(:disabled),
 }
 
 .spotlight-card::before {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
     border-radius: inherit;
-    background: radial-gradient(350px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 255, 255, 0.16), transparent 75%);
+    background: radial-gradient(
+        350px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+        rgba(255, 255, 255, 0.16),
+        transparent 75%
+    );
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.3s ease;
@@ -59,10 +66,13 @@ button:active:not(:disabled),
 }
 
 .dark-mode .spotlight-card::before {
-    background: radial-gradient(350px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 255, 255, 0.08), transparent 75%);
+    background: radial-gradient(
+        350px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+        rgba(255, 255, 255, 0.08),
+        transparent 75%
+    );
 }
 
 .spotlight-card:hover::before {
     opacity: 1;
 }
-
