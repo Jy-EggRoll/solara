@@ -2,18 +2,19 @@ import { defineConfig } from "vite";
 import { resolve } from "node:path";
 
 /**
- * Vite 构建“种子”（当前休眠）。
+ * Vite 构建配置（已启用）。
  *
- * 现状：Cloudflare Pages 以“无构建直发仓库根”部署，本配置文件不会被执行，
- * index.html/login.html/css/js 仍按裸静态资源提供，手动 `?v=` 后缀负责初步防缓存。
+ * 产出：dist/，资源带内容哈希（/assets/*），可长期强缓存；HTML 每次回源校验。
+ * 包管理器：pnpm（见 package.json 的 packageManager 字段）。
+ * Cloudflare Pages 设置：Build command = `pnpm install --frozen-lockfile && pnpm build`，
+ *                        Build output directory = `dist`，Node >= 20。
  *
- * 若要切换到自动内容哈希（彻底免强刷），还需：
- *  1) Pages 后台设置 Build command = `npm ci && npm run build`，Output = `dist`，Node >= 20。
- *  2) 将 favicon.svg / favicon.png / manifest.json 移入 public/（供 JS 里的 `/favicon.png` 绝对引用）。
- *  3) index.html 里把运行时用 JS 注入的 css/desktop.css、css/mobile.css 改为普通 `<link>`
- *     （两者规则分别作用域于 html.desktop-view / .mobile-view，可安全常驻加载），
- *     并删除底部 `js/mobile.js` 的注入块，改由 app.js 里 `import("./mobile.js")` 动态分块。
- *  4) 届时可移除手动的 `?v=` 后缀，由 hash 文件名接管缓存失效。
+ * 说明：
+ *  - favicon.svg / favicon.png / manifest.json 已置于 public/（按根路径原样服务）。
+ *  - css/desktop.css、css/mobile.css 改为常驻 <link>（规则分别作用域于
+ *    html.desktop-view / .mobile-view，可安全同时加载）。
+ *  - mobile.js 由 js/app.js 动态 import() 拆分，仅移动端拉取。
+ *  - 手动 ?v= 后缀已移除，缓存失效交由内容哈希接管。
  */
 export default defineConfig({
     base: "/",

@@ -19,8 +19,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css?v=20260922">
-    <script src="js/i18n.js?v=20260922"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/desktop.css">
+    <link rel="stylesheet" href="css/mobile.css">
+    <script src="js/i18n.js"></script>
     <script>
         (function () {
             const ua = navigator.userAgent || "";
@@ -52,19 +54,9 @@
             } catch (_) {}
             if (!isMobile) {
                 document.documentElement.classList.add("desktop-view");
-                const desktopLink = document.createElement("link");
-                desktopLink.rel = "stylesheet";
-                desktopLink.href = "css/desktop.css?v=20260922";
-                desktopLink.id = "desktopStylesheet";
-                document.head.appendChild(desktopLink);
                 return;
             }
             document.documentElement.classList.add("mobile-view");
-            const link = document.createElement("link");
-            link.rel = "stylesheet";
-            link.href = "css/mobile.css?v=20260922";
-            link.id = "mobileStylesheet";
-            document.head.appendChild(link);
             const setViewportUnit = () => {
                 const vv = window.visualViewport;
                 const winH = window.innerHeight;
@@ -697,14 +689,6 @@
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script type="module" src="js/app.js?v=20260922"></script>
-<script>
-    if (window.__SOLARA_IS_MOBILE) {
-        const mobileScript = document.createElement('script');
-        mobileScript.type = 'module';
-        mobileScript.src = 'js/mobile.js';
-        document.body.appendChild(mobileScript);
-    }
-</script>
+<script type="module" src="js/app.js"></script>
 </body>
 </html>

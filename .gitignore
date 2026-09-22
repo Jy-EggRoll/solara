@@ -8,9 +8,12 @@ data/
 # Node.js dependencies (standalone server)
 server/node_modules/
 
-# Vite build seed (root)
+# Vite build (root)
 node_modules/
 dist/
+# 仅使用 pnpm，忽略其它包管理器的锁文件
+package-lock.json
+yarn.lock
 
 # Local backups and temporary scripts
 *.backup.js

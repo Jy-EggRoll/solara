@@ -84,12 +84,15 @@ docker compose up -d
 ### ✅ Cloudflare Pages 部署 (适合免服务器托管)
 如果您没有自己的服务器，可以直接使用 Cloudflare 免费部署：
 1. Fork 或克隆本仓库到您自己的 GitHub 账号下。
-2. 登录 Cloudflare 控制台，按照 Cloudflare Pages 文档创建站点，并将本仓库作为构建来源或直接上传静态资源。
+2. 登录 Cloudflare 控制台，按 Cloudflare Pages 文档创建站点并连接本仓库；在构建设置中填写 Build command = `pnpm install --frozen-lockfile && pnpm build`、Build output directory = `dist`、Node ≥ 20（详见下方「构建与缓存」）。
 3. 部署完成后，通过 Cloudflare Pages 分配的域名访问站点即可。
 
-### 🧯 前端缓存策略与构建路线图
-- **当前（无构建直发）**：`index.html`/`login.html` 里对本地 `css`/`js` 的引用、运行时注入的 `css/desktop.css`/`css/mobile.css`，以及 `css/style.css`、`css/mobile.css` 中的每条 `@import`，都带一个统一的版本后缀 `?v=YYYYMMDD`。**改动前端资源后，把这 4 处的日期串更新一次即可**让访客（含移动端，无法强刷时）拿到新文件。注意：`js/app.js` 通过相对 `import` 深链加载的子模块暂不受该后缀覆盖，仍可能需要硬刷。
-- **路线图（已埋 Vite 种子，休眠中）**：仓库已加入 `package.json`、`vite.config.ts`、`public/_headers` 作为脚手架（包管理器约定为 **pnpm**），当前 Pages 未配置构建命令时完全不生效、零影响。待需要时可一步切换到自动内容哈希：在 Pages 后台设 Build command = `pnpm install --frozen-lockfile && pnpm build`、Output = `dist`、Node ≥ 20，并按 `vite.config.ts` 顶部注释把 `favicon/manifest` 移入 `public/`、把 `desktop.css`/`mobile.css` 运行时注入改为普通 `<link>`、`mobile.js` 改动态 `import()`，之后即可移除手动 `?v=` 后缀。
+### 🏗️ 构建与缓存（Vite + pnpm）
+前端已接入 **Vite** 构建：资源自动带内容哈希输出到 `dist/assets/*`，HTML 每次回源校验（见 `public/_headers`），**不再需要手动维护 `?v=` 版本号** —— 改任一样式/脚本后重新构建即自动换名，访客（含移动端）无需强刷即可拿到最新版本。
+
+- **Cloudflare Pages 设置**：Build command = `pnpm install --frozen-lockfile && pnpm build`，Build output directory = `dist`，Node ≥ 20。
+- **本地开发**：`pnpm install` → `pnpm dev`（热更开发）/ `pnpm build`（产出 `dist/`）/ `pnpm preview`（预览产物）。
+- **约定**：`favicon.*`、`manifest.json` 位于 `public/`（按根路径原样服务）；`css/desktop.css`、`css/mobile.css` 作为常驻 `<link>` 交由 Vite 处理；`js/mobile.js` 由 `js/app.js` 动态 `import()` 按需拆分（仅移动端拉取）；`public/js/i18n.js` 为 classic 脚本，保持原路径、不参与哈希。
 
 ## ⚙️ 配置提示
 - API 基地址定义在 `functions/proxy.ts` 中，可替换为自建接口域名。

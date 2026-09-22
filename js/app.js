@@ -131,6 +131,11 @@ initDebugShortcut(state, dom, debugLog);
 
 const isMobileView = Boolean(window.__SOLARA_IS_MOBILE);
 
+// 移动端专属逻辑按需加载（构建时拆分为独立哈希 chunk，仅移动端拉取）
+if (isMobileView) {
+    import("./mobile.js");
+}
+
 // 状态保存快捷方法
 export function savePlayerState(options = {}) {
     const { skipRemote = false } = options;
