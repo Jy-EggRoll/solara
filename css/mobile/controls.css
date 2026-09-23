@@ -62,7 +62,15 @@ body.mobile-view .progress-container input[type="range"] {
     outline: none;
     -webkit-appearance: none;
     appearance: none;
-    background: rgba(120, 120, 128, 0.22);
+    /* 与桌面同源：已播放段走主色，未播放段维持移动端的灰 */
+    background: linear-gradient(
+        to right,
+        var(--primary-color) 0%,
+        var(--primary-color) var(--progress, 0%),
+        rgba(120, 120, 128, 0.22) var(--progress, 0%),
+        rgba(120, 120, 128, 0.22) 100%
+    );
+    box-shadow: var(--slider-track-glow);
     cursor: pointer;
     touch-action: none;
 }
@@ -74,13 +82,20 @@ body.mobile-view .progress-container input[type="range"]::-webkit-slider-thumb {
     height: 13px;
     border-radius: 50%;
     background: #ffffff;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
     border: 1.5px solid var(--primary-color);
-    transition: transform 0.1s ease;
+    box-shadow:
+        0 2px 6px rgba(0, 0, 0, 0.25),
+        var(--slider-glow);
+    transition:
+        transform 0.1s ease,
+        box-shadow 0.18s ease;
 }
 
 body.mobile-view .progress-container input[type="range"]:active::-webkit-slider-thumb {
     transform: scale(1.35);
+    box-shadow:
+        0 2px 6px rgba(0, 0, 0, 0.25),
+        var(--slider-glow-active);
 }
 
 body.mobile-view .progress-container span {

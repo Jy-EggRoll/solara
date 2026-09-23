@@ -6,20 +6,22 @@
    选择器均用 (类) 前缀 + !important，对运行时注入的 desktop.css / mobile.css
    以「更高特异性」稳定压制，不依赖样式加载顺序。 */
 
-/* 1. 去底图：彻底不渲染封面模糊层 / noise / 过渡层（display:none 后 filter 无成本） */
-html.eco-mode .cover-backdrop,
+/* 1. 底图在省电模式下保留但冻结：单张静态栅格本身没有每帧开销，
+   停掉旋转即可，既保住封面观感又不引入逐帧成本（毛玻璃仍不启用，那才是真正的重开销）。 */
+html.eco-mode .cover-backdrop {
+    animation: none !important;
+    will-change: auto !important;
+    /* 与移动端同理：不旋转也必须保留放大，否则模糊羽化边会落进屏幕内 */
+    transform: translateZ(0) scale(1.6) !important;
+}
+
+/* noise 与过渡层在省电模式下不渲染：没有交叉淡入，基底层直接呈现底图/静态渐变 */
 html.eco-mode .aurora-noise,
 html.eco-mode .background-stage__layer--transition {
     display: none !important;
     filter: none !important;
     will-change: auto !important;
     animation: none !important;
-}
-
-/* 关闭跨淡入：过渡层已隐藏，基底层直接呈现静态渐变 */
-html.eco-mode body.background-transitioning .background-stage__layer--transition,
-html.eco-mode.background-transitioning .background-stage__layer--transition {
-    opacity: 0 !important;
 }
 
 /* 基底层保留单层静态渐变（background-image 已是 var(--bg-gradient)，取色仍会更新它） */
@@ -109,13 +111,6 @@ html.eco-mode body.eco-mode.mobile-view .album-cover::after {
     -webkit-backdrop-filter: none !important;
 }
 
-/* 4. 冻结常驻无限动画（律动条、雷达脉冲、唱片旋转、封面脉冲等）
-   只动 animation，不影响 transition（标签指示器/hover 保留） */
-html.eco-mode *,
-html.eco-mode *::before,
-html.eco-mode *::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-}
-
-/* 5. 兜底：prefers-reduced-motion 下也停掉 orb（与 eco 无关的既有行为，保留） */
+/* 4. 停止常驻无限动画中真正昂贵的那一类已随极光一并消失，
+   因此不再一律冻结：唱片旋转、律动条等纯合成小动画在省电模式下照常运行。
+   省电模式省的是每帧高斯与逐层毛玻璃重采样，不是这些零成本的位移。 */

@@ -41,14 +41,31 @@
     /* 凡把调色板色当文字用的地方统一取它：JS 在每次落地调色板时按 WCAG AA(4.5:1)
        对面板底色校验，不达标则沿明度轴变换后写回；兜底即主色本身。 */
     --accent-text: var(--primary-color);
+    /* 进度条 / 音量条：滑块的描边 + 光晕与轨道辉光。深浅色共用同一套数值，
+       颜色取自 --primary-color（它本身按主题取值），因此两个模式天然同步。 */
+    --slider-glow:
+        0 0 0 4px color-mix(in srgb, var(--primary-color) 24%, transparent),
+        0 0 16px color-mix(in srgb, var(--primary-color) 55%, transparent);
+    --slider-glow-hover:
+        0 0 0 5px color-mix(in srgb, var(--primary-color) 30%, transparent),
+        0 0 20px color-mix(in srgb, var(--primary-color) 66%, transparent);
+    --slider-glow-active:
+        0 0 0 6px color-mix(in srgb, var(--primary-color) 34%, transparent),
+        0 0 24px color-mix(in srgb, var(--primary-color) 76%, transparent);
+    --slider-track-glow: 0 0 14px color-mix(in srgb, var(--primary-color) 34%, transparent);
     --border-color: rgba(255, 255, 255, 0.35);
 
     /* 歌词当前高亮行统一语义 Token（颜色随封面调色板动态派生，组件内禁止写死色值） */
     --lyrics-current-text: var(--accent-text);
     --lyrics-current-weight: 700;
-    --lyrics-current-glow: color-mix(in srgb, var(--primary-color) 9%, transparent);
-    --lyrics-current-glow-soft: color-mix(in srgb, var(--primary-color) 2%, transparent);
-    --lyrics-current-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    /* 当前歌词行：底色染与文字辉光都取主色，深浅色共用这一份定义。
+       底色染的深度直接复用 --item-current-mix，与列表当前项一致；
+       它也是对比度校验里已经纳入考核的那一档背景，因此主色文字的可读性下限仍然成立。 */
+    --lyrics-current-glow: color-mix(in srgb, var(--primary-color) var(--item-current-mix), transparent);
+    --lyrics-current-glow-soft: color-mix(in srgb, var(--primary-color) 6%, transparent);
+    --lyrics-current-halo: 0 0 16px var(--palette-glow), 0 0 36px var(--palette-glow);
+    --lyrics-current-depth: 0 1px 3px rgba(0, 0, 0, 0.06);
+    --lyrics-current-shadow: var(--lyrics-current-halo), var(--lyrics-current-depth);
 
     --scrollbar-thumb-bg: rgba(0, 0, 0, 0.18);
     --scrollbar-track-bg: transparent;
@@ -90,11 +107,8 @@
     --item-current-bg: color-mix(in srgb, var(--primary-color) var(--item-current-mix), transparent);
     --border-color: rgba(255, 255, 255, 0.1);
 
-    --lyrics-current-text: #ffffff;
     --lyrics-current-weight: 800;
-    --lyrics-current-glow: color-mix(in srgb, #ffffff 12%, transparent);
-    --lyrics-current-glow-soft: color-mix(in srgb, #ffffff 3%, transparent);
-    --lyrics-current-shadow: 0 0 20px var(--palette-glow), 0 0 40px var(--palette-glow), 0 2px 8px rgba(0, 0, 0, 0.7);
+    --lyrics-current-depth: 0 2px 8px rgba(0, 0, 0, 0.7);
 
     --scrollbar-thumb-bg: rgba(255, 255, 255, 0.2);
     --success-color-hover: #1f8a4f;
