@@ -1093,42 +1093,31 @@ html[lang="en"] .lyrics.empty[data-placeholder="default"] .lyrics-scroll::before
     content: none;
 }
 
+/* ─── 歌词当前高亮行：桌面端与移动端共用同一套语义 Token ──────────────── */
 .lyrics .current,
-.lyrics-content > div.current {
-    color: var(--primary-color-dark, #0d9488) !important;
-    font-weight: 700 !important;
+.lyrics-content > div.current,
+body.mobile-view .mobile-inline-lyrics__content .current {
+    color: var(--lyrics-current-text) !important;
+    font-weight: var(--lyrics-current-weight) !important;
     opacity: 1 !important;
     filter: none !important;
-    font-size: 1.25em !important;
-    letter-spacing: -0.015em !important;
     background: radial-gradient(
         ellipse at center,
-        rgba(13, 148, 136, 0.09) 0%,
-        rgba(13, 148, 136, 0.02) 65%,
+        var(--lyrics-current-glow) 0%,
+        var(--lyrics-current-glow-soft) 68%,
         transparent 100%
     ) !important;
     border: none !important;
-    transform: scale(1.03) !important;
-    border-radius: 14px !important;
     box-shadow: none !important;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-    padding: 8px 18px;
+    text-shadow: var(--lyrics-current-shadow);
 }
 
-.dark-mode .lyrics .current,
-.dark-mode .lyrics-content > div.current {
-    color: var(--lyrics-highlight-text, #ffffff) !important;
-    font-weight: 800 !important;
-    background: radial-gradient(
-        ellipse at center,
-        rgba(255, 255, 255, 0.12) 0%,
-        rgba(255, 255, 255, 0.03) 65%,
-        transparent 100%
-    ) !important;
-    border: none !important;
-    box-shadow: none !important;
-    text-shadow:
-        0 0 20px var(--palette-glow, rgba(52, 209, 182, 0.45)),
-        0 0 40px var(--palette-glow, rgba(52, 209, 182, 0.25)),
-        0 2px 8px rgba(0, 0, 0, 0.7);
+/* 桌面端高亮行的排版度量（移动端度量见 mobile/stage.css） */
+.lyrics .current,
+.lyrics-content > div.current {
+    font-size: 1.25em !important;
+    letter-spacing: -0.015em !important;
+    transform: scale(1.03) !important;
+    border-radius: 14px !important;
+    padding: 8px 18px;
 }

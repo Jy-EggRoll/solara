@@ -386,43 +386,15 @@ body.mobile-view .mobile-inline-lyrics__content > div:active {
     opacity: 0.95;
 }
 
-/* 当前高亮焦点行（Apple Music 级自发光与大字重） */
+/* 当前高亮焦点行：颜色语义统一由 components/player-stage.css 的共用 Token 提供，
+   此处仅保留移动端专属排版度量，彻底消除重复声明与写死色值。 */
 body.mobile-view .mobile-inline-lyrics__content .current {
-    color: var(--primary-color-dark, #0d9488) !important;
-    font-weight: 800 !important;
-    opacity: 1 !important;
-    filter: none !important;
     font-size: clamp(1.32rem, 5.6vw, 1.62rem) !important;
     letter-spacing: -0.02em !important;
-    background: radial-gradient(
-        ellipse at center,
-        rgba(13, 148, 136, 0.12) 0%,
-        rgba(13, 148, 136, 0.02) 70%,
-        transparent 100%
-    ) !important;
-    border: none !important;
     transform: scale(1.05) !important;
     transform-origin: center center;
     border-radius: 16px !important;
-    box-shadow: none !important;
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
     padding: 8px 18px !important;
-}
-
-body.mobile-view.dark-mode .mobile-inline-lyrics__content .current {
-    color: #ffffff !important;
-    background: radial-gradient(
-        ellipse at center,
-        rgba(255, 255, 255, 0.1) 0%,
-        rgba(255, 255, 255, 0.02) 65%,
-        transparent 100%
-    ) !important;
-    border: none !important;
-    box-shadow: none !important;
-    text-shadow:
-        0 0 22px var(--palette-glow, rgba(46, 204, 113, 0.5)),
-        0 0 45px var(--palette-glow, rgba(46, 204, 113, 0.25)),
-        0 2px 8px rgba(0, 0, 0, 0.7);
 }
 
 /* ─── 4. 歌曲元信息与音浪 (Song Metadata & Visualizer) ──────────────────── */
