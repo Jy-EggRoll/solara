@@ -173,13 +173,25 @@ body.background-transitioning .background-stage__layer--transition {
     opacity: 1;
 }
 
+/* 过渡层常驻 opacity: 0，其中那份极光只有交叉淡入的 0.8s 会被看见。
+   平时不渲染可省掉整整一半的极光开销，过渡期间照旧显示，淡入观感不变。 */
+.background-stage__layer--transition .aurora-mesh {
+    visibility: hidden;
+}
+
+body.background-transitioning .background-stage__layer--transition .aurora-mesh {
+    visibility: visible;
+}
+
 .aurora-mesh {
     position: absolute;
     inset: -25%;
     width: 150%;
     height: 150%;
     overflow: hidden;
-    filter: blur(50px) saturate(140%);
+    /* 模糊不放在本层：整层 filter 会因内部光球逐帧位移，被迫每帧重算 150% 视口面积的
+       50px 高斯（DPR2 下即 100px 半径），这才是 GPU 被打满的主因。高斯是线性算子，
+       下移到各光球与整层作用等价，但只需栅格化一次，此后每帧仅剩合成器 transform。 */
     pointer-events: none;
     opacity: 0.85;
     will-change: transform;
@@ -199,6 +211,7 @@ body.background-transitioning .background-stage__layer--transition {
 .aurora-orb {
     position: absolute;
     border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%;
+    filter: blur(50px) saturate(140%);
     will-change: transform;
 }
 
@@ -284,6 +297,19 @@ body.background-transitioning .background-stage__layer--transition {
     100% {
         transform: translate3d(-6vw, 8vh, 0) scale(1.02);
     }
+}
+
+/* 暂停时冻结极光（与 .album-cover img 同一套范式）：外观停在当前帧不变，续播接着转。
+   极光一停，上层所有毛玻璃的 backdrop 也不再变化，可直接命中纹理缓存，
+   于是每帧的模糊重算与重绘一并归零。 */
+.aurora-mesh,
+.aurora-orb {
+    animation-play-state: paused;
+}
+
+body.is-playing .aurora-mesh,
+body.is-playing .aurora-orb {
+    animation-play-state: running;
 }
 
 .aurora-noise {

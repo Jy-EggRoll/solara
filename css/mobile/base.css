@@ -83,12 +83,12 @@ body.mobile-view.dark-mode .background-stage__layer {
     filter: none !important;
 }
 
-/* 移动端极光网格：采用径向光晕自然扩散，取消暴力模糊，改为纯硬件加速的柔和弥散 */
+/* 移动端极光网格：采用径向光晕自然扩散，取消暴力模糊，改为纯硬件加速的柔和弥散。
+   与桌面端保持一致，模糊挂在光球自身而非本层，避免与球体自带模糊叠加成双重模糊。 */
 body.mobile-view .aurora-mesh {
     inset: -25%;
     width: 150%;
     height: 150%;
-    filter: blur(32px) saturate(135%) !important;
     opacity: 0.85;
     transform: translateZ(0);
 }
@@ -100,6 +100,7 @@ body.mobile-view .aurora-orb {
     animation: none !important;
     will-change: auto !important;
     transform: translateZ(0);
+    filter: blur(32px) saturate(135%) !important;
 }
 
 body.mobile-view .aurora-orb--1 {

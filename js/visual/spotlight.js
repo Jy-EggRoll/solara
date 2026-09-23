@@ -9,23 +9,30 @@ export function initSpotlightEffect() {
     }
 
     let ticking = false;
+    let card = null;
+    let pointerX = 0;
+    let pointerY = 0;
+
     window.addEventListener(
         "mousemove",
         (e) => {
-            if (!ticking) {
-                window.requestAnimationFrame(() => {
-                    const elements = document.querySelectorAll(".spotlight-card, .container");
-                    elements.forEach((el) => {
-                        const rect = el.getBoundingClientRect();
-                        const x = e.clientX - rect.left;
-                        const y = e.clientY - rect.top;
-                        el.style.setProperty("--mouse-x", `${x}px`);
-                        el.style.setProperty("--mouse-y", `${y}px`);
-                    });
-                    ticking = false;
-                });
-                ticking = true;
-            }
+            // --mouse-x/y 只有 .spotlight-card::before 消费，且同时只有指针所在的那张
+            // 卡片可见。逐帧回写全部卡片（尤其没有消费者的 .container）只会白白触发
+            // 整棵子树样式失效。
+            card = e.target instanceof Element ? e.target.closest(".spotlight-card") : null;
+            pointerX = e.clientX;
+            pointerY = e.clientY;
+            if (!card || ticking) return;
+
+            ticking = true;
+            window.requestAnimationFrame(() => {
+                ticking = false;
+                const target = card;
+                if (!target) return;
+                const rect = target.getBoundingClientRect();
+                target.style.setProperty("--mouse-x", `${pointerX - rect.left}px`);
+                target.style.setProperty("--mouse-y", `${pointerY - rect.top}px`);
+            });
         },
         { passive: true },
     );
