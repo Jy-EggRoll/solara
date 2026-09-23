@@ -1,6 +1,8 @@
 /* ─── 极简低开销主题 (Eco Mode) ───────────────────────────────────
    正交开关：html.eco-mode + body.eco-mode，与 dark-mode / layout-compact 独立。
    目标：砍掉每帧整屏高斯模糊与动画重绘、去掉逐层毛玻璃重采样，大幅降 GPU/合成开销。
+   着色：面板不做纯白/纯黑实色化，而是用封面调色板 color-mix 出低比例色调分发到各组件，
+         在零每帧开销的前提下保留封面色与层次。
    选择器均用 (类) 前缀 + !important，对运行时注入的 desktop.css / mobile.css
    以「更高特异性」稳定压制，不依赖样式加载顺序。 */
 
@@ -29,16 +31,28 @@ html.eco-mode .background-stage__layer--base {
     will-change: auto !important;
 }
 
-/* 2. 提高面板/组件底色不透明度，弥补去模糊后的可读性 */
+/* 2. 面板/组件底色「实色化」，弥补去模糊后的可读性。
+   不再退化成纯白/纯黑：把封面调色板色做一次低比例 color-mix，按组件层级分配到
+   --container-bg / --component-bg / --apple-glass-border*，让省电模式依然保有封面色彩与层次。
+   color-mix 仅在样式解析时计算一次，无每帧开销，不影响省电初衷。 */
 html.eco-mode {
-    --container-bg: rgba(255, 255, 255, 0.88);
-    --component-bg: rgba(255, 255, 255, 0.84);
+    /* 单次 mix 的基色：主色负责大面积底色（沉稳、已按可读性调和），强调色负责描边（活泼） */
+    --eco-tint: var(--primary-color);
+    --eco-accent: var(--palette-accent, var(--primary-color));
+
+    --container-bg: color-mix(in srgb, var(--eco-tint) 12%, rgba(255, 255, 255, 0.9));
+    --component-bg: color-mix(in srgb, var(--eco-tint) 8%, rgba(255, 255, 255, 0.86));
+    --apple-glass-border: color-mix(in srgb, var(--eco-accent) 26%, rgba(255, 255, 255, 0.45));
+    --apple-glass-border-top: color-mix(in srgb, var(--eco-accent) 18%, rgba(255, 255, 255, 0.82));
+
     --apple-glass-blur: none;
     --backdrop-blur: 0px;
 }
 html.eco-mode.dark-mode {
-    --container-bg: rgba(18, 22, 28, 0.9);
-    --component-bg: rgba(255, 255, 255, 0.1);
+    --container-bg: color-mix(in srgb, var(--eco-tint) 24%, rgba(14, 17, 21, 0.93));
+    --component-bg: color-mix(in srgb, var(--eco-tint) 16%, rgba(22, 26, 31, 0.9));
+    --apple-glass-border: color-mix(in srgb, var(--eco-accent) 30%, rgba(255, 255, 255, 0.12));
+    --apple-glass-border-top: color-mix(in srgb, var(--eco-accent) 24%, rgba(255, 255, 255, 0.28));
 }
 
 /* 3. 去毛玻璃 —— 桌面常驻面板与交互菜单（单类特异性已高于基础单类规则） */
