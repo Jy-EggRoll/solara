@@ -2,6 +2,39 @@
  * Solara 全局常量与配置
  */
 
+/** 调试浮层日志回调（由 visual/spotlight.js 注入） */
+export type DebugLogger = (message: string) => void;
+
+export interface SourceOption {
+    value: string;
+    label: string;
+}
+
+export interface QualityOption {
+    value: string;
+    label: string;
+    description: string;
+}
+
+export interface RadarPlaylist {
+    id: string;
+    name: string;
+    description: string;
+}
+
+/** 规范化的歌曲对象（搜索与雷达列表共用）。字段直接来自上游，可能缺失，取用前自行兜底。 */
+export interface Song {
+    id?: string | number;
+    name?: string;
+    artist?: string;
+    album?: string;
+    source?: string;
+    lyric_id?: string | number;
+    pic_id?: string;
+    url_id?: string | number;
+    pic?: string;
+}
+
 export const DEFAULT_RADAR_GENRES = ["热歌榜", "新歌榜", "飙升榜"];
 
 export const EXPLORE_RADAR_GENRES = [
@@ -14,14 +47,14 @@ export const EXPLORE_RADAR_GENRES = [
     "美国Billboard榜",
 ];
 
-export const SOURCE_OPTIONS = [
+export const SOURCE_OPTIONS: SourceOption[] = [
     { value: "netease", label: "网易云音乐" },
     { value: "kuwo", label: "酷我音乐" },
     { value: "joox", label: "JOOX音乐" },
     { value: "bilibili", label: "哔哩哔哩" },
 ];
 
-export const RADAR_PLAYLISTS = [
+export const RADAR_PLAYLISTS: RadarPlaylist[] = [
     { id: "3778678", name: "热歌榜", description: "网易云音乐官方热歌榜" },
     { id: "19723756", name: "飙升榜", description: "网易云音乐官方飙升榜" },
     { id: "3779629", name: "新歌榜", description: "网易云音乐官方新歌榜" },
@@ -31,19 +64,19 @@ export const RADAR_PLAYLISTS = [
     { id: "60198", name: "美国Billboard榜", description: "网易云音乐美国Billboard榜" },
 ];
 
-export function normalizeSource(value) {
+export function normalizeSource(value: unknown): string {
     const allowed = SOURCE_OPTIONS.map((option) => option.value);
-    return allowed.includes(value) ? value : SOURCE_OPTIONS[0].value;
+    return typeof value === "string" && allowed.includes(value) ? value : SOURCE_OPTIONS[0].value;
 }
 
-export const QUALITY_OPTIONS = [
+export const QUALITY_OPTIONS: QualityOption[] = [
     { value: "128", label: "标准音质", description: "128 kbps" },
     { value: "192", label: "高品音质", description: "192 kbps" },
     { value: "320", label: "极高音质", description: "320 kbps" },
     { value: "999", label: "无损音质", description: "FLAC" },
 ];
 
-export function normalizeQuality(value) {
+export function normalizeQuality(value: unknown): string {
     const match = QUALITY_OPTIONS.find((option) => option.value === value);
     return match ? match.value : "320";
 }
@@ -81,7 +114,18 @@ export const PALETTE_TARGET_SAMPLE_COUNT = 2400;
 
 export const PLACEHOLDER_HTML = `<div class="placeholder"><i class="fas fa-music"></i></div>`;
 
-export const themeDefaults = {
+export interface ThemeDefaultVariant {
+    gradient: string;
+    primaryColor: string;
+    primaryColorDark: string;
+}
+
+export interface ThemeDefaults {
+    light: ThemeDefaultVariant;
+    dark: ThemeDefaultVariant;
+}
+
+export const themeDefaults: ThemeDefaults = {
     light: {
         gradient: "",
         primaryColor: "",
@@ -94,10 +138,54 @@ export const themeDefaults = {
     },
 };
 
+/** 上游返回的原始歌曲条目：字段可能缺失，取用前需自行兜底 */
+interface RawSong {
+    id?: string | number;
+    name?: string;
+    artist?: string;
+    album?: string;
+    pic_id?: string;
+    url_id?: string | number;
+    lyric_id?: string | number;
+    source?: string;
+    pic?: string;
+}
+
+/** 雷达列表的上游条目（网易云字段命名） */
+interface RawRadarTrack {
+    id?: string | number;
+    name?: string;
+    ar?: Array<{ name?: string }> | { name?: string };
+    al?: { name?: string; picUrl?: string; pic?: string; pic_str?: string };
+}
+
+export interface RadarPlaylistOptions {
+    limit?: number;
+    count?: number;
+    offset?: number;
+}
+
+export interface ApiClient {
+    baseUrl: string;
+    generateSignature: () => string;
+    fetchJson: (url: string, debugLogger?: DebugLogger | null) => Promise<unknown>;
+    search: (
+        keyword: string,
+        source?: string,
+        count?: number,
+        page?: number,
+        debugLogger?: DebugLogger | null,
+    ) => Promise<Song[]>;
+    getRadarPlaylist: (playlistId?: string, options?: number | RadarPlaylistOptions) => Promise<Song[]>;
+    getSongUrl: (song: Song, quality?: string) => string;
+    getLyric: (song: Song) => string;
+    getPicUrl: (song: Song) => string;
+}
+
 /**
  * 核心后端 API 代理接口
  */
-export const API = {
+export const API: ApiClient = {
     baseUrl: "/proxy",
 
     generateSignature: () => {
@@ -151,7 +239,7 @@ export const API = {
 
             if (!Array.isArray(data)) throw new Error("搜索结果格式错误");
 
-            return data.map((song) => ({
+            return (data as RawSong[]).map((song) => ({
                 id: song.id,
                 name: song.name,
                 artist: song.artist,
@@ -162,7 +250,9 @@ export const API = {
                 source: song.source,
             }));
         } catch (error) {
-            if (typeof debugLogger === "function") debugLogger(`API错误: ${error.message}`);
+            if (typeof debugLogger === "function") {
+                debugLogger(`API错误: ${error instanceof Error ? error.message : String(error)}`);
+            }
             throw error;
         }
     },
@@ -177,12 +267,12 @@ export const API = {
             limit = options;
         } else if (options && typeof options === "object") {
             if (Number.isFinite(options.limit)) {
-                limit = options.limit;
+                limit = options.limit as number;
             } else if (Number.isFinite(options.count)) {
-                limit = options.count;
+                limit = options.count as number;
             }
             if (Number.isFinite(options.offset)) {
-                offset = options.offset;
+                offset = options.offset as number;
             }
         }
 
@@ -199,10 +289,10 @@ export const API = {
         const url = `${API.baseUrl}?${params.toString()}`;
 
         try {
-            const data = await API.fetchJson(url);
+            const data = (await API.fetchJson(url)) as { playlist?: { tracks?: unknown } } | null;
             const tracks =
                 data && data.playlist && Array.isArray(data.playlist.tracks)
-                    ? data.playlist.tracks.slice(0, limit)
+                    ? (data.playlist.tracks as RawRadarTrack[]).slice(0, limit)
                     : [];
 
             if (tracks.length === 0) throw new Error("No tracks found");

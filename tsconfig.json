@@ -16,5 +16,5 @@
         "noUnusedLocals": true,
         "noUnusedParameters": true
     },
-    "include": ["js/**/*.ts"]
+    "include": ["src/scripts/**/*.ts"]
 }

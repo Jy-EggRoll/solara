@@ -98,13 +98,13 @@ docker compose up -d
 
 - **Cloudflare Pages 设置**：Build command = `pnpm install --frozen-lockfile && pnpm build`，Build output directory = `dist`，Node ≥ 20。
 - **本地开发**：`pnpm install` → `pnpm preview`（先 `vite build`，再以 `dist/` + Pages Functions 起全栈服务，默认 `http://127.0.0.1:8787`）/ `pnpm build`（只产出 `dist/`）/ `pnpm typecheck`（TS 类型检查）。搜歌、播放、`/palette` 取色在 `pnpm preview` 下均可用；可选环境变量写在根目录 `.dev.vars`（已被 gitignore，字段见 `.env.example`），未配置时 `PASSWORD` 为空即不鉴权、`API_BASE_URL` 回落默认节点。本地不绑定 D1，播放记录/收藏自动落到 localStorage。注意：`wrangler pages dev` 在检测到被服务目录变更时会重载，偶尔会自行退出，重跑 `pnpm preview` 即可。
-- **TypeScript（渐进迁移中）**：新文件直接写 `.ts`（`tsconfig.json` 走 `strict`，目前只检查 `.ts`，存量 `.js` 作为类型来源但不报错）。把一个文件迁到 TS 只需重命名——`vite.config.ts` 里的解析回退会把 `"./foo.js"` 这种导入落到同名 `.ts`，无需回头改所有引用方；`window` 上由存量 JS 注入的全局契约（如 `__solaraDebugLog`）补在 `js/types/globals.d.ts`。快捷键统一登记在 `js/core/shortcuts.ts`（主键 + 修饰键精确匹配、默认输入态不触发）。
+- **TypeScript（渐进迁移中）**：新文件直接写 `.ts`（`tsconfig.json` 走 `strict`，目前只检查 `.ts`，存量 `.js` 作为类型来源但不报错）。把一个文件迁到 TS 只需重命名——`vite.config.ts` 里的解析回退会把 `"./foo.js"` 这种导入落到同名 `.ts`，无需回头改所有引用方；`window` 上由存量 JS 注入的全局契约（如 `__solaraDebugLog`）补在 `src/scripts/types/globals.d.ts`。快捷键统一登记在 `src/scripts/core/shortcuts.ts`（主键 + 修饰键精确匹配、默认输入态不触发）。
 - **约定**：`favicon.*`、`manifest.json` 位于 `public/`（按根路径原样服务）；`css/desktop.css`、`css/mobile.css` 作为常驻 `<link>` 交由 Vite 处理；`js/mobile.js` 由 `js/app.js` 动态 `import()` 按需拆分（仅移动端拉取）；`public/js/i18n.js` 为 classic 脚本，保持原路径、不参与哈希。
 
 ## ⚙️ 配置提示
 
 - API 基地址定义在 `functions/proxy.ts` 中，可替换为自建接口域名。
-- 默认主题、播放模式等偏好可在 `js/state.js` 初始化逻辑中按需调整。
+- 默认主题、播放模式等偏好可在 `src/scripts/state.js` 初始化逻辑中按需调整。
 
 ### ☁️ Cloudflare D1 绑定与建表
 
@@ -197,42 +197,42 @@ docker compose up -d
 ## 🗂️ 项目结构 (现代化模块解耦架构)
 
 ```
-Music-Player/
-├── css/
-│   ├── tokens/
-│   │   └── theme.css          # 设计系统色彩、阴影、间距与全局变量 Token
-│   ├── components/
-│   │   ├── controls.css       # 播放器底栏、控制台悬浮窗（拖拽/折叠）样式
-│   │   ├── modals.css         # 弹窗、HUD 提示与设置面板样式
-│   │   ├── player-stage.css   # 主播放舞台、封面与专辑旋转动效
-│   │   └── search.css         # 搜索面板、音源下拉菜单与结果列表
-│   ├── layout/
-│   │   ├── base.css           # 全域基础排版与无滚动条沉浸式样式
-│   │   └── stage.css          # 页面主体栅格与响应式布局
-│   └── mobile/                # 移动端专用设计规范与底部抽屉样式
-│       ├── base.css / controls.css / modals.css / search.css / sheet.css / stage.css
-├── js/
-│   ├── app.js                 # 主应用调度中心，负责模块装配与事件聚合
-│   ├── state.js               # 全局响应式状态机
-│   ├── constants.js           # 系统常量与官方榜单配置
-│   ├── dom.js                 # DOM 元素缓存池
-│   ├── core/                  # 核心基础设施层
-│   │   ├── audio.js           # 播放器底层状态机、防抖与请求熔断器
-│   │   ├── quality.js         # 音质码率协商与流地址解析
-│   │   ├── storage.js         # 本地持久化与 Cloudflare D1 漫游驱动
-│   │   └── media-session.js   # 全平台锁屏控制器与元数据同步
-│   ├── features/              # 业务特性层
-│   │   ├── search.js          # 搜索引擎、结果缓存与防抖
-│   │   ├── playlist.js        # 播放队列管理（防幽灵播放、删歌指针重定位）
-│   │   ├── favorites.js       # 收藏夹独立管理与持久化
-│   │   ├── lyrics.js          # 动态歌词解析与高亮滚动引擎
-│   │   └── settings.js        # 个性化设置与参数配置
-│   ├── visual/                # 视觉与动效层
-│   │   ├── aurora.js          # 流体极光色彩渲染器与 GPU 降负载优化
-│   │   ├── palette.js         # 智能双通道封面取色算法
-│   │   └── spotlight.js       # 调试控制台（支持自由拖拽、胶囊折叠、彩色日志）
-│   └── mobile/                # 移动端手势与抽屉交互
-│       ├── gestures.js / sheet.js / stage.js / search.js / toolbar.js
+Solara/
+├── src/                       # 前端源码（构建入口 index.html / login.html 位于仓库根）
+│   ├── scripts/
+│   │   ├── app.js             # 主应用调度中心，负责模块装配与事件聚合
+│   │   ├── mobile.js          # 移动端入口，由 app.js 动态 import() 按需加载
+│   │   ├── state.js           # 全局状态机
+│   │   ├── constants.ts       # 系统常量、榜单配置与后端 API 代理客户端
+│   │   ├── dom.js             # DOM 元素缓存池
+│   │   ├── core/              # 基础设施层（不反向依赖业务层）
+│   │   │   ├── audio.js           # 播放器底层状态机、防抖与请求熔断器
+│   │   │   ├── quality.js         # 音质码率协商与流地址解析
+│   │   │   ├── storage.ts         # 本地持久化与 Cloudflare D1 漫游驱动
+│   │   │   ├── contrast.ts        # WCAG 对比度计算与色彩变换
+│   │   │   ├── shortcuts.ts       # 全局快捷键注册表
+│   │   │   ├── fullscreen.ts      # 全屏状态同步与 F 键登记
+│   │   │   ├── wake-lock.js       # 防息屏锁
+│   │   │   └── media-session.js   # 全平台锁屏控制器与元数据同步
+│   │   ├── features/          # 业务特性层
+│   │   │   ├── search.js          # 搜索引擎、结果缓存与防抖
+│   │   │   ├── playlist.js        # 播放队列管理（防幽灵播放、删歌指针重定位）
+│   │   │   ├── favorites.js       # 收藏夹独立管理与持久化
+│   │   │   ├── lyrics.js          # 动态歌词解析与高亮滚动引擎
+│   │   │   └── settings.js        # 个性化设置与参数配置
+│   │   ├── visual/            # 画面与主题层
+│   │   │   ├── aurora.js          # 封面底图、调色板落地与文字可读性校验
+│   │   │   ├── palette.js         # 智能双通道封面取色算法
+│   │   │   └── spotlight.js       # 聚光灯跟随与调试控制台（可拖拽/折叠/彩标日志）
+│   │   ├── mobile/            # 移动端手势与抽屉交互
+│   │   │   └── gestures.js / sheet.js / stage.js / search.js / toolbar.js / core.js
+│   │   ├── boot/              # 启动期适配（视口 / 软键盘）
+│   │   └── types/             # 全局类型契约（window 扩展等）
+│   └── styles/                # 样式：tokens → layout → components → mobile
+│       ├── style.css / mobile.css      # 两个聚合入口（@import 各层）
+│       ├── desktop.css / eco-mode.css  # 桌面端补齐与省电模式
+│       ├── tokens/theme.css            # 设计系统 Token：色彩、材质、动效周期
+│       ├── layout/ · components/ · mobile/
 ├── functions/                 # Cloudflare Pages Functions 边缘服务
 │   ├── _middleware.ts         # 统一认证与路由中间件
 │   ├── api/                   # 各曲库代理入口与 D1 存储路由
@@ -247,6 +247,15 @@ Music-Player/
 ├── Dockerfile                 # 容器构建配置
 └── README.md                  # 项目文档
 ```
+
+**目录与命名约定**（新增代码请遵守）：
+
+- 源码一律进 `src/`：逻辑放 `src/scripts`，样式放 `src/styles`；只有**必须保留原始 URL** 的资源才放 `public/`（如 classic 脚本 `public/js/i18n.js`）
+- `functions/`、`index.html`、`login.html` 必须留在仓库根（Cloudflare Pages 与构建入口的约定）
+- 依赖方向自上而下：`app → features / visual / mobile → core`；`core` 不反向依赖业务层，新增的通用能力优先落在 `core`
+- 新文件优先写 `.ts`（`pnpm typecheck` 目前只检查 TS 文件，存量 JS 逐步迁移；迁移只需重命名，构建会自动把 `"./foo.js"` 这类导入落到同名 `.ts`）
+- 快捷键不要各自绑 `keydown`，统一登记到 `src/scripts/core/shortcuts.ts`
+- `window` 上由存量 JS 注入的全局（如 `__solaraDebugLog`）补进 `src/scripts/types/globals.d.ts`，不要在业务代码里用 `any` 绕过
 
 ## 📄 许可证
 

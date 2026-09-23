@@ -30,11 +30,13 @@ function resolveTsForJsSpecifier(): Plugin {
  *                        Build output directory = `dist`，Node >= 20。
  *
  * 说明：
+ *  - 源码收拢在 src/：src/scripts（前端逻辑）、src/styles（样式）；入口 index.html / login.html
+ *    与 public/、functions/ 保持在仓库根（Cloudflare Pages 与构建入口的约定）。
  *  - favicon.svg / favicon.png / manifest.json 已置于 public/（按根路径原样服务）。
- *  - css/desktop.css、css/mobile.css 改为常驻 <link>（规则分别作用域于
+ *  - src/styles/desktop.css、src/styles/mobile.css 改为常驻 <link>（规则分别作用域于
  *    html.desktop-view / .mobile-view，可安全同时加载）。
- *  - mobile.js 由 js/app.js 动态 import() 拆分，仅移动端拉取；
- *    视口/键盘适配在 js/boot/viewport.js。
+ *  - mobile.js 由 src/scripts/app.js 动态 import() 拆分，仅移动端拉取；
+ *    视口/键盘适配在 src/scripts/boot/viewport.js。
  *  - 手动 ?v= 后缀已移除，缓存失效交由内容哈希接管；未配置 _headers，缓存策略交由 Pages 默认。
  */
 export default defineConfig({

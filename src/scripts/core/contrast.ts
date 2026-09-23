@@ -7,16 +7,29 @@
 export const AA_NORMAL_TEXT = 4.5;
 export const AA_LARGE_TEXT = 3;
 
+export interface RgbColor {
+    r: number;
+    g: number;
+    b: number;
+    a?: number;
+}
+
+export interface HslColor {
+    h: number;
+    s: number;
+    l: number;
+}
+
 const RE_HEX_SHORT = /^#([\da-f])([\da-f])([\da-f])$/i;
 const RE_HEX_LONG = /^#([\da-f]{2})([\da-f]{2})([\da-f]{2})([\da-f]{2})?$/i;
 const RE_RGB = /^rgba?\(\s*([\d.]+)[\s,]+([\d.]+)[\s,]+([\d.]+)[\s,/]*([\d.%]*)\s*\)$/i;
 const RE_FIRST_COLOR = /#[0-9a-f]{3,8}\b|rgba?\([^)]*\)/i;
 
-const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
-const clamp255 = (value) => clamp(Math.round(Number(value) || 0), 0, 255);
+const clamp = (value: number, min: number, max: number): number => Math.min(Math.max(value, min), max);
+const clamp255 = (value: unknown): number => clamp(Math.round(Number(value) || 0), 0, 255);
 
 /** 解析 #rgb / #rrggbb / #rrggbbaa / rgb() / rgba()，无法解析返回 null。 */
-export function parseColor(value) {
+export function parseColor(value: unknown): RgbColor | null {
     if (typeof value !== "string") return null;
     const input = value.trim();
     if (!input) return null;
@@ -57,19 +70,19 @@ export function parseColor(value) {
 }
 
 /** 取出字符串里第一个颜色（用于从渐变声明里拿一个代表色）。 */
-export function firstColorIn(value) {
+export function firstColorIn(value: unknown): string | null {
     if (typeof value !== "string") return null;
     const matched = value.match(RE_FIRST_COLOR);
     return matched ? matched[0] : null;
 }
 
-export function toHex(color) {
-    const hex = (channel) => clamp255(channel).toString(16).padStart(2, "0");
+export function toHex(color: RgbColor): string {
+    const hex = (channel: number): string => clamp255(channel).toString(16).padStart(2, "0");
     return `#${hex(color.r)}${hex(color.g)}${hex(color.b)}`;
 }
 
 /** WCAG 相对亮度（不含 alpha，调用方需先 composite 出不透明色）。 */
-export function relativeLuminance(color) {
+export function relativeLuminance(color: RgbColor): number {
     const [r, g, b] = [color.r, color.g, color.b].map((channel) => {
         const ratio = channel / 255;
         return ratio <= 0.03928 ? ratio / 12.92 : ((ratio + 0.055) / 1.055) ** 2.4;
@@ -78,7 +91,7 @@ export function relativeLuminance(color) {
 }
 
 /** WCAG 对比度：(L1 + 0.05) / (L2 + 0.05)。 */
-export function contrastRatio(foreground, background) {
+export function contrastRatio(foreground: RgbColor, background: RgbColor): number {
     const a = relativeLuminance(foreground);
     const b = relativeLuminance(background);
     const lighter = Math.max(a, b);
@@ -87,12 +100,12 @@ export function contrastRatio(foreground, background) {
 }
 
 /** 半透明前景压在不透明背景上的等效颜色。 */
-export function composite(foreground, background) {
+export function composite(foreground: RgbColor, background: RgbColor): RgbColor {
     const alpha = foreground.a ?? 1;
     if (alpha >= 1) {
         return { r: clamp255(foreground.r), g: clamp255(foreground.g), b: clamp255(foreground.b), a: 1 };
     }
-    const blend = (fg, bg) => fg * alpha + bg * (1 - alpha);
+    const blend = (fg: number, bg: number): number => fg * alpha + bg * (1 - alpha);
     return {
         r: clamp255(blend(foreground.r, background.r)),
         g: clamp255(blend(foreground.g, background.g)),
@@ -101,7 +114,7 @@ export function composite(foreground, background) {
     };
 }
 
-function rgbToHsl({ r, g, b }) {
+function rgbToHsl({ r, g, b }: RgbColor): HslColor {
     const red = r / 255;
     const green = g / 255;
     const blue = b / 255;
@@ -127,13 +140,13 @@ function rgbToHsl({ r, g, b }) {
     return { h: (hue * 60 + 360) % 360, s: saturation, l: lightness };
 }
 
-function hslToRgb(h, s, l) {
+function hslToRgb(h: number, s: number, l: number): RgbColor {
     const hue = ((h % 360) + 360) % 360;
     const chroma = (1 - Math.abs(2 * l - 1)) * s;
     const secondary = chroma * (1 - Math.abs(((hue / 60) % 2) - 1));
     const match = l - chroma / 2;
 
-    let rgb;
+    let rgb: [number, number, number];
     if (hue < 60) rgb = [chroma, secondary, 0];
     else if (hue < 120) rgb = [secondary, chroma, 0];
     else if (hue < 180) rgb = [0, chroma, secondary];
@@ -152,12 +165,16 @@ function hslToRgb(h, s, l) {
  * 保证 color 对全部 backgrounds 都达到 minRatio；已达标则原样返回。
  * 变换方式：固定色相与饱和度，沿明度轴由近及远扫描，取第一个达标的明度。
  */
-export function ensureContrast(color, backgrounds, minRatio = AA_NORMAL_TEXT) {
-    const targets = (backgrounds || []).filter(Boolean);
+export function ensureContrast(
+    color: RgbColor | null | undefined,
+    backgrounds: Array<RgbColor | null | undefined>,
+    minRatio = AA_NORMAL_TEXT,
+): string {
+    const targets = (backgrounds || []).filter((item): item is RgbColor => Boolean(item));
     const base = { r: clamp255(color?.r), g: clamp255(color?.g), b: clamp255(color?.b) };
     if (!targets.length) return toHex(base);
 
-    const passes = (candidate) => targets.every((bg) => contrastRatio(candidate, bg) >= minRatio);
+    const passes = (candidate: RgbColor): boolean => targets.every((bg) => contrastRatio(candidate, bg) >= minRatio);
     if (passes(base)) return toHex(base);
 
     const { h, s, l } = rgbToHsl(base);

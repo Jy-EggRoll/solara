@@ -22,13 +22,13 @@
             rel="stylesheet"
         />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-        <link rel="stylesheet" href="css/style.css" />
-        <link rel="stylesheet" href="css/desktop.css" />
-        <link rel="stylesheet" href="css/mobile.css" />
+        <link rel="stylesheet" href="src/styles/style.css" />
+        <link rel="stylesheet" href="src/styles/desktop.css" />
+        <link rel="stylesheet" href="src/styles/mobile.css" />
         <script src="js/i18n.js"></script>
         <script>
             // 首帧前必须执行的极小逻辑：设备判定 + 主题/省电/视图类预置（防 FOUC）。
-            // 其余视口 / 键盘适配见 js/boot/viewport.js
+            // 其余视口 / 键盘适配见 src/scripts/boot/viewport.js
             (function () {
                 var ua = navigator.userAgent || "";
                 var isMobile =
@@ -1457,6 +1457,6 @@
         </div>
 
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script type="module" src="js/app.js"></script>
+        <script type="module" src="src/scripts/app.js"></script>
     </body>
 </html>

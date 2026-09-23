@@ -2,23 +2,43 @@
  * Solara 本地与云端持久化存储层 (LocalStorage + Cloudflare D1 / SQLite Storage API)
  */
 
-import { REMOTE_STORAGE_ENDPOINT, STORAGE_KEYS_TO_SYNC, PALETTE_STORAGE_KEY, API } from "../constants.js";
+import { REMOTE_STORAGE_ENDPOINT, STORAGE_KEYS_TO_SYNC, API } from "../constants.js";
+
+export interface PersistentStorageClient {
+    checkAvailability: () => Promise<boolean>;
+    getItems: (keys?: string[]) => Promise<unknown>;
+    setItems: (items: Record<string, unknown>) => Promise<boolean>;
+    removeItems: (keys?: string[]) => Promise<boolean>;
+}
+
+export interface LocalStorageWriteOptions {
+    /** 只写本地，不同步云端 */
+    skipRemote?: boolean;
+}
+
+export interface StoredSearchState {
+    keyword: string;
+    source: string;
+    page: number;
+    hasMore: boolean;
+    results: unknown[];
+}
 
 let remoteSyncEnabled = false;
 
-export function setRemoteSyncEnabled(enabled) {
+export function setRemoteSyncEnabled(enabled: boolean): void {
     remoteSyncEnabled = Boolean(enabled);
 }
 
-export function isRemoteSyncEnabled() {
+export function isRemoteSyncEnabled(): boolean {
     return remoteSyncEnabled;
 }
 
-export function createPersistentStorageClient() {
-    let availabilityPromise = null;
+export function createPersistentStorageClient(): PersistentStorageClient {
+    let availabilityPromise: Promise<boolean> | null = null;
     let remoteAvailable = false;
 
-    const checkAvailability = async () => {
+    const checkAvailability = async (): Promise<boolean> => {
         if (availabilityPromise) {
             return availabilityPromise;
         }
@@ -30,7 +50,7 @@ export function createPersistentStorageClient() {
                 if (!response.ok) {
                     return false;
                 }
-                const result = await response.json().catch(() => ({}));
+                const result = (await response.json().catch(() => ({}))) as { d1Available?: boolean };
                 remoteAvailable = Boolean(result && result.d1Available);
                 return remoteAvailable;
             } catch (error) {
@@ -41,7 +61,7 @@ export function createPersistentStorageClient() {
         return availabilityPromise;
     };
 
-    const getItems = async (keys = []) => {
+    const getItems = async (keys: string[] = []): Promise<unknown> => {
         const available = await checkAvailability();
         if (!available || !Array.isArray(keys) || keys.length === 0) {
             return null;
@@ -60,7 +80,7 @@ export function createPersistentStorageClient() {
         }
     };
 
-    const setItems = async (items) => {
+    const setItems = async (items: Record<string, unknown>): Promise<boolean> => {
         const available = await checkAvailability();
         if (!available || !items || typeof items !== "object") {
             return false;
@@ -78,7 +98,7 @@ export function createPersistentStorageClient() {
         }
     };
 
-    const removeItems = async (keys = []) => {
+    const removeItems = async (keys: string[] = []): Promise<boolean> => {
         const available = await checkAvailability();
         if (!available || !Array.isArray(keys) || keys.length === 0) {
             return false;
@@ -106,11 +126,11 @@ export function createPersistentStorageClient() {
 
 export const persistentStorage = createPersistentStorageClient();
 
-export function shouldSyncStorageKey(key) {
+export function shouldSyncStorageKey(key: string): boolean {
     return STORAGE_KEYS_TO_SYNC.has(key);
 }
 
-export function persistStorageItems(items) {
+export function persistStorageItems(items: Record<string, unknown>): void {
     if (!items || typeof items !== "object") {
         return;
     }
@@ -119,7 +139,7 @@ export function persistStorageItems(items) {
     });
 }
 
-export function removePersistentItems(keys = []) {
+export function removePersistentItems(keys: string[] = []): void {
     if (!Array.isArray(keys) || keys.length === 0) {
         return;
     }
@@ -128,9 +148,9 @@ export function removePersistentItems(keys = []) {
     });
 }
 
-export function syncLocalDataToCloud() {
+export function syncLocalDataToCloud(): void {
     if (!remoteSyncEnabled) return;
-    const itemsToUpload = {};
+    const itemsToUpload: Record<string, string> = {};
     for (const key of STORAGE_KEYS_TO_SYNC) {
         const val = safeGetLocalStorage(key);
         if (val != null && val !== "") {
@@ -142,7 +162,7 @@ export function syncLocalDataToCloud() {
     }
 }
 
-export function safeGetLocalStorage(key) {
+export function safeGetLocalStorage(key: string): string | null {
     try {
         return localStorage.getItem(key);
     } catch (error) {
@@ -151,7 +171,7 @@ export function safeGetLocalStorage(key) {
     }
 }
 
-export function safeSetLocalStorage(key, value, options = {}) {
+export function safeSetLocalStorage(key: string, value: string, options: LocalStorageWriteOptions = {}): void {
     const { skipRemote = false } = options;
     try {
         localStorage.setItem(key, value);
@@ -163,7 +183,7 @@ export function safeSetLocalStorage(key, value, options = {}) {
     }
 }
 
-export function safeRemoveLocalStorage(key, options = {}) {
+export function safeRemoveLocalStorage(key: string, options: LocalStorageWriteOptions = {}): void {
     const { skipRemote = false } = options;
     try {
         localStorage.removeItem(key);
@@ -175,18 +195,18 @@ export function safeRemoveLocalStorage(key, options = {}) {
     }
 }
 
-export function parseJSON(value, fallback) {
+export function parseJSON<T>(value: string | null, fallback: T): T {
     if (!value) return fallback;
     try {
         const parsed = JSON.parse(value);
-        return parsed;
+        return parsed as T;
     } catch (error) {
         console.warn("解析本地存储 JSON 失败", error);
         return fallback;
     }
 }
 
-export function cloneSearchResults(results) {
+export function cloneSearchResults(results: unknown): unknown[] {
     if (!Array.isArray(results)) {
         return [];
     }
@@ -194,30 +214,31 @@ export function cloneSearchResults(results) {
         return JSON.parse(JSON.stringify(results));
     } catch (error) {
         console.warn("复制搜索结果失败，回退到浅拷贝", error);
-        return results.map((item) => {
+        return results.map((item: unknown) => {
             if (item && typeof item === "object") {
-                return { ...item };
+                return { ...(item as Record<string, unknown>) };
             }
             return item;
         });
     }
 }
 
-export function sanitizeStoredSearchState(data, defaultSource = "netease") {
+export function sanitizeStoredSearchState(data: unknown, defaultSource = "netease"): StoredSearchState | null {
     if (!data || typeof data !== "object") {
         return null;
     }
 
-    const keyword = typeof data.keyword === "string" ? data.keyword : "";
-    const source = typeof data.source === "string" ? data.source : defaultSource;
-    const page = Number.isInteger(data.page) && data.page > 0 ? data.page : 1;
-    const hasMore = typeof data.hasMore === "boolean" ? data.hasMore : true;
-    const results = cloneSearchResults(data.results);
+    const record = data as Record<string, unknown>;
+    const keyword = typeof record.keyword === "string" ? record.keyword : "";
+    const source = typeof record.source === "string" ? record.source : defaultSource;
+    const page = Number.isInteger(record.page) && (record.page as number) > 0 ? (record.page as number) : 1;
+    const hasMore = typeof record.hasMore === "boolean" ? record.hasMore : true;
+    const results = cloneSearchResults(record.results);
 
     return { keyword, source, page, hasMore, results };
 }
 
-export function preferHttpsUrl(url) {
+export function preferHttpsUrl(url: string | null | undefined): string | null | undefined {
     if (!url || typeof url !== "string") return url;
 
     try {
@@ -235,7 +256,7 @@ export function preferHttpsUrl(url) {
     }
 }
 
-export function toAbsoluteUrl(url) {
+export function toAbsoluteUrl(url: string | null | undefined): string {
     if (!url) {
         return "";
     }
@@ -248,7 +269,7 @@ export function toAbsoluteUrl(url) {
     }
 }
 
-export function buildAudioProxyUrl(url) {
+export function buildAudioProxyUrl(url: string | null | undefined): string | null | undefined {
     if (!url || typeof url !== "string") return url;
 
     try {
