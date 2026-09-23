@@ -3,6 +3,7 @@
  */
 
 import { BACKGROUND_TRANSITION_DURATION, PALETTE_APPLY_DELAY, themeDefaults, PLACEHOLDER_HTML } from "../constants.js";
+import { AA_NORMAL_TEXT, composite, ensureContrast, firstColorIn, parseColor } from "../core/contrast.js";
 import { preferHttpsUrl, toAbsoluteUrl, safeGetLocalStorage, safeSetLocalStorage } from "../core/storage.js";
 import { paletteCache, persistPaletteCache, fetchPaletteData, extractPaletteFromCanvas } from "./palette.js";
 
@@ -148,6 +149,45 @@ export function setDocumentGradient(gradient, state, dom, { immediate = false } 
     });
 }
 
+/** 玻璃面板的等效底色：封面平均色（或主题渐变首色）依次被容器底色、面板底色覆盖。 */
+function estimatePanelBackground(state, isDark) {
+    const styles = getComputedStyle(document.documentElement);
+    const backdrop =
+        parseColor(state.dynamicPalette?.averageColor) ||
+        parseColor(firstColorIn(styles.getPropertyValue("--bg-gradient"))) ||
+        (isDark ? { r: 12, g: 14, b: 18, a: 1 } : { r: 242, g: 244, b: 243, a: 1 });
+
+    return ["--container-bg", "--component-bg"].reduce((background, token) => {
+        const layer = parseColor(styles.getPropertyValue(token));
+        return layer ? composite(layer, background) : background;
+    }, backdrop);
+}
+
+/**
+ * 凡把调色板色当文字用的地方（列表项标题、tab 选中态、搜索结果标题、歌词当前行等）
+ * 统一走 --accent-text：对面板底色校验 WCAG AA(4.5:1)，不达标就沿明度轴变换后写回，
+ * 使配色始终保留色相而可读性有下限。
+ */
+function applyReadableAccentText(state) {
+    if (typeof window === "undefined" || !document.documentElement) return;
+
+    const styles = getComputedStyle(document.documentElement);
+    const primary = parseColor(styles.getPropertyValue("--primary-color"));
+    if (!primary) return;
+
+    const isDark = document.documentElement.classList.contains("dark-mode");
+    const panelBackground = estimatePanelBackground(state, isDark);
+    const backgrounds = [panelBackground];
+
+    // 当前项底色是主色按 --item-current-mix 叠在面板上，比面板本身更极端，一并纳入考核
+    const currentItemMix = parseFloat(styles.getPropertyValue("--item-current-mix")) / 100;
+    if (Number.isFinite(currentItemMix) && currentItemMix > 0) {
+        backgrounds.push(composite({ ...primary, a: currentItemMix }, panelBackground));
+    }
+
+    setGlobalThemeProperty("--accent-text", ensureContrast(primary, backgrounds, AA_NORMAL_TEXT));
+}
+
 export function applyDynamicGradient(state, dom, options = {}) {
     if (!state.themeDefaultsCaptured) {
         captureThemeDefaults(state);
@@ -237,6 +277,7 @@ export function applyDynamicGradient(state, dom, options = {}) {
         setGlobalThemeProperty("--palette-glow", `${targetColors[4]}66`);
         applyThemeTokens(targetTokens);
         syncSystemThemeColor();
+        applyReadableAccentText(state);
     };
 
     if (immediate || !dom.backgroundTransitionLayer || !dom.backgroundBaseLayer) {

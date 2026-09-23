@@ -37,7 +37,7 @@ html.desktop-view .playlist-action-btn:focus-visible:not(:disabled) {
     box-shadow: none;
     filter: none;
     border: none;
-    color: var(--primary-color);
+    color: var(--accent-text);
 }
 
 html.desktop-view .playlist-action-btn--clear {
@@ -121,12 +121,12 @@ html.desktop-view .search-results-toolbar .import-selected-btn:active:not(:disab
 /* 激活态（已选择歌曲）高亮主题色 */
 html.desktop-view .search-results-toolbar .import-selected-btn:not(:disabled) {
     border-color: var(--primary-color);
-    color: var(--primary-color);
+    color: var(--accent-text);
 }
 
 html.desktop-view .dark-mode .search-results-toolbar .import-selected-btn:not(:disabled) {
     border-color: var(--primary-color);
-    color: var(--primary-color);
+    color: var(--accent-text);
     box-shadow: 0 0 12px var(--palette-glow);
 }
 

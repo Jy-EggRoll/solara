@@ -183,7 +183,7 @@ body.mobile-view .mobile-panel-header .playlist-tab:active {
 
 body.mobile-view .mobile-panel-header .playlist-tab.active {
     background: var(--item-current-bg) !important;
-    color: var(--primary-color) !important;
+    color: var(--accent-text) !important;
     box-shadow: none !important;
 }
 
@@ -343,7 +343,7 @@ body.mobile-view .playlist-item.current {
 }
 
 body.mobile-view .playlist-item.current .playlist-item-title {
-    color: var(--primary-color) !important;
+    color: var(--accent-text) !important;
     font-weight: 700;
 }
 
@@ -396,7 +396,7 @@ body.mobile-view .playlist-item-action {
 
 body.mobile-view .playlist-item-action:active {
     transform: scale(0.85);
-    color: var(--primary-color);
+    color: var(--accent-text);
 }
 
 /* 正在播放项 Apple Music 经典动态音浪 (Equalizer) */

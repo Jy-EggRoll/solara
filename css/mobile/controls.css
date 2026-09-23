@@ -256,7 +256,7 @@ body.mobile-view #mobileQueueToggle {
 body.mobile-view .play-mode-btn.is-single,
 body.mobile-view .play-mode-btn.is-random,
 body.mobile-view .play-mode-btn.active {
-    color: var(--primary-color) !important;
+    color: var(--accent-text) !important;
     opacity: 1 !important;
 }
 

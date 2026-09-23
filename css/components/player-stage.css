@@ -118,7 +118,7 @@ body.dark-mode.is-playing .album-cover:hover {
     height: 100%;
     object-fit: cover;
     border-radius: 50%;
-    animation: cover-spin 30s linear infinite;
+    animation: cover-spin var(--spin-duration) linear infinite;
     animation-play-state: paused;
     will-change: transform;
 }
@@ -602,7 +602,7 @@ body.dark-mode .playlist-tabs {
 
 .playlist-tab.active {
     background: var(--item-current-bg) !important;
-    color: var(--primary-color) !important;
+    color: var(--accent-text) !important;
     font-weight: 600;
     box-shadow: none !important;
 }
@@ -639,7 +639,7 @@ body.dark-mode .playlist-tabs {
 
 .mobile-panel-header .playlist-tab:hover:not(.active) {
     border-color: var(--primary-color);
-    color: var(--primary-color);
+    color: var(--accent-text);
 }
 
 /* 使收藏列表与播放列表共享相同的定位和内边距 */
@@ -797,7 +797,7 @@ body.dark-mode .playlist-tabs {
     background: rgba(255, 77, 103, 0.1);
 }
 .favorite-item-action--add:hover {
-    color: var(--primary-color);
+    color: var(--accent-text);
     background: var(--item-hover-bg);
 }
 .playlist-item-download:hover,
@@ -824,7 +824,7 @@ body.dark-mode .playlist-tabs {
 }
 
 .favorite-toggle:hover {
-    color: var(--primary-color);
+    color: var(--accent-text);
 }
 
 .favorite-toggle.is-active {

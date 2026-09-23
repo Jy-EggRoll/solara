@@ -186,7 +186,7 @@
 .source-select-btn:hover,
 .source-select-btn.active {
     border-color: var(--primary-color);
-    color: var(--primary-color);
+    color: var(--accent-text);
     box-shadow: 0 6px 18px color-mix(in srgb, var(--primary-color) 22%, transparent);
 }
 
@@ -206,7 +206,7 @@
 
 .source-select-btn:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(26, 188, 156, 0.18);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--palette-accent) 18%, transparent);
 }
 
 .source-select-btn .caret-icon {
@@ -521,15 +521,15 @@
 }
 
 .import-dropdown-item:hover .import-dropdown-icon {
-    color: var(--primary-color);
+    color: var(--accent-text);
 }
 
 .import-dropdown-item.is-active {
-    color: var(--primary-color);
+    color: var(--accent-text);
 }
 
 .import-dropdown-item.is-active .import-dropdown-icon {
-    color: var(--primary-color);
+    color: var(--accent-text);
 }
 
 .import-dropdown-item .import-dropdown-label {
@@ -684,19 +684,19 @@ body.dark-mode .container.search-mode .search-results-list:empty::before {
 .search-result-item.selected {
     background: var(--item-current-bg);
     border-color: var(--primary-color);
-    box-shadow: 0 12px 28px rgba(26, 188, 156, 0.25);
+    box-shadow: 0 12px 28px color-mix(in srgb, var(--palette-accent) 25%, transparent);
     transform: translateY(0);
 }
 
 .search-result-item.selected .search-result-title {
-    color: var(--primary-color);
+    color: var(--accent-text);
 }
 
 .search-result-item.selected .search-result-select {
     border-color: var(--primary-color);
     background: var(--primary-color);
     color: #ffffff;
-    box-shadow: 0 6px 16px rgba(26, 188, 156, 0.35);
+    box-shadow: 0 6px 16px color-mix(in srgb, var(--palette-accent) 35%, transparent);
 }
 
 .search-result-item.selected .search-result-select i {
@@ -729,7 +729,7 @@ body.dark-mode .container.search-mode .search-results-list:empty::before {
 
 .search-result-select:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(26, 188, 156, 0.35);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--palette-accent) 35%, transparent);
 }
 
 .search-result-item .search-result-select:hover {
@@ -817,7 +817,7 @@ body.dark-mode .container.search-mode .search-results-list:empty::before {
 
 /* 播放按钮 - 悬停变主题色 */
 .search-result-actions .action-btn.play:hover {
-    color: var(--primary-color);
+    color: var(--accent-text);
     transform: scale(1.1);
 }
 
@@ -830,7 +830,7 @@ body.dark-mode .container.search-mode .search-results-list:empty::before {
 }
 
 .search-result-actions .action-btn.download:hover {
-    color: #2ecc71;
+    color: var(--success-color);
     background: transparent;
     transform: scale(1.1);
     box-shadow: none;
@@ -855,7 +855,7 @@ body.dark-mode .container.search-mode .search-results-list:empty::before {
         transform 0.2s ease,
         box-shadow 0.2s ease,
         filter 0.2s ease;
-    box-shadow: 0 10px 24px rgba(26, 188, 156, 0.25);
+    box-shadow: 0 10px 24px color-mix(in srgb, var(--palette-accent) 25%, transparent);
 }
 
 .import-selected-btn:disabled {
@@ -868,7 +868,7 @@ body.dark-mode .container.search-mode .search-results-list:empty::before {
 .import-selected-btn:not(:disabled):hover,
 .import-selected-btn:not(:disabled):focus-visible {
     transform: scale(1.03);
-    box-shadow: 0 14px 30px rgba(26, 188, 156, 0.32);
+    box-shadow: 0 14px 30px color-mix(in srgb, var(--palette-accent) 32%, transparent);
     filter: brightness(1.05);
 }
 
@@ -900,7 +900,7 @@ body.dark-mode .container.search-mode .search-results-list:empty::before {
 .action-btn:hover {
     background: var(--primary-color-dark);
     transform: scale(1.03);
-    box-shadow: 0 4px 12px rgba(26, 188, 156, 0.3);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--palette-accent) 30%, transparent);
 }
 
 .action-btn.download {
@@ -910,6 +910,6 @@ body.dark-mode .container.search-mode .search-results-list:empty::before {
 }
 
 .action-btn.download:hover {
-    background: #27ae60;
-    box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+    background: var(--success-color-hover);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--success-color) 30%, transparent);
 }

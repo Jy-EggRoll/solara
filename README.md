@@ -97,7 +97,8 @@ docker compose up -d
 前端已接入 **Vite** 构建：资源自动带内容哈希输出到 `dist/assets/*`，HTML 每次回源校验（见 `public/_headers`），**不再需要手动维护 `?v=` 版本号** —— 改任一样式/脚本后重新构建即自动换名，访客（含移动端）无需强刷即可拿到最新版本。
 
 - **Cloudflare Pages 设置**：Build command = `pnpm install --frozen-lockfile && pnpm build`，Build output directory = `dist`，Node ≥ 20。
-- **本地开发**：`pnpm install` → `pnpm dev`（热更开发）/ `pnpm build`（产出 `dist/`）/ `pnpm preview`（预览产物）。
+- **本地开发**：`pnpm install` → `pnpm dev`（Vite 热更，仅前端，无 Pages Functions）/ `pnpm build`（产出 `dist/`）/ `pnpm preview`（预览产物）。
+- **本地跑全栈（含 Pages Functions）**：`pnpm dev:pages`（源码原点，等价于 Docker 里的 `wrangler pages dev .`）/ `pnpm preview:pages`（先构建、再以 `dist/` 起服务，用于验证构建产物）。两者默认 `http://127.0.0.1:8787`，搜歌、播放、`/palette` 取色均可用；可选环境变量写在根目录 `.dev.vars`（已被 gitignore，字段见 `.env.example`），未配置时 `PASSWORD` 为空即不鉴权、`API_BASE_URL` 回落默认节点。本地不绑定 D1，播放记录/收藏自动落到 localStorage。
 - **约定**：`favicon.*`、`manifest.json` 位于 `public/`（按根路径原样服务）；`css/desktop.css`、`css/mobile.css` 作为常驻 `<link>` 交由 Vite 处理；`js/mobile.js` 由 `js/app.js` 动态 `import()` 按需拆分（仅移动端拉取）；`public/js/i18n.js` 为 classic 脚本，保持原路径、不参与哈希。
 
 ## ⚙️ 配置提示

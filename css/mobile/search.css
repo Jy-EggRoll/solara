@@ -215,7 +215,7 @@ body.mobile-view .search-icon {
 }
 
 body.mobile-view .search-bar-unified:focus-within .search-icon {
-    color: var(--primary-color, #10a37f) !important;
+    color: var(--accent-text, #10a37f) !important;
 }
 
 /* 输入框文字：深色模式纯白、浅色模式纯黑，绝对清晰！ */
@@ -655,7 +655,7 @@ body.mobile-view .search-result-actions .action-btn:active {
 }
 
 body.mobile-view .search-result-actions .action-btn.play {
-    color: var(--primary-color, #10a37f) !important;
+    color: var(--accent-text, #10a37f) !important;
 }
 
 body.mobile-view .search-result-actions .action-btn.favorite.active {
@@ -1012,7 +1012,7 @@ body.mobile-view.dark-mode .search-result-actions .action-btn:active {
 }
 
 body.mobile-view .search-result-actions .action-btn.play {
-    color: var(--primary-color, #10a37f);
+    color: var(--accent-text, #10a37f);
 }
 
 body.mobile-view .search-result-actions .action-btn.favorite.active {

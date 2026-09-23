@@ -33,13 +33,18 @@
     --success-color: #34c759;
     --success-color-hover: #2db34e;
 
-    --item-hover-bg: color-mix(in srgb, var(--primary-color) 10%, transparent);
-    --item-current-bg: color-mix(in srgb, var(--primary-color) 20%, transparent);
+    --item-hover-mix: 10%;
+    --item-current-mix: 20%;
+    --item-hover-bg: color-mix(in srgb, var(--primary-color) var(--item-hover-mix), transparent);
+    --item-current-bg: color-mix(in srgb, var(--primary-color) var(--item-current-mix), transparent);
     --item-current-text: var(--text-color);
+    /* 凡把调色板色当文字用的地方统一取它：JS 在每次落地调色板时按 WCAG AA(4.5:1)
+       对面板底色校验，不达标则沿明度轴变换后写回；兜底即主色本身。 */
+    --accent-text: var(--primary-color);
     --border-color: rgba(255, 255, 255, 0.35);
 
     /* 歌词当前高亮行统一语义 Token（颜色随封面调色板动态派生，组件内禁止写死色值） */
-    --lyrics-current-text: var(--primary-color-dark);
+    --lyrics-current-text: var(--accent-text);
     --lyrics-current-weight: 700;
     --lyrics-current-glow: color-mix(in srgb, var(--primary-color) 9%, transparent);
     --lyrics-current-glow-soft: color-mix(in srgb, var(--primary-color) 2%, transparent);
@@ -51,6 +56,10 @@
     --spring-snappy: cubic-bezier(0.16, 1, 0.3, 1);
     --spring-smooth: cubic-bezier(0.25, 1, 0.5, 1);
     --spring-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    /* 装饰性旋转的统一周期（封面底图与专辑封面唱片共用）；
+       加载转圈之类的功能性旋转不走这个 token */
+    --spin-duration: 60s;
 }
 
 .dark-mode {
@@ -75,8 +84,10 @@
 
     --primary-color: #34d1b6;
     --primary-color-dark: #28a992;
-    --item-hover-bg: color-mix(in srgb, var(--primary-color) 16%, transparent);
-    --item-current-bg: color-mix(in srgb, var(--primary-color) 28%, transparent);
+    --item-hover-mix: 16%;
+    --item-current-mix: 28%;
+    --item-hover-bg: color-mix(in srgb, var(--primary-color) var(--item-hover-mix), transparent);
+    --item-current-bg: color-mix(in srgb, var(--primary-color) var(--item-current-mix), transparent);
     --border-color: rgba(255, 255, 255, 0.1);
 
     --lyrics-current-text: #ffffff;
@@ -167,19 +178,14 @@ body {
     transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
     pointer-events: none;
     will-change: opacity;
+    /* 整层只在这 0.8s 交叉淡入期间参与渲染，平时不绘制。
+       交接瞬间基础层已同步成同一张底图与同一相位，故直接整层隐藏不会跳变；
+       若只藏其中的底图，会露出本层那条不透明的兜底渐变 → 换歌时闪一下。 */
+    visibility: hidden;
 }
 
 body.background-transitioning .background-stage__layer--transition {
     opacity: 1;
-}
-
-/* 过渡层常驻 opacity: 0，其中的底图只有交叉淡入的 0.8s 会被看见。
-   平时不渲染可省掉一半的底图开销，过渡期间照旧显示，淡入观感不变。 */
-.background-stage__layer--transition .cover-backdrop {
-    visibility: hidden;
-}
-
-body.background-transitioning .background-stage__layer--transition .cover-backdrop {
     visibility: visible;
 }
 
@@ -199,7 +205,7 @@ body.background-transitioning .background-stage__layer--transition .cover-backdr
     filter: blur(50px) saturate(140%);
     pointer-events: none;
     will-change: transform;
-    animation: bg-revolve 120s linear infinite;
+    animation: bg-revolve var(--spin-duration) linear infinite;
     /* 暂停时冻结底图（与封面旋转同一套范式），续播接着转；
        底图一停，上层所有毛玻璃的 backdrop 也不再变化，可直接命中纹理缓存 */
     animation-play-state: paused;

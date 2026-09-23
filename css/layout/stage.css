@@ -293,7 +293,7 @@ body.layout-compact .playlist-item-title {
 }
 
 .theme-toggle-button:hover {
-    color: var(--primary-color);
+    color: var(--accent-text);
     border-color: var(--primary-color);
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
     transform: scale(1.03);
@@ -305,13 +305,13 @@ body.layout-compact .playlist-item-title {
 
 /* Eco / 防息屏开关激活态 */
 .theme-toggle-button.is-active {
-    color: var(--primary-color);
+    color: var(--accent-text);
     border-color: var(--primary-color);
     background: var(--item-current-bg);
 }
 
 .theme-toggle-button.is-active:hover {
-    color: var(--primary-color);
+    color: var(--accent-text);
 }
 
 /* 防息屏不可用（非安全上下文 / 浏览器不支持）时的禁用态 */
@@ -365,5 +365,5 @@ body.layout-compact .layout-toggle-btn .layout-icon--maximize {
 }
 
 .layout-toggle-btn:hover .layout-icon {
-    color: var(--primary-color);
+    color: var(--accent-text);
 }

@@ -578,6 +578,6 @@ body.mobile-view.dark-mode .mobile-quality-chip:active {
 
 body.mobile-view .mobile-quality-chip.active {
     border-color: var(--primary-color);
-    color: var(--primary-color);
+    color: var(--accent-text);
     opacity: 1;
 }

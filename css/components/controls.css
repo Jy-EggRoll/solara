@@ -45,7 +45,7 @@
 
 .controls button:hover {
     background: rgba(255, 255, 255, 0.32);
-    color: var(--primary-color);
+    color: var(--accent-text);
     transform: scale(1.08);
 }
 
@@ -232,7 +232,7 @@ html:not(.mobile-view) .transport-controls {
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
-    color: var(--primary-color-dark, #0d9488) !important;
+    color: var(--accent-text, #0d9488) !important;
     transform: scale(1.05);
 }
 
@@ -242,7 +242,7 @@ html:not(.mobile-view) .transport-controls {
 .dark-mode .transport-button--shuffle[aria-pressed="true"],
 .dark-mode #shuffleToggleBtn.active,
 .dark-mode #playModeBtn.is-single {
-    color: var(--primary-color) !important;
+    color: var(--accent-text) !important;
 }
 
 .icon-repeat-single text {
@@ -333,7 +333,7 @@ html:not(.mobile-view) .transport-controls {
 
 .volume-icon-wrap:hover {
     opacity: 0.8;
-    color: var(--primary-color);
+    color: var(--accent-text);
 }
 
 .volume-icon-wrap:active {
@@ -444,7 +444,7 @@ input[type="range"]:active::-moz-range-thumb {
 .controls .player-quality-btn:hover,
 .controls .player-quality-btn.active {
     border-color: var(--primary-color) !important;
-    color: var(--primary-color) !important;
+    color: var(--accent-text) !important;
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12) !important;
 }
 
@@ -640,7 +640,7 @@ input[type="range"]:active::-moz-range-thumb {
 .load-more-btn {
     width: 100%;
     background: var(--component-bg);
-    color: var(--primary-color);
+    color: var(--accent-text);
     border: 2px solid var(--primary-color);
     border-radius: 12px;
     padding: 15px;
@@ -662,7 +662,7 @@ input[type="range"]:active::-moz-range-thumb {
     background: var(--primary-color);
     color: white;
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(26, 188, 156, 0.35);
+    box-shadow: 0 6px 20px color-mix(in srgb, var(--palette-accent) 35%, transparent);
 }
 
 .load-more-btn:disabled {
@@ -738,7 +738,7 @@ input[type="range"]:active::-moz-range-thumb {
 .debug-info-title {
     font-weight: 600;
     font-size: 11px;
-    color: var(--primary-color, #38bdf8);
+    color: var(--accent-text, #38bdf8);
     letter-spacing: 0.03em;
     display: flex;
     align-items: center;
