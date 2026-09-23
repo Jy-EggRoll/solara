@@ -1,0 +1,20 @@
+{
+    // 渐进式 TS 迁移：新文件写 .ts（走 strict），存量 .js 只作为类型来源、不做检查。
+    // include 只列 .ts 文件；被它们 import 的 .js 仍会被载入以提供推断类型，但不会报错。
+    "compilerOptions": {
+        "target": "ES2022",
+        "module": "ESNext",
+        "moduleResolution": "bundler",
+        "lib": ["ES2022", "DOM", "DOM.Iterable"],
+        "strict": true,
+        "noEmit": true,
+        "allowJs": true,
+        "checkJs": false,
+        "isolatedModules": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true
+    },
+    "include": ["js/**/*.ts"]
+}

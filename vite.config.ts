@@ -1,5 +1,25 @@
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin } from "vite";
 import { resolve } from "node:path";
+
+/**
+ * 渐进式 TS 迁移的解析回退：允许 `.js` 形式的相对导入落到同名 `.ts` 文件。
+ *
+ * 背景：vite 自带的 `.js → .ts` 映射只对「TS 引用方」生效；存量 .js 文件里写着的
+ * `"./foo.js"` 在文件改名为 foo.ts 之后会解析失败。有了这条回退，迁移一个文件
+ * 只需重命名，不必回头修改所有引用方的后缀。
+ * 仅在同名 .js 确实不存在时才回退，因此不会掩盖真正缺失的模块。
+ */
+function resolveTsForJsSpecifier(): Plugin {
+    return {
+        name: "solara:resolve-ts-for-js-specifier",
+        enforce: "pre",
+        async resolveId(source, importer) {
+            if (!importer || !source.startsWith(".") || !source.endsWith(".js")) return null;
+            if (await this.resolve(source, importer, { skipSelf: true })) return null;
+            return this.resolve(source.replace(/\.js$/, ".ts"), importer, { skipSelf: true });
+        },
+    };
+}
 
 /**
  * Vite 构建配置（已启用）。
@@ -20,6 +40,7 @@ import { resolve } from "node:path";
 export default defineConfig({
     base: "/",
     appType: "mpa",
+    plugins: [resolveTsForJsSpecifier()],
     build: {
         outDir: "dist",
         emptyOutDir: true,

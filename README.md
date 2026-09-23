@@ -97,8 +97,8 @@ docker compose up -d
 前端已接入 **Vite** 构建：资源自动带内容哈希输出到 `dist/assets/*`，HTML 每次回源校验（见 `public/_headers`），**不再需要手动维护 `?v=` 版本号** —— 改任一样式/脚本后重新构建即自动换名，访客（含移动端）无需强刷即可拿到最新版本。
 
 - **Cloudflare Pages 设置**：Build command = `pnpm install --frozen-lockfile && pnpm build`，Build output directory = `dist`，Node ≥ 20。
-- **本地开发**：`pnpm install` → `pnpm dev`（Vite 热更，仅前端，无 Pages Functions）/ `pnpm build`（产出 `dist/`）/ `pnpm preview`（预览产物）。
-- **本地跑全栈（含 Pages Functions）**：`pnpm dev:pages`（源码原点，等价于 Docker 里的 `wrangler pages dev .`）/ `pnpm preview:pages`（先构建、再以 `dist/` 起服务，用于验证构建产物）。两者默认 `http://127.0.0.1:8787`，搜歌、播放、`/palette` 取色均可用；可选环境变量写在根目录 `.dev.vars`（已被 gitignore，字段见 `.env.example`），未配置时 `PASSWORD` 为空即不鉴权、`API_BASE_URL` 回落默认节点。本地不绑定 D1，播放记录/收藏自动落到 localStorage。
+- **本地开发**：`pnpm install` → `pnpm preview`（先 `vite build`，再以 `dist/` + Pages Functions 起全栈服务，默认 `http://127.0.0.1:8787`）/ `pnpm build`（只产出 `dist/`）/ `pnpm typecheck`（TS 类型检查）。搜歌、播放、`/palette` 取色在 `pnpm preview` 下均可用；可选环境变量写在根目录 `.dev.vars`（已被 gitignore，字段见 `.env.example`），未配置时 `PASSWORD` 为空即不鉴权、`API_BASE_URL` 回落默认节点。本地不绑定 D1，播放记录/收藏自动落到 localStorage。注意：`wrangler pages dev` 在检测到被服务目录变更时会重载，偶尔会自行退出，重跑 `pnpm preview` 即可。
+- **TypeScript（渐进迁移中）**：新文件直接写 `.ts`（`tsconfig.json` 走 `strict`，目前只检查 `.ts`，存量 `.js` 作为类型来源但不报错）。把一个文件迁到 TS 只需重命名——`vite.config.ts` 里的解析回退会把 `"./foo.js"` 这种导入落到同名 `.ts`，无需回头改所有引用方；`window` 上由存量 JS 注入的全局契约（如 `__solaraDebugLog`）补在 `js/types/globals.d.ts`。快捷键统一登记在 `js/core/shortcuts.ts`（主键 + 修饰键精确匹配、默认输入态不触发）。
 - **约定**：`favicon.*`、`manifest.json` 位于 `public/`（按根路径原样服务）；`css/desktop.css`、`css/mobile.css` 作为常驻 `<link>` 交由 Vite 处理；`js/mobile.js` 由 `js/app.js` 动态 `import()` 按需拆分（仅移动端拉取）；`public/js/i18n.js` 为 classic 脚本，保持原路径、不参与哈希。
 
 ## ⚙️ 配置提示

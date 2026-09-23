@@ -2,24 +2,34 @@
  * 全屏 (Fullscreen API)
  * 语义：用户手动进入/退出全屏；状态由 fullscreenchange 同步（含按 ESC 退出）。
  * 不支持的环境（如 iPhone Safari 对普通元素）按钮置灰降级，不抛错。
+ * 键位：非输入状态下 F 切换（键位本身登记在 core/shortcuts）。
  */
 
-let domRef = null;
-let supported = false;
+import { registerShortcut } from "./shortcuts.js";
 
-function buttons() {
-    const list = [];
-    if (domRef && domRef.fullscreenBtn) list.push(domRef.fullscreenBtn);
+interface FullscreenDom {
+    fullscreenBtn?: HTMLElement | null;
+}
+
+let domRef: FullscreenDom | null = null;
+let supported = false;
+let shortcutBound = false;
+let changeListenerBound = false;
+
+function buttons(): HTMLButtonElement[] {
+    const list: HTMLButtonElement[] = [];
+    const toolbarButton = domRef?.fullscreenBtn;
+    if (toolbarButton instanceof HTMLButtonElement) list.push(toolbarButton);
     const setting = document.getElementById("fullscreenSettingToggle");
-    if (setting) list.push(setting);
+    if (setting instanceof HTMLButtonElement) list.push(setting);
     return list;
 }
 
-function isActive() {
+function isActive(): boolean {
     return !!document.fullscreenElement;
 }
 
-function render() {
+function render(): void {
     const on = isActive();
     const label = `全屏：${on ? "开" : "关"}`;
     for (const btn of buttons()) {
@@ -32,7 +42,7 @@ function render() {
     if (settingText) settingText.textContent = label;
 }
 
-function log(message) {
+function log(message: string): void {
     const line = `[全屏] ${message}`;
     console.log(line);
     if (typeof window !== "undefined" && typeof window.__solaraDebugLog === "function") {
@@ -40,7 +50,7 @@ function log(message) {
     }
 }
 
-function isSupported() {
+function isSupported(): boolean {
     return (
         typeof document !== "undefined" &&
         !!document.documentElement.requestFullscreen &&
@@ -49,7 +59,7 @@ function isSupported() {
     );
 }
 
-async function toggle() {
+async function toggle(): Promise<void> {
     try {
         if (document.fullscreenElement) {
             await document.exitFullscreen();
@@ -57,11 +67,22 @@ async function toggle() {
             await document.documentElement.requestFullscreen();
         }
     } catch (err) {
-        log(`切换失败: ${err && err.name ? err.name : err}`);
+        log(`切换失败: ${err instanceof Error ? err.name : String(err)}`);
     }
 }
 
-export function initFullscreen(dom) {
+function bindShortcut(): void {
+    if (shortcutBound) return;
+    shortcutBound = true;
+    registerShortcut({
+        key: "f",
+        handler: () => {
+            void toggle();
+        },
+    });
+}
+
+export function initFullscreen(dom: FullscreenDom | null): void {
     domRef = dom || domRef;
     if (!buttons().length) return;
 
@@ -83,16 +104,17 @@ export function initFullscreen(dom) {
     }
 
     for (const btn of buttons()) {
-        if (btn.__fullscreenBound) continue;
-        btn.__fullscreenBound = true;
+        if (btn.dataset.fullscreenBound) continue;
+        btn.dataset.fullscreenBound = "1";
         btn.addEventListener("click", toggle);
     }
 
-    if (!window.__fullscreenChangeBound) {
-        window.__fullscreenChangeBound = true;
+    if (!changeListenerBound) {
+        changeListenerBound = true;
         document.addEventListener("fullscreenchange", render);
         document.addEventListener("fullscreenerror", () => log("进入全屏失败"));
     }
 
+    bindShortcut();
     render();
 }
