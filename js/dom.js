@@ -7,6 +7,8 @@ export const dom = {
     backgroundStage: document.getElementById("backgroundStage"),
     backgroundBaseLayer: document.getElementById("backgroundBaseLayer"),
     backgroundTransitionLayer: document.getElementById("backgroundTransitionLayer"),
+    coverBackdrop: document.getElementById("coverBackdrop"),
+    coverBackdropNext: document.getElementById("coverBackdropNext"),
     playlist: document.getElementById("playlist"),
     playlistItems: document.getElementById("playlistItems"),
     favorites: document.getElementById("favorites"),

@@ -167,6 +167,7 @@ export const state = {
     pendingPaletteReady: false,
     audioReadyForPalette: true,
     currentGradient: "",
+    currentBackdrop: "",
     isMobileInlineLyricsOpen: false,
     selectedSearchResults: new Set(),
 };

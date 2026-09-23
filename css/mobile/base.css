@@ -83,56 +83,15 @@ body.mobile-view.dark-mode .background-stage__layer {
     filter: none !important;
 }
 
-/* 移动端极光网格：采用径向光晕自然扩散，取消暴力模糊，改为纯硬件加速的柔和弥散。
-   与桌面端保持一致，模糊挂在光球自身而非本层，避免与球体自带模糊叠加成双重模糊。 */
-body.mobile-view .aurora-mesh {
-    inset: -25%;
-    width: 150%;
-    height: 150%;
-    opacity: 0.85;
-    transform: translateZ(0);
-}
-
-/* 核心：彻底停止光球在移动端的 120Hz 无限旋转和形变动画！
-   让光球固定在四角构成天然柔和的静态色彩网格背景，GPU 占用由 100% 暴降至 0%，
-   使得上层所有毛玻璃（顶栏、底栏、歌单抽屉）可以完美命中 WebKit 纹理缓存，机身彻底冰凉且动画达到满帧 120fps！ */
-body.mobile-view .aurora-orb {
+/* 移动端底图：与桌面同一张静态模糊封面，但彻底不旋转、不缩放形变。
+   静止的底图让上层所有毛玻璃（顶栏、底栏、歌单抽屉）可以完美命中 WebKit 纹理缓存，
+   GPU 占用降到接近 0，机身彻底冰凉且动画达到满帧。 */
+body.mobile-view .cover-backdrop {
     animation: none !important;
     will-change: auto !important;
-    transform: translateZ(0);
-    filter: blur(32px) saturate(135%) !important;
-}
-
-body.mobile-view .aurora-orb--1 {
-    width: 80vw;
-    height: 80vw;
-    top: -10vw;
-    left: -10vw;
-    opacity: 0.9;
-}
-
-body.mobile-view .aurora-orb--2 {
-    width: 80vw;
-    height: 80vw;
-    top: -5vw;
-    right: -10vw;
-    opacity: 0.85;
-}
-
-body.mobile-view .aurora-orb--3 {
-    width: 75vw;
-    height: 75vw;
-    bottom: 5vw;
-    right: -5vw;
-    opacity: 0.8;
-}
-
-body.mobile-view .aurora-orb--4 {
-    width: 75vw;
-    height: 75vw;
-    bottom: -5vw;
-    left: -5vw;
-    opacity: 0.85;
+    /* 不旋转，但保留放大：否则模糊羽化边会正好落在屏幕上下边缘 */
+    transform: translateZ(0) scale(1.6);
+    filter: blur(40px) saturate(135%) !important;
 }
 
 /* 彻底移除全屏遮罩上的 backdrop-filter，避免在背景之上再做全屏高斯模糊 */

@@ -34,6 +34,13 @@ export function removeGlobalThemeProperty(name) {
     }
 }
 
+/** 把封面图落到背景底图上；空值即退回静态渐变兜底。 */
+function setBackdropImage(el, url) {
+    if (!el) return;
+    const safeUrl = url ? toAbsoluteUrl(preferHttpsUrl(url)).replace(/["'()\\\s]/g, "") : "";
+    el.style.backgroundImage = safeUrl ? `url("${safeUrl}")` : "none";
+}
+
 export function captureThemeDefaults(state) {
     if (state.themeDefaultsCaptured) {
         return;
@@ -149,6 +156,8 @@ export function applyDynamicGradient(state, dom, options = {}) {
     const mode = isDark ? "dark" : "light";
     const defaults = themeDefaults[mode];
     const immediate = Boolean(options.immediate);
+    const coverUrl = state.currentPaletteImage || "";
+    const backdropChanged = coverUrl !== (state.currentBackdrop || "");
 
     let targetGradient = defaults.gradient || "";
     let targetColors = isDark
@@ -244,20 +253,23 @@ export function applyDynamicGradient(state, dom, options = {}) {
             removeGlobalThemeProperty("--bg-gradient");
             removeGlobalThemeProperty("--bg-gradient-next");
         }
+        setBackdropImage(dom.coverBackdrop, coverUrl);
+        setBackdropImage(dom.coverBackdropNext, coverUrl);
         state.currentGradient = targetGradient;
+        state.currentBackdrop = coverUrl;
         return;
     }
 
-    // 渐变已完全相同时无需触发过渡
+    // 渐变与底图都完全相同时无需触发过渡
     const current = (state.currentGradient || "").trim();
-    if (targetGradient && targetGradient === current) {
+    if (targetGradient && targetGradient === current && !backdropChanged) {
         applyGlobalColorsAndTokens();
         return;
     }
 
     window.clearTimeout(backgroundTransitionTimer);
 
-    // 1. 将新调色板与渐变作用于过渡层自身（图层变量隔离，底层色球与渐变保持原样不变，彻底杜绝突变与两段式跳跃）
+    // 1. 将新调色板、渐变与封面底图作用于过渡层自身（图层变量隔离，底层保持原样不变，彻底杜绝突变与两段式跳跃）
     dom.backgroundTransitionLayer.style.setProperty("--palette-c1", targetColors[0]);
     dom.backgroundTransitionLayer.style.setProperty("--palette-c2", targetColors[1]);
     dom.backgroundTransitionLayer.style.setProperty("--palette-c3", targetColors[2]);
@@ -265,6 +277,7 @@ export function applyDynamicGradient(state, dom, options = {}) {
     dom.backgroundTransitionLayer.style.setProperty("--palette-accent", targetColors[4]);
     dom.backgroundTransitionLayer.style.setProperty("--palette-glow", `${targetColors[4]}66`);
     setGlobalThemeProperty("--bg-gradient-next", targetGradient);
+    setBackdropImage(dom.coverBackdropNext, coverUrl);
 
     // 2. 下一帧激活平滑淡入
     requestAnimationFrame(() => {
@@ -280,11 +293,13 @@ export function applyDynamicGradient(state, dom, options = {}) {
                 removeGlobalThemeProperty("--bg-gradient");
                 removeGlobalThemeProperty("--bg-gradient-next");
             }
+            setBackdropImage(dom.coverBackdrop, coverUrl);
             if (dom.backgroundTransitionLayer) {
                 dom.backgroundTransitionLayer.removeAttribute("style");
             }
             document.body.classList.remove("background-transitioning");
             state.currentGradient = targetGradient;
+            state.currentBackdrop = coverUrl;
         }, BACKGROUND_TRANSITION_DURATION);
     });
 }

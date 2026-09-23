@@ -6,9 +6,8 @@
    选择器均用 (类) 前缀 + !important，对运行时注入的 desktop.css / mobile.css
    以「更高特异性」稳定压制，不依赖样式加载顺序。 */
 
-/* 1. 去极光：彻底不渲染 orb / mesh / noise / 过渡层（display:none 后 filter 无成本） */
-html.eco-mode .aurora-mesh,
-html.eco-mode .aurora-orb,
+/* 1. 去底图：彻底不渲染封面模糊层 / noise / 过渡层（display:none 后 filter 无成本） */
+html.eco-mode .cover-backdrop,
 html.eco-mode .aurora-noise,
 html.eco-mode .background-stage__layer--transition {
     display: none !important;

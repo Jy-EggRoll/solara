@@ -173,143 +173,50 @@ body.background-transitioning .background-stage__layer--transition {
     opacity: 1;
 }
 
-/* 过渡层常驻 opacity: 0，其中那份极光只有交叉淡入的 0.8s 会被看见。
-   平时不渲染可省掉整整一半的极光开销，过渡期间照旧显示，淡入观感不变。 */
-.background-stage__layer--transition .aurora-mesh {
+/* 过渡层常驻 opacity: 0，其中的底图只有交叉淡入的 0.8s 会被看见。
+   平时不渲染可省掉一半的底图开销，过渡期间照旧显示，淡入观感不变。 */
+.background-stage__layer--transition .cover-backdrop {
     visibility: hidden;
 }
 
-body.background-transitioning .background-stage__layer--transition .aurora-mesh {
+body.background-transitioning .background-stage__layer--transition .cover-backdrop {
     visibility: visible;
 }
 
-.aurora-mesh {
+/* 封面模糊底图：模糊只栅格化一次，之后每帧只剩合成器旋转。
+   取 100vmax 的方块再 scale(1.6)：栅格面积更小（更省）且观感更糊；
+   放大后半径始终远超视口对角线，旋转时图层边缘扫不进屏幕，不会有裁切线。 */
+.cover-backdrop {
     position: absolute;
-    inset: -25%;
-    width: 150%;
-    height: 150%;
-    overflow: hidden;
-    /* 模糊不放在本层：整层 filter 会因内部光球逐帧位移，被迫每帧重算 150% 视口面积的
-       50px 高斯（DPR2 下即 100px 半径），这才是 GPU 被打满的主因。高斯是线性算子，
-       下移到各光球与整层作用等价，但只需栅格化一次，此后每帧仅剩合成器 transform。 */
+    top: 50%;
+    left: 50%;
+    width: 100vmax;
+    height: 100vmax;
+    margin: -50vmax 0 0 -50vmax;
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    filter: blur(50px) saturate(140%);
     pointer-events: none;
-    opacity: 0.85;
     will-change: transform;
-    animation: bg-revolve 30s linear infinite;
+    animation: bg-revolve 120s linear infinite;
+    /* 暂停时冻结底图（与封面旋转同一套范式），续播接着转；
+       底图一停，上层所有毛玻璃的 backdrop 也不再变化，可直接命中纹理缓存 */
+    animation-play-state: paused;
+}
+
+body.is-playing .cover-backdrop {
+    animation-play-state: running;
 }
 
 /* 整层缓慢旋转：纯 transform 合成，不重绘模糊 */
 @keyframes bg-revolve {
     from {
-        transform: translateZ(0) rotate(0deg);
+        transform: translateZ(0) rotate(0deg) scale(1.6);
     }
     to {
-        transform: translateZ(0) rotate(360deg);
+        transform: translateZ(0) rotate(360deg) scale(1.6);
     }
-}
-
-.aurora-orb {
-    position: absolute;
-    border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%;
-    filter: blur(50px) saturate(140%);
-    will-change: transform;
-}
-
-.aurora-orb--1 {
-    width: 70vw;
-    height: 70vw;
-    top: -15vw;
-    left: -12vw;
-    background: radial-gradient(circle at 40% 40%, var(--palette-c1) 0%, transparent 68%);
-    animation: aurora-flow-1 28s var(--spring-smooth) infinite alternate;
-}
-
-.aurora-orb--2 {
-    width: 75vw;
-    height: 75vw;
-    top: -20vw;
-    right: -15vw;
-    background: radial-gradient(circle at 50% 50%, var(--palette-c2) 0%, transparent 68%);
-    animation: aurora-flow-2 34s var(--spring-smooth) infinite alternate;
-}
-
-.aurora-orb--3 {
-    width: 65vw;
-    height: 65vw;
-    bottom: -18vw;
-    right: 0vw;
-    background: radial-gradient(circle at 50% 50%, var(--palette-c3) 0%, transparent 68%);
-    animation: aurora-flow-3 24s var(--spring-smooth) infinite alternate;
-}
-
-.aurora-orb--4 {
-    width: 62vw;
-    height: 62vw;
-    bottom: -15vw;
-    left: 2vw;
-    background: radial-gradient(circle at 40% 50%, var(--palette-c4) 0%, transparent 68%);
-    animation: aurora-flow-4 30s var(--spring-smooth) infinite alternate;
-}
-
-@keyframes aurora-flow-1 {
-    0% {
-        transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
-    }
-    50% {
-        transform: translate3d(10vw, 8vh, 0) scale(1.15) rotate(110deg);
-    }
-    100% {
-        transform: translate3d(-6vw, 14vh, 0) scale(0.96) rotate(220deg);
-    }
-}
-
-@keyframes aurora-flow-2 {
-    0% {
-        transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
-    }
-    50% {
-        transform: translate3d(-12vw, 10vh, 0) scale(1.12) rotate(-90deg);
-    }
-    100% {
-        transform: translate3d(6vw, -6vh, 0) scale(1.05) rotate(-190deg);
-    }
-}
-
-@keyframes aurora-flow-3 {
-    0% {
-        transform: translate3d(0, 0, 0) scale(1.04);
-    }
-    50% {
-        transform: translate3d(-10vw, -8vh, 0) scale(0.92);
-    }
-    100% {
-        transform: translate3d(8vw, -10vh, 0) scale(1.16);
-    }
-}
-
-@keyframes aurora-flow-4 {
-    0% {
-        transform: translate3d(0, 0, 0) scale(0.94);
-    }
-    50% {
-        transform: translate3d(12vw, -6vh, 0) scale(1.1);
-    }
-    100% {
-        transform: translate3d(-6vw, 8vh, 0) scale(1.02);
-    }
-}
-
-/* 暂停时冻结极光（与 .album-cover img 同一套范式）：外观停在当前帧不变，续播接着转。
-   极光一停，上层所有毛玻璃的 backdrop 也不再变化，可直接命中纹理缓存，
-   于是每帧的模糊重算与重绘一并归零。 */
-.aurora-mesh,
-.aurora-orb {
-    animation-play-state: paused;
-}
-
-body.is-playing .aurora-mesh,
-body.is-playing .aurora-orb {
-    animation-play-state: running;
 }
 
 .aurora-noise {
@@ -334,8 +241,7 @@ body.is-playing .aurora-orb {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .aurora-orb,
-    .aurora-mesh,
+    .cover-backdrop,
     .album-cover img {
         animation: none !important;
     }
