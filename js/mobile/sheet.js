@@ -59,26 +59,6 @@ export function switchMobilePanelTab(targetTab) {
         document.body.setAttribute("data-mobile-panel-view", targetTab);
     }
 
-    // 移动端分段控制器物理滑动胶囊
-    const tabsContainer = $("mobilePanelHeader")?.querySelector(".playlist-tabs");
-    if (tabsContainer) {
-        requestAnimationFrame(() => {
-            let indicator = tabsContainer.querySelector(".playlist-tabs-indicator");
-            if (!indicator) {
-                indicator = document.createElement("div");
-                indicator.className = "playlist-tabs-indicator";
-                indicator.setAttribute("aria-hidden", "true");
-                tabsContainer.prepend(indicator);
-            }
-            const activeTab = isFavorites ? favTab : plTab;
-            if (activeTab && activeTab.offsetWidth > 0) {
-                indicator.style.transform = `translateX(${activeTab.offsetLeft}px)`;
-                indicator.style.width = `${activeTab.offsetWidth}px`;
-                indicator.style.opacity = "1";
-            }
-        });
-    }
-
     try {
         window.dispatchEvent(new CustomEvent("solara:mobile-tab-changed", { detail: { tab: targetTab } }));
     } catch (e) {}
@@ -94,18 +74,6 @@ export function openMobilePanel(view = "playlist") {
     updateMobileOverlayScrim();
 
     const panel = $("mobilePanel");
-    if (panel) {
-        requestAnimationFrame(() => {
-            const tabsContainer = $("mobilePanelHeader")?.querySelector(".playlist-tabs");
-            const activeTab = targetView === "favorites" ? $("mobileFavoritesTab") : $("mobilePlaylistTab");
-            const indicator = tabsContainer?.querySelector(".playlist-tabs-indicator");
-            if (indicator && activeTab && activeTab.offsetWidth > 0) {
-                indicator.style.transform = `translateX(${activeTab.offsetLeft}px)`;
-                indicator.style.width = `${activeTab.offsetWidth}px`;
-                indicator.style.opacity = "1";
-            }
-        });
-    }
     if (panel) {
         panel.style.transform = "";
         panel.style.transition = "";

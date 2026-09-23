@@ -172,6 +172,39 @@ export function updatePlaylistActionStates(state, dom) {
     }
 }
 
+/** 按唯一特征（Key / ID / 歌名）在曲库中定位当前播放曲目，匹配不到时退回既有索引。 */
+export function findCurrentSongIndex(songs, currentSong, fallbackIndex) {
+    const currentKey = getSongKey(currentSong);
+    const currentId = currentSong?.id ? String(currentSong.id) : null;
+    const currentName = currentSong?.name || null;
+
+    const matchedIndex = songs.findIndex((song) => {
+        const k = getSongKey(song);
+        if (currentKey && k && k === currentKey) return true;
+        if (currentId && song?.id && String(song.id) === currentId) return true;
+        if (currentName && song?.name && song.name === currentName) return true;
+        return false;
+    });
+
+    if (matchedIndex >= 0) {
+        return matchedIndex;
+    }
+    if (fallbackIndex >= 0 && fallbackIndex < songs.length) {
+        return fallbackIndex;
+    }
+    return -1;
+}
+
+/** 播放列表与收藏列表共用：把 .current 高亮落到目标索引上。 */
+export function applyCurrentHighlight(items, targetIndex) {
+    items.forEach((item, index) => {
+        const isCurrent = index === targetIndex;
+        item.classList.toggle("current", isCurrent);
+        item.setAttribute("aria-current", isCurrent ? "true" : "false");
+        item.setAttribute("aria-pressed", isCurrent ? "true" : "false");
+    });
+}
+
 export function updatePlaylistHighlight(state, dom) {
     if (!dom.playlistItems) return;
     const items = dom.playlistItems.querySelectorAll(".playlist-item");
@@ -181,34 +214,12 @@ export function updatePlaylistHighlight(state, dom) {
     const isPlayingPlaylist = state.currentPlaylist === "playlist" && state.currentSong != null;
 
     if (isPlayingPlaylist && Array.isArray(state.playlistSongs) && state.playlistSongs.length > 0) {
-        const currentKey = getSongKey(state.currentSong);
-        const currentId = state.currentSong?.id ? String(state.currentSong.id) : null;
-        const currentName = state.currentSong?.name || null;
-
-        // 优先根据唯一特征（Key / ID / 歌名）在播放列表中匹配出唯一目标索引
-        const matchedIndex = state.playlistSongs.findIndex((song) => {
-            const k = getSongKey(song);
-            if (currentKey && k && k === currentKey) return true;
-            if (currentId && song?.id && String(song.id) === currentId) return true;
-            if (currentName && song?.name && song.name === currentName) return true;
-            return false;
-        });
-
-        if (matchedIndex >= 0) {
-            targetIndex = matchedIndex;
-            // 自动纠偏当前索引，确保状态与视图完全一致
-            state.currentTrackIndex = matchedIndex;
-        } else if (state.currentTrackIndex >= 0 && state.currentTrackIndex < state.playlistSongs.length) {
-            targetIndex = state.currentTrackIndex;
-        }
+        targetIndex = findCurrentSongIndex(state.playlistSongs, state.currentSong, state.currentTrackIndex);
+        // 自动纠偏当前索引，确保状态与视图完全一致
+        if (targetIndex >= 0) state.currentTrackIndex = targetIndex;
     }
 
-    items.forEach((item, index) => {
-        const isCurrent = index === targetIndex;
-        item.classList.toggle("current", isCurrent);
-        item.setAttribute("aria-current", isCurrent ? "true" : "false");
-        item.setAttribute("aria-pressed", isCurrent ? "true" : "false");
-    });
+    applyCurrentHighlight(items, targetIndex);
 }
 
 export function renderPlaylist(state, dom, callbacks = {}) {
@@ -261,61 +272,6 @@ export function renderPlaylist(state, dom, callbacks = {}) {
     updatePlaylistActionStates(state, dom);
 }
 
-let tabsResizeObserver = null;
-
-export function observeTabsResize() {
-    if (typeof ResizeObserver === "undefined" || typeof document === "undefined") return;
-    if (!tabsResizeObserver) {
-        tabsResizeObserver = new ResizeObserver((entries) => {
-            for (const entry of entries) {
-                const target = entry.target;
-                const tabsContainer = target.classList?.contains("playlist-tabs")
-                    ? target
-                    : target.closest?.(".playlist-tabs");
-                if (tabsContainer) {
-                    updateTabsIndicator(tabsContainer);
-                }
-            }
-        });
-    }
-    document.querySelectorAll(".playlist-tabs").forEach((tabs) => {
-        tabsResizeObserver.observe(tabs);
-        tabs.querySelectorAll(".playlist-tab").forEach((tab) => {
-            tabsResizeObserver.observe(tab);
-        });
-    });
-}
-
-export function updateTabsIndicator(tabsContainer) {
-    if (!tabsContainer || !(tabsContainer instanceof HTMLElement)) return;
-    let indicator = tabsContainer.querySelector(".playlist-tabs-indicator");
-    if (!indicator) {
-        indicator = document.createElement("div");
-        indicator.className = "playlist-tabs-indicator";
-        indicator.setAttribute("aria-hidden", "true");
-        tabsContainer.prepend(indicator);
-    }
-    const activeTab = tabsContainer.querySelector(".playlist-tab.active");
-    if (activeTab && activeTab.offsetWidth > 0) {
-        const left = activeTab.offsetLeft;
-        const width = activeTab.offsetWidth;
-        indicator.style.transform = `translateX(${left}px)`;
-        indicator.style.width = `${width}px`;
-        indicator.style.opacity = "1";
-    } else if (!activeTab) {
-        indicator.style.opacity = "0";
-    }
-}
-
-export function updateAllTabsIndicators() {
-    requestAnimationFrame(() => {
-        document.querySelectorAll(".playlist-tabs").forEach((tabs) => {
-            updateTabsIndicator(tabs);
-        });
-    });
-    observeTabsResize();
-}
-
 export function switchLibraryTab(target, dom, callbacks = {}) {
     const showFavorites = target === "favorites";
 
@@ -330,9 +286,6 @@ export function switchLibraryTab(target, dom, callbacks = {}) {
             tab.setAttribute("aria-selected", isActive ? "true" : "false");
         });
     }
-
-    // 物理平滑滑动指示器
-    updateAllTabsIndicators();
 
     if (dom.playlist) {
         if (showFavorites) {
@@ -353,9 +306,6 @@ export function switchLibraryTab(target, dom, callbacks = {}) {
             dom.favorites.setAttribute("hidden", "");
         }
     }
-
-    // 切换后再次在微帧内矫正指示器位置（防止容器动画引起的轻微位移差）
-    updateAllTabsIndicators();
 
     if (typeof callbacks.updateMobileLibraryActionVisibility === "function") {
         callbacks.updateMobileLibraryActionVisibility(showFavorites);

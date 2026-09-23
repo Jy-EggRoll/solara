@@ -153,30 +153,7 @@ body.mobile-view.dark-mode .mobile-panel-header .playlist-tabs {
     background: rgba(120, 120, 128, 0.26);
 }
 
-/* 移动端 Apple 物理滑动胶囊滑块 */
-body.mobile-view .mobile-panel-header .playlist-tabs-indicator {
-    position: absolute;
-    top: 3px;
-    bottom: 3px;
-    left: 0;
-    border-radius: 999px;
-    background: #ffffff;
-    box-shadow:
-        0 3px 10px rgba(0, 0, 0, 0.16),
-        0 1px 3px rgba(0, 0, 0, 0.08);
-    pointer-events: none;
-    z-index: 1;
-    transition:
-        transform 0.32s cubic-bezier(0.22, 1, 0.36, 1),
-        width 0.32s cubic-bezier(0.22, 1, 0.36, 1);
-    will-change: transform, width;
-}
-
-body.mobile-view.dark-mode .mobile-panel-header .playlist-tabs-indicator {
-    background: rgba(255, 255, 255, 0.25);
-    box-shadow: 0 3px 14px rgba(0, 0, 0, 0.45);
-}
-
+/* 移动端选中态同样用底色表达，与桌面/列表项共用一套 token */
 body.mobile-view .mobile-panel-header .playlist-tab {
     position: relative;
     z-index: 2;
@@ -191,6 +168,7 @@ body.mobile-view .mobile-panel-header .playlist-tab {
     cursor: pointer;
     white-space: nowrap;
     transition:
+        background-color 0.22s ease,
         color 0.22s ease,
         transform 0.12s ease;
     user-select: none;
@@ -204,13 +182,9 @@ body.mobile-view .mobile-panel-header .playlist-tab:active {
 }
 
 body.mobile-view .mobile-panel-header .playlist-tab.active {
-    background: transparent !important;
-    color: #1d1d1f !important;
+    background: var(--item-current-bg) !important;
+    color: var(--primary-color) !important;
     box-shadow: none !important;
-}
-
-body.mobile-view.dark-mode .mobile-panel-header .playlist-tab.active {
-    color: #ffffff !important;
 }
 
 /* 操作按鈕组 — margin-left:auto 推到最右侧，与 tabs 共行 */
@@ -450,6 +424,15 @@ body.mobile-view .playlist-item.current::before {
         transform: scaleY(1);
         opacity: 1;
     }
+}
+
+/* 暂停时音浪静止（与封面旋转、极光同一套范式），续播接着动 */
+body.mobile-view .playlist-item.current::before {
+    animation-play-state: paused;
+}
+
+body.mobile-view.is-playing .playlist-item.current::before {
+    animation-play-state: running;
 }
 
 /* ─── 4. 列表空状态提示 ─────────────────────────────────────────────────── */

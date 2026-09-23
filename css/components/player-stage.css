@@ -560,23 +560,7 @@ body.dark-mode .playlist-tabs {
     border-color: rgba(255, 255, 255, 0.08);
 }
 
-/* 电脑端 Apple 级物理滑动分段控制器滑块 */
-.playlist-tabs-indicator {
-    position: absolute;
-    top: 3px;
-    bottom: 3px;
-    left: 0;
-    border-radius: 7px;
-    background: var(--primary-color);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
-    pointer-events: none;
-    z-index: 1;
-    transition:
-        transform 0.32s cubic-bezier(0.22, 1, 0.36, 1),
-        width 0.32s cubic-bezier(0.22, 1, 0.36, 1);
-    will-change: transform, width;
-}
-
+/* 选中态改用底色表达（与列表项、搜索结果同一套 token），不再有滑动滑块与逐帧测量 */
 .playlist-tab {
     position: relative;
     z-index: 2;
@@ -593,6 +577,7 @@ body.dark-mode .playlist-tabs {
     font-weight: 500;
     cursor: pointer;
     transition:
+        background-color 0.24s ease,
         color 0.24s ease,
         transform 0.18s var(--spring-snappy);
     flex: 0 0 auto;
@@ -607,6 +592,7 @@ body.dark-mode .playlist-tabs {
 }
 
 .playlist-tab:hover:not(.active) {
+    background: var(--item-hover-bg) !important;
     color: var(--text-color);
 }
 
@@ -615,8 +601,8 @@ body.dark-mode .playlist-tabs {
 }
 
 .playlist-tab.active {
-    background: transparent !important;
-    color: #ffffff !important;
+    background: var(--item-current-bg) !important;
+    color: var(--primary-color) !important;
     font-weight: 600;
     box-shadow: none !important;
 }
@@ -721,6 +707,8 @@ body.dark-mode .playlist-tabs {
     z-index: 10;
 }
 
+/* 悬浮与正在播放共用同一套 token（--item-hover-bg / --item-current-bg 自身带深浅色两档），
+   正在播放只是同款底色更深的一档，不再另维护竖条与暗色覆盖两份。 */
 .playlist-items .playlist-item:hover {
     background-color: var(--item-hover-bg);
     color: var(--item-current-text);
@@ -728,28 +716,10 @@ body.dark-mode .playlist-tabs {
 }
 
 .playlist-items .playlist-item.current {
-    color: #111113 !important;
-    font-weight: 600 !important;
-    background-color: rgba(255, 255, 255, 0.68) !important;
-    border: 1px solid rgba(255, 255, 255, 0.85) !important;
-    border-left: 3.5px solid var(--primary-color) !important;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06) !important;
-}
-
-/* 暗色模式下强化对比度与材质感 */
-body.dark-mode .playlist-items .playlist-item:hover {
-    background-color: rgba(255, 255, 255, 0.08);
-    color: #ffffff;
-    border-color: rgba(255, 255, 255, 0.12);
-}
-
-body.dark-mode .playlist-items .playlist-item.current {
-    background-color: rgba(255, 255, 255, 0.1) !important;
-    color: #ffffff !important;
-    font-weight: 600 !important;
-    border: 1px solid rgba(255, 255, 255, 0.15) !important;
-    border-left: 3.5px solid var(--primary-color) !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22) !important;
+    background-color: var(--item-current-bg);
+    color: var(--item-current-text);
+    font-weight: 600;
+    border-color: var(--primary-color);
 }
 
 /* ===== 播放列表与收藏列表操作按钮：极简现代风格 ===== */

@@ -68,7 +68,6 @@ import {
     removeFromPlaylist,
     exportPlaylist,
     handleImportPlaylistChange,
-    updateAllTabsIndicators,
 } from "./features/playlist.js";
 import {
     ensureFavoriteSongsArray,
@@ -1695,8 +1694,6 @@ export async function bootstrap() {
     buildQualityMenu(state, dom);
     applyDynamicGradient(state, dom, { immediate: true });
     initDesktopLyricsInteractions(state, dom);
-    updateAllTabsIndicators();
-    window.addEventListener("resize", () => updateAllTabsIndicators(), { passive: true });
 
     // 初始化音量条状态与填充进度，防止初次加载时滑轨高亮溢出
     try {
