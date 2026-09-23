@@ -151,24 +151,33 @@ export function setDocumentGradient(gradient, state, dom, { immediate = false } 
 
 /** 玻璃面板的等效底色：封面平均色（或主题渐变首色）依次被容器底色、面板底色覆盖。 */
 function estimatePanelBackground(state, isDark) {
+    const themeFallback = isDark ? { r: 12, g: 14, b: 18, a: 1 } : { r: 242, g: 244, b: 243, a: 1 };
     const styles = getComputedStyle(document.documentElement);
-    const backdrop =
+    let background =
         parseColor(state.dynamicPalette?.averageColor) ||
         parseColor(firstColorIn(styles.getPropertyValue("--bg-gradient"))) ||
-        (isDark ? { r: 12, g: 14, b: 18, a: 1 } : { r: 242, g: 244, b: 243, a: 1 });
+        themeFallback;
 
-    return ["--container-bg", "--component-bg"].reduce((background, token) => {
+    for (const token of ["--container-bg", "--component-bg"]) {
         const layer = parseColor(styles.getPropertyValue(token));
-        return layer ? composite(layer, background) : background;
-    }, backdrop);
+        // 省电模式把面板底色写成 color-mix()，解析不了：那意味着面板已接近实色，
+        // 必须按主题极值评估。若此时退回封面平均色，会把近黑面板误判成亮背景、
+        // 把主色压深，表现为省电模式下当前歌词对比度不足。
+        if (!layer) return themeFallback;
+        background = composite(layer, background);
+    }
+
+    return background;
 }
 
 /**
  * 凡把调色板色当文字用的地方（列表项标题、tab 选中态、搜索结果标题、歌词当前行等）
  * 统一走 --accent-text：对面板底色校验 WCAG AA(4.5:1)，不达标就沿明度轴变换后写回，
  * 使配色始终保留色相而可读性有下限。
+ * 凡是会改变面板底色的开关（主题、省电模式）都必须在切换后调用它重算，
+ * 否则会残留按旧底色算出的颜色。
  */
-function applyReadableAccentText(state) {
+export function applyReadableAccentText(state) {
     if (typeof window === "undefined" || !document.documentElement) return;
 
     const styles = getComputedStyle(document.documentElement);

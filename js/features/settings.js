@@ -7,6 +7,7 @@ import { safeGetLocalStorage, safeSetLocalStorage, persistStorageItems } from ".
 import { toggleDebugMode } from "../visual/spotlight.js";
 import { initWakeLock } from "../core/wake-lock.js";
 import { initFullscreen } from "../core/fullscreen.js";
+import { applyReadableAccentText } from "../visual/aurora.js";
 
 const NOTIFICATION_ICONS = {
     success: `<svg class="notification-svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg>`,
@@ -239,7 +240,7 @@ export function initLayoutMode(dom) {
     }
 }
 
-export function initEcoMode(dom) {
+export function initEcoMode(dom, state) {
     const STORAGE_KEY = "solara_eco";
     const headerBtn = dom?.ecoToggleButton || document.getElementById("ecoToggleBtn");
     const settingBtn = document.getElementById("ecoSettingToggle");
@@ -248,6 +249,9 @@ export function initEcoMode(dom) {
     const applyEco = (on) => {
         document.documentElement.classList.toggle("eco-mode", on);
         if (document.body) document.body.classList.toggle("eco-mode", on);
+        // 省电模式换掉的是整套面板底色，主色文字必须按新底色重新校验与变换，
+        // 否则会残留按普通模式算出的颜色（切回普通模式也一样要重算）
+        applyReadableAccentText(state);
         for (const target of [headerBtn, settingBtn]) {
             if (!target) continue;
             target.classList.toggle("is-active", on);
@@ -355,7 +359,7 @@ export function initSettings(dom, state, callbacks = {}) {
 
     loadSettings(dom, state);
     initLayoutMode(dom);
-    initEcoMode(dom);
+    initEcoMode(dom, state);
     initWakeLock(dom, state);
     initFullscreen(dom);
 }

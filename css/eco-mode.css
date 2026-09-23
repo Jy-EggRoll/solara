@@ -15,9 +15,9 @@ html.eco-mode .cover-backdrop {
     transform: translateZ(0) scale(1.6) !important;
 }
 
-/* noise 与过渡层在省电模式下不渲染：没有交叉淡入，基底层直接呈现底图/静态渐变 */
-html.eco-mode .aurora-noise,
-html.eco-mode .background-stage__layer--transition {
+/* noise 在省电模式下不渲染。过渡层必须保留：它只是一层静态栅格 + 0.8s 淡入，
+   没有每帧成本，但少了它切歌时底图会硬切（交叉淡入就是靠它）。 */
+html.eco-mode .aurora-noise {
     display: none !important;
     filter: none !important;
     will-change: auto !important;
