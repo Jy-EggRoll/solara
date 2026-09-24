@@ -258,6 +258,7 @@ Solara/
     - 桌面端布局 = `(min-width: 821px) and (hover: hover)`
     - JS 侧需要"行为差异"时查 `core/viewport.ts` 的 `isMobileLayout()`（与样式同一条件）
 - 新文件优先写 `.ts`（`pnpm typecheck` 目前只检查 TS 文件，存量 JS 逐步迁移；迁移只需重命名，构建会自动把 `"./foo.js"` 这类导入落到同名 `.ts`）
+- **样式层叠（迁移中）**：现有 500+ 个 `!important` 多是为跨文件覆盖"抢胜负"而加的历史债。计划顺序是「**先降 `!important`，再迁 `@layer`**」——因为 layer 中 `!important` 的优先级顺序与普通声明**相反**（早层胜晚层），而 `color` / `display` / `transform` 等属性在 8~9 个文件里都带 `!important`，整体加层会成片翻转胜负，无法保证无回归。`pnpm check:css` 是止血阀：新增 `!important` 会让检查失败；删掉后请同步调小 `scripts/check-css-budget.mjs` 里的预算，让刻度只往下走。
 - 快捷键不要各自绑 `keydown`，统一登记到 `src/scripts/core/shortcuts.ts`
 - `window` 上由存量 JS 注入的全局（如 `__solaraDebugLog`）补进 `src/scripts/types/globals.d.ts`，不要在业务代码里用 `any` 绕过
 
