@@ -14,9 +14,11 @@ body {
     margin-inline: auto;
 }
 
-body:not(.mobile-view) {
-    padding-left: max(env(safe-area-inset-left), 16px);
-    padding-right: max(env(safe-area-inset-right), 16px);
+@media (min-width: 821px) and (hover: hover) {
+    body {
+        padding-left: max(env(safe-area-inset-left), 16px);
+        padding-right: max(env(safe-area-inset-right), 16px);
+    }
 }
 
 /* ─── Apple 全局零延迟按压反馈 (Kill Latency) ──────────────────── */

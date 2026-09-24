@@ -173,9 +173,11 @@
     flex: 0 0 auto;
 }
 
-html:not(.mobile-view) .transport-controls {
-    width: auto;
-    gap: 8px;
+@media (min-width: 821px) and (hover: hover) {
+    .transport-controls {
+        width: auto;
+        gap: 8px;
+    }
 }
 
 #mobileQueueToggle {

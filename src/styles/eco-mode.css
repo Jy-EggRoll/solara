@@ -93,22 +93,23 @@ html.eco-mode #qualityToggle {
 
 /* 3b. 移动端玻璃层（用 var(--apple-glass-blur) 的已被上面的 token 覆盖清零；
    以下为使用字面 blur() 的规则，按真实选择器精确命中。
-   前缀 html.eco-mode body.eco-mode.mobile-view 取得 (0,4,2)/(1,4,2) 特异性，
-   稳定压制运行时注入的 mobile.css，不依赖加载顺序与深浅色变体） */
-html.eco-mode
-    body.eco-mode.mobile-view
-    :is(
-        .mobile-panel,
-        .mobile-quality-chip,
-        .mobile-inline-lyrics__hint,
-        #notification,
-        .settings-content,
-        .import-dropdown-menu,
-        .mobile-panel-header .playlist-tabs
-    ),
-html.eco-mode body.eco-mode.mobile-view .album-cover::after {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
+   移动端布局由媒体查询判定，不再依赖 JS 派发的设备类） */
+@media (max-width: 820px), (hover: none) {
+    html.eco-mode
+        body.eco-mode
+        :is(
+            .mobile-panel,
+            .mobile-quality-chip,
+            .mobile-inline-lyrics__hint,
+            #notification,
+            .settings-content,
+            .import-dropdown-menu,
+            .mobile-panel-header .playlist-tabs
+        ),
+    html.eco-mode body.eco-mode .album-cover::after {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
 }
 
 /* 4. 停止常驻无限动画中真正昂贵的那一类已随极光一并消失，

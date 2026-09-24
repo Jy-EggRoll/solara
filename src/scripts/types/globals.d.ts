@@ -6,6 +6,4 @@
 interface Window {
     /** 调试浮层日志（js/visual/spotlight.js 注入） */
     __solaraDebugLog?: (message: string) => void;
-    /** 移动端判定（index.html 首帧脚本写入） */
-    __SOLARA_IS_MOBILE?: boolean;
 }

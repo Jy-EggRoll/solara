@@ -211,6 +211,7 @@ Solara/
 │   │   │   ├── storage.ts         # 本地持久化与 Cloudflare D1 漫游驱动
 │   │   │   ├── contrast.ts        # WCAG 对比度计算与色彩变换
 │   │   │   ├── shortcuts.ts       # 全局快捷键注册表
+│   │   │   ├── viewport.ts        # 设备布局判定（媒体查询）与视口/软键盘适配
 │   │   │   ├── fullscreen.ts      # 全屏状态同步与 F 键登记
 │   │   │   ├── wake-lock.js       # 防息屏锁
 │   │   │   └── media-session.js   # 全平台锁屏控制器与元数据同步
@@ -226,8 +227,7 @@ Solara/
 │   │   │   └── spotlight.js       # 聚光灯跟随与调试控制台（可拖拽/折叠/彩标日志）
 │   │   ├── mobile/            # 移动端手势与抽屉交互
 │   │   │   └── gestures.js / sheet.js / stage.js / search.js / toolbar.js / core.js
-│   │   ├── boot/              # 启动期适配（视口 / 软键盘）
-│   │   └── types/             # 全局类型契约（window 扩展等）
+│   │   ├── types/             # 全局类型契约（window 扩展等）
 │   └── styles/                # 样式：tokens → layout → components → mobile
 │       ├── style.css / mobile.css      # 两个聚合入口（@import 各层）
 │       ├── desktop.css / eco-mode.css  # 桌面端补齐与省电模式
@@ -253,6 +253,10 @@ Solara/
 - 源码一律进 `src/`：逻辑放 `src/scripts`，样式放 `src/styles`；只有**必须保留原始 URL** 的资源才放 `public/`（如 classic 脚本 `public/js/i18n.js`）
 - `functions/`、`index.html`、`login.html` 必须留在仓库根（Cloudflare Pages 与构建入口的约定）
 - 依赖方向自上而下：`app → features / visual / mobile → core`；`core` 不反向依赖业务层，新增的通用能力优先落在 `core`
+- **布局模式一律用媒体查询判定，禁止用 JS 往 `<html>`/`<body>` 上派发设备类**（理由：宽窗/分屏/旋转会让 UA 判定与实际视口脱节，且类驱动的覆盖层难以维护）。权威定义只有一处，改则两处同步：
+    - 移动端布局 = `(max-width: 820px), (hover: none)`
+    - 桌面端布局 = `(min-width: 821px) and (hover: hover)`
+    - JS 侧需要"行为差异"时查 `core/viewport.ts` 的 `isMobileLayout()`（与样式同一条件）
 - 新文件优先写 `.ts`（`pnpm typecheck` 目前只检查 TS 文件，存量 JS 逐步迁移；迁移只需重命名，构建会自动把 `"./foo.js"` 这类导入落到同名 `.ts`）
 - 快捷键不要各自绑 `keydown`，统一登记到 `src/scripts/core/shortcuts.ts`
 - `window` 上由存量 JS 注入的全局（如 `__solaraDebugLog`）补进 `src/scripts/types/globals.d.ts`，不要在业务代码里用 `any` 绕过

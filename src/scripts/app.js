@@ -2,7 +2,7 @@
  * Solara 主应用总装入口 (App Assembly & Lifecycle Orchestrator)
  */
 
-import "./boot/viewport.js";
+import { initViewportAdaptation, isMobileLayout } from "./core/viewport.js";
 import {
     API,
     DEFAULT_RADAR_GENRES,
@@ -121,7 +121,8 @@ import { initMediaSession } from "./core/media-session.js";
 const debugLog = createDebugLogger(state, dom);
 initDebugShortcut(state, dom, debugLog);
 
-const isMobileView = Boolean(window.__SOLARA_IS_MOBILE);
+const isMobileView = isMobileLayout();
+initViewportAdaptation();
 
 // 移动端专属逻辑按需加载（构建时拆分为独立哈希 chunk，仅移动端拉取）
 if (isMobileView) {
@@ -1364,11 +1365,7 @@ function setupEventHandlers() {
     document.addEventListener("click", (e) => {
         if (!state.isSearchMode) return;
 
-        const isMobile =
-            isMobileView ||
-            document.body?.classList.contains("mobile-view") ||
-            document.documentElement?.classList.contains("mobile-view");
-        if (isMobile) {
+        if (isMobileLayout()) {
             return;
         }
 

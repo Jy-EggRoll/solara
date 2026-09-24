@@ -5,6 +5,7 @@
 import { BACKGROUND_TRANSITION_DURATION, PALETTE_APPLY_DELAY, themeDefaults, PLACEHOLDER_HTML } from "../constants.js";
 import { AA_NORMAL_TEXT, composite, ensureContrast, firstColorIn, parseColor } from "../core/contrast.js";
 import { preferHttpsUrl, toAbsoluteUrl, safeGetLocalStorage, safeSetLocalStorage } from "../core/storage.js";
+import { isMobileLayout } from "../core/viewport.js";
 import { paletteCache, persistPaletteCache, fetchPaletteData, extractPaletteFromCanvas } from "./palette.js";
 
 let paletteAbortController = null;
@@ -266,7 +267,7 @@ export function applyDynamicGradient(state, dom, options = {}) {
                 document.head.appendChild(metaTheme);
             }
             metaTheme.setAttribute("content", themeColor);
-            if (window.__SOLARA_IS_MOBILE) {
+            if (isMobileLayout()) {
                 document.documentElement.style.backgroundColor = themeColor;
             } else {
                 document.documentElement.style.removeProperty("background-color");

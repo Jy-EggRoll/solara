@@ -4,6 +4,7 @@
 
 import { QUALITY_OPTIONS, SOURCE_OPTIONS, normalizeQuality, normalizeSource } from "../constants.js";
 import { safeSetLocalStorage } from "./storage.js";
+import { isMobileLayout } from "./viewport.js";
 
 let qualityMenuAnchor = null;
 let qualityMenuPositionFrame = null;
@@ -122,9 +123,7 @@ export function updatePlayerQualityMenuPosition(state, dom, isMobileView = false
 
     const isMobile =
         isMobileView ||
-        Boolean(window.__SOLARA_IS_MOBILE) ||
-        document.body?.classList.contains("mobile-view") ||
-        document.documentElement?.classList.contains("mobile-view") ||
+        isMobileLayout() ||
         anchor.id === "mobileQualityToggle" ||
         Boolean(anchor.classList && anchor.classList.contains("mobile-quality-chip"));
 

@@ -4,6 +4,7 @@
  */
 
 import { $, updateMobileOverlayScrim } from "./mobile/core.js";
+import { isMobileLayout } from "./core/viewport.js";
 import { openMobileSearch, closeMobileSearch, toggleMobileSearch } from "./mobile/search.js";
 import {
     openMobilePanel,
@@ -17,13 +18,8 @@ import { initBottomSheetGestures, initSearchPanelGestures } from "./mobile/gestu
 import { bindMobileToolbar } from "./mobile/toolbar.js";
 
 (function () {
-    // 检查是否为移动端
-    const ua = navigator.userAgent || "";
-    const isMobileUA = /android|iphone|ipad|ipod|mobile|blackberry|phone|opera mini|windows phone/i.test(ua);
-    const isSmallScreen = typeof window.matchMedia === "function" && window.matchMedia("(max-width: 820px)").matches;
-    const isMobile = window.__SOLARA_IS_MOBILE || isMobileUA || isSmallScreen;
-
-    if (!isMobile) {
+    // 是否加载移动端交互层：与样式层同一条件（媒体查询），不再读 UA 或设备类
+    if (!isMobileLayout()) {
         return;
     }
 
@@ -41,7 +37,6 @@ import { bindMobileToolbar } from "./mobile/toolbar.js";
         }
         initialized = true;
 
-        document.body.classList.add("mobile-view");
         document.body.setAttribute("data-mobile-panel-view", "playlist");
 
         // 1. 搜索按钮绑定

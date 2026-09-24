@@ -314,8 +314,10 @@
 }
 
 /* 「显示与性能」开关仅在移动端出现（桌面端用顶栏按钮） */
-html:not(.mobile-view) .display-perf-section {
-    display: none;
+@media (min-width: 821px) and (hover: hover) {
+    .display-perf-section {
+        display: none;
+    }
 }
 
 /* 防息屏不支持时的禁用态（复用调试开关同款视觉） */

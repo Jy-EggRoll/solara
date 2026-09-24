@@ -2,9 +2,11 @@
  * Solara 视觉动效与调试支持 (Spotlight 跟随光效 & Debug Log 浮层)
  */
 
+import { isMobileLayout } from "../core/viewport.js";
+
 export function initSpotlightEffect() {
     // 移动设备触屏操作无需鼠标跟随聚光灯效果，避免无谓的重排计算与能耗
-    if (window.__SOLARA_IS_MOBILE || document.documentElement.classList.contains("mobile-view")) {
+    if (isMobileLayout()) {
         return;
     }
 
@@ -113,7 +115,7 @@ export function toggleDebugMode(state, dom, debugLog = null) {
             dom.debugInfo.classList.add("show");
             const logger = debugLog || window.__solaraDebugLog;
             if (typeof logger === "function") {
-                logger(`[系统] 调试控制台已启用 (设备: ${window.__SOLARA_IS_MOBILE ? "移动端" : "桌面端"})`);
+                logger(`[系统] 调试控制台已启用 (设备: ${isMobileLayout() ? "移动端" : "桌面端"})`);
             }
         } else {
             dom.debugInfo.classList.remove("show");
