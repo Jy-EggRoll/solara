@@ -7,12 +7,11 @@ body {
     box-sizing: border-box;
 }
 
-.login-shell {
-    position: relative;
-    left: 50%;
-    transform: translateX(-50%);
-    margin-inline: auto;
-}
+/* 共享基础层协议（种子）：本文件同时被 index.html 与 login.html 引入，
+   只允许放全站通用规则，禁止定义页面专属选择器（如 .login-* / .app-* 等）。
+   历史上 .login-shell 死规则与登录页自身布局叠加，曾导致登录卡片不居中。
+   后续升级方向见 README「样式层叠（迁移中）」：拆分 src/styles/pages/ 各页入口，
+   并加 CI 选择器归属校验，根治跨页样式碰撞。 */
 
 @media (min-width: 821px) and (hover: hover) and (pointer: fine) {
     :root body {

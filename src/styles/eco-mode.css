@@ -112,6 +112,13 @@ html.eco-mode #qualityToggle {
     }
 }
 
-/* 4. 停止常驻无限动画中真正昂贵的那一类已随极光一并消失，
-   因此不再一律冻结：唱片旋转、律动条等纯合成小动画在省电模式下照常运行。
-   省电模式省的是每帧高斯与逐层毛玻璃重采样，不是这些零成本的位移。 */
+/* 4. 冻结常驻无限动画：唱片旋转、律动条、移动端音浪在省电模式下也停下。
+   这类虽只是合成器位移（不重排/重绘），但在 120Hz 屏幕上仍会每帧唤醒合成器与
+   显示管线、让 GPU 无法进入空闲，是省电模式最该省掉的持续开销。
+   用更高特异性压制，不新增 important 标记（避免顶破 CSS 预算刻度）。 */
+html.eco-mode body .album-cover img,
+html.eco-mode body .audio-visualizer span,
+html.eco-mode body .playlist-item.current::before {
+    animation: none;
+    will-change: auto;
+}

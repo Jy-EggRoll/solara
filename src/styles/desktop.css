@@ -190,4 +190,32 @@
         width: 16px;
         height: 16px;
     }
+
+    /* ─── GPU 优化：容器内嵌玻璃层去重（非省电模式，视觉效果不变）─────────────
+       .container 自身已是毛玻璃；其内部面板/控件再叠一层 backdrop-filter，
+       模糊的其实只是「已经被容器模糊过的背景舞台」——而背景底图本身就已
+       filter: blur(50px)（见 tokens/theme.css .cover-backdrop）。因此内层这层
+       模糊视觉上近乎无差，却把每个内层都变成独立合成层，在底图旋转时逐帧
+       重复做高成本模糊采样，是 GPU 吃满的主因。
+       这里只清掉「背后只有背景舞台」的内层冗余 backdrop；浮层菜单/弹窗仍保留
+       模糊——它们背后是真实文字内容，模糊是真有效果的。省电模式另有全量关闭。 */
+    html:root body .search-area,
+    html:root body .search-area.spotlight-card,
+    html:root body .container.search-mode .search-area,
+    html:root body .cover-area,
+    html:root body .playlist,
+    html:root body .lyrics,
+    html:root body .controls,
+    html:root body .playlist-tabs,
+    html:root body .playlist-action-btn,
+    html:root body .load-more-btn,
+    html:root body .search-result-item,
+    html:root body .theme-toggle-button,
+    html:root body .container.search-mode .close-search-btn,
+    html:root body #loadOnlineBtn,
+    html:root body #qualityToggle,
+    html:root body .controls .player-quality-btn {
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
 }
