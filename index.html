@@ -30,7 +30,7 @@
             // 首帧前必须执行的极小逻辑：主题 / 省电 / 移动端 meta 预置（防 FOUC）。
             // 布局模式不由 JS 派发，样式层与行为层统一用媒体查询判定（见 src/scripts/core/viewport.ts）
             (function () {
-                var MOBILE_QUERY = "(max-width: 820px), (hover: none)";
+                var MOBILE_QUERY = "(max-width: 820px), (hover: none), (pointer: coarse)";
                 var isMobile = typeof window.matchMedia === "function" && window.matchMedia(MOBILE_QUERY).matches;
                 var root = document.documentElement;
                 try {

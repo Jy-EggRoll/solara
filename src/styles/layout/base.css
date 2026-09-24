@@ -14,8 +14,8 @@ body {
     margin-inline: auto;
 }
 
-@media (min-width: 821px) and (hover: hover) {
-    body {
+@media (min-width: 821px) and (hover: hover) and (pointer: fine) {
+    :root body {
         padding-left: max(env(safe-area-inset-left), 16px);
         padding-right: max(env(safe-area-inset-right), 16px);
     }

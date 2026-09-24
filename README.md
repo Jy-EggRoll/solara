@@ -254,8 +254,8 @@ Solara/
 - `functions/`、`index.html`、`login.html` 必须留在仓库根（Cloudflare Pages 与构建入口的约定）
 - 依赖方向自上而下：`app → features / visual / mobile → core`；`core` 不反向依赖业务层，新增的通用能力优先落在 `core`
 - **布局模式一律用媒体查询判定，禁止用 JS 往 `<html>`/`<body>` 上派发设备类**（理由：宽窗/分屏/旋转会让 UA 判定与实际视口脱节，且类驱动的覆盖层难以维护）。权威定义只有一处，改则两处同步：
-    - 移动端布局 = `(max-width: 820px), (hover: none)`
-    - 桌面端布局 = `(min-width: 821px) and (hover: hover)`
+    - 移动端布局 = `(max-width: 820px), (hover: none), (pointer: coarse)`
+    - 桌面端布局 = `(min-width: 821px) and (hover: hover) and (pointer: fine)`
     - JS 侧需要"行为差异"时查 `core/viewport.ts` 的 `isMobileLayout()`（与样式同一条件）
 - 新文件优先写 `.ts`（`pnpm typecheck` 目前只检查 TS 文件，存量 JS 逐步迁移；迁移只需重命名，构建会自动把 `"./foo.js"` 这类导入落到同名 `.ts`）
 - **样式层叠（迁移中）**：现有 500+ 个 `!important` 多是为跨文件覆盖"抢胜负"而加的历史债。计划顺序是「**先降 `!important`，再迁 `@layer`**」——因为 layer 中 `!important` 的优先级顺序与普通声明**相反**（早层胜晚层），而 `color` / `display` / `transform` 等属性在 8~9 个文件里都带 `!important`，整体加层会成片翻转胜负，无法保证无回归。`pnpm check:css` 是止血阀：新增 `!important` 会让检查失败；删掉后请同步调小 `scripts/check-css-budget.mjs` 里的预算，让刻度只往下走。

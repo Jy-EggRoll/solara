@@ -1,13 +1,14 @@
-/* 本文件全部规则仅在移动端布局生效：由视口宽度与输入能力判定，不再依赖 JS 派发的设备类。
-   原 `body.mobile-view` 前缀已移除，元素选择器保留以维持原有相对特异性。 */
-@media (max-width: 820px), (hover: none) {
+/* 本文件全部规则仅在移动端布局生效：由媒体查询判定，不再依赖 JS 派发的设备类。
+   选择器用 html:root 前缀替代原 body.mobile-view，**特异性逐条与原规则相等**，
+   避免被 body.layout-compact … 这类桌面规则反超。勿擅自简化该前缀。 */
+@media (max-width: 820px), (hover: none), (pointer: coarse) {
     /* ==========================================================================
    Solara Mobile UI - 1. 基础规范、极光背景、App容器与Toolbar顶栏
    ========================================================================== */
 
     /* ─── 1. 移动端根基底与视口防抖 ─────────────────────────────────────────── */
 
-    html {
+    html:root {
         margin: 0;
         padding: 0;
         width: 100%;
@@ -28,12 +29,12 @@
         transition: background-color 0.4s ease;
     }
 
-    html:not(.dark-mode) {
+    html:root:not(.dark-mode) {
         background-color: #f5f7fa;
         background-image: var(--bg-gradient);
     }
 
-    body {
+    :root body {
         margin: 0;
         padding: 0;
         display: flex;
@@ -59,7 +60,7 @@
 
     /* ─── 2. 移动端全屏流体极光舞台 (高性能静态色彩网格 + 切歌平滑淡入) ──────────────── */
 
-    body .background-stage {
+    html:root .background-stage {
         display: block !important;
         position: fixed;
         top: 0;
@@ -77,19 +78,19 @@
     }
 
     /* 消除移动端多重嵌套的重度高斯模糊滤镜，极大释放 GPU 压力与发热 */
-    body .background-stage__layer {
+    html:root .background-stage__layer {
         filter: none !important;
         transform: none !important;
     }
 
-    body.dark-mode .background-stage__layer {
+    html:root.dark-mode .background-stage__layer {
         filter: none !important;
     }
 
     /* 移动端底图：与桌面同一张静态模糊封面，但彻底不旋转、不缩放形变。
    静止的底图让上层所有毛玻璃（顶栏、底栏、歌单抽屉）可以完美命中 WebKit 纹理缓存，
    GPU 占用降到接近 0，机身彻底冰凉且动画达到满帧。 */
-    body .cover-backdrop {
+    html:root .cover-backdrop {
         animation: none !important;
         will-change: auto !important;
         /* 不旋转，但保留放大：否则模糊羽化边会正好落在屏幕上下边缘 */
@@ -98,7 +99,7 @@
     }
 
     /* 彻底移除全屏遮罩上的 backdrop-filter，避免在背景之上再做全屏高斯模糊 */
-    body .background-stage__glass-scrim {
+    html:root .background-stage__glass-scrim {
         display: block !important;
         position: absolute;
         inset: 0;
@@ -109,13 +110,13 @@
         transition: background 0.45s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    body.dark-mode .background-stage__glass-scrim {
+    html:root.dark-mode .background-stage__glass-scrim {
         background: radial-gradient(circle at 50% 30%, transparent 20%, rgba(6, 7, 10, 0.55) 100%);
     }
 
     /* ─── 3. 移动端主容器 (App Shell) ───────────────────────────────────────── */
 
-    body .container {
+    html:root .container {
         width: 100%;
         max-width: 540px;
         height: 100%;
@@ -142,14 +143,14 @@
     }
 
     /* 隐藏桌面端专有的大头部元素 */
-    body .header,
-    body .theme-switch-wrapper {
+    html:root .header,
+    html:root .theme-switch-wrapper {
         display: none !important;
     }
 
     /* ─── 4. 浮动顶部导航栏 (iOS Floating Navigation Bar) ───────────────────── */
 
-    body .mobile-toolbar {
+    html:root .mobile-toolbar {
         position: relative;
         display: flex;
         align-items: center;
@@ -162,7 +163,7 @@
         flex-shrink: 0;
     }
 
-    body .mobile-toolbar__title {
+    html:root .mobile-toolbar__title {
         position: absolute;
         left: 50%;
         top: 50%;
@@ -185,18 +186,18 @@
         pointer-events: auto;
     }
 
-    body .mobile-toolbar__title::after {
+    html:root .mobile-toolbar__title::after {
         display: none !important;
     }
 
-    body .mobile-toolbar__actions {
+    html:root .mobile-toolbar__actions {
         display: flex;
         align-items: center;
         gap: 10px;
         z-index: 2;
     }
 
-    body .mobile-toolbar__button {
+    html:root .mobile-toolbar__button {
         position: relative;
         z-index: 2;
         width: 38px;
@@ -220,34 +221,34 @@
         position: relative;
     }
 
-    body .mobile-toolbar__button .apple-svg-icon {
+    html:root .mobile-toolbar__button .apple-svg-icon {
         width: 19px;
         height: 19px;
     }
 
-    body .mobile-toolbar__button:active {
+    html:root .mobile-toolbar__button:active {
         transform: scale(0.92);
     }
 
     /* 移动端深浅色主题图标精准控制：杜绝深色下不可见 */
-    body .theme-icon--sun {
+    html:root .theme-icon--sun {
         display: block !important;
         opacity: 1 !important;
         color: #f59e0b !important;
         transform: scale(1) rotate(0deg) !important;
     }
 
-    body .theme-icon--moon {
+    html:root .theme-icon--moon {
         display: none !important;
         opacity: 0 !important;
     }
 
-    body.dark-mode .theme-icon--sun {
+    html:root.dark-mode .theme-icon--sun {
         display: none !important;
         opacity: 0 !important;
     }
 
-    body.dark-mode .theme-icon--moon {
+    html:root.dark-mode .theme-icon--moon {
         display: block !important;
         opacity: 1 !important;
         color: #818cf8 !important;

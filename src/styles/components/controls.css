@@ -173,8 +173,8 @@
     flex: 0 0 auto;
 }
 
-@media (min-width: 821px) and (hover: hover) {
-    .transport-controls {
+@media (min-width: 821px) and (hover: hover) and (pointer: fine) {
+    html:root .transport-controls {
         width: auto;
         gap: 8px;
     }

@@ -314,8 +314,8 @@
 }
 
 /* 「显示与性能」开关仅在移动端出现（桌面端用顶栏按钮） */
-@media (min-width: 821px) and (hover: hover) {
-    .display-perf-section {
+@media (min-width: 821px) and (hover: hover) and (pointer: fine) {
+    html:root .display-perf-section {
         display: none;
     }
 }
