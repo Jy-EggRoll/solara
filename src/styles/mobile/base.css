@@ -105,13 +105,32 @@
         inset: 0;
         backdrop-filter: none !important;
         -webkit-backdrop-filter: none !important;
-        /* 采用纯渐变自然融合，零 GPU 模糊开销 */
-        background: radial-gradient(circle at 50% 35%, rgba(245, 247, 250, 0.05) 0%, rgba(235, 238, 244, 0.15) 100%);
+        /* 采用纯渐变自然融合，零 GPU 模糊开销。
+       极性说明：亮色模式文字是深色（--text-color: #1d1d1f），遮罩必须"提亮"底图才有意义；
+       桌面亮色遮罩是轻微压暗（0.01→0.18），那是因为桌面 .container 自带 --container-bg 玻璃底
+       兜底（layout/stage.css），而移动端容器是 transparent（见下方 .container）。所以这里只
+       对齐桌面亮色遮罩的最大档位（0.18），极性保持提亮。 */
+        background: radial-gradient(circle at 50% 35%, rgba(245, 247, 250, 0.05) 0%, rgba(235, 238, 244, 0.18) 100%);
         transition: background 0.45s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
+    /* 暗色模式文字是浅色（--text-color: #f5f5f7），遮罩必须"压暗"底图。
+   原先中心档写成 transparent 20%，亮色封面在屏幕中心几乎原样透出，浅色文字直接压在高亮
+   底图上 → 对比度塌陷，这是本文件必须修的主症状。
+
+   为什么不是照抄桌面那组 0.22→0.60：桌面文字还额外坐在 --container-bg
+   rgba(18,22,28,0.62) 这层 62% 深色玻璃上（layout/stage.css），而移动端 .container 是
+   transparent（见下方），等效底只有遮罩自己。实测（#f5f5f7 对合成底，AA 需 ≥4.5:1）：
+       底图     桌面等效底(遮罩+62%玻璃)   本文件旧档 0.22中心   本档 0.66中心
+       纯白255  rgb(87,89,93) 6.44:1 ✓     rgb(199) 1.55:1 ✗    rgb(87) 6.67:1 ✓
+       近白230  7.22:1 ✓                   1.92:1 ✗             7.62:1 ✓
+       浅灰200  8.31:1 ✓                   2.52:1 ✗             8.95:1 ✓
+       中灰150  10.47:1 ✓                  4.23:1 ✗             11.60:1 ✓
+   故取 0.66/0.80：它复现的等效底 rgb(87,87,87) 与桌面 rgb(87,89,93) 基本一致，才算真正
+   "强度对齐桌面"。想调轻可从 0.58/0.74 起试（纯白封面仍可过 AA，约 4.89:1），再低就会
+   在亮封面中心重新跌破 AA。 */
     html:root.dark-mode .background-stage__glass-scrim {
-        background: radial-gradient(circle at 50% 30%, transparent 20%, rgba(6, 7, 10, 0.55) 100%);
+        background: radial-gradient(circle at 50% 40%, rgba(0, 0, 0, 0.66) 0%, rgba(0, 0, 0, 0.8) 100%);
     }
 
     /* ─── 3. 移动端主容器 (App Shell) ───────────────────────────────────────── */
