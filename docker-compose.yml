@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
     solara:
         image: ghcr.io/akudamatata/solara:latest

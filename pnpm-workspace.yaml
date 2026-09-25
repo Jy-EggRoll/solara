@@ -1,4 +1,9 @@
 # pnpm ≥11 的设置新家（原 package.json 的 pnpm 字段已废弃）：
+# 工作区成员：根（前端 Vite 构建）+ server（Docker 独立 Node 服务），统一用 pnpm 管理。
+packages:
+    - "."
+    - "server"
+
 # allowBuilds 显式放行依赖的构建脚本（postinstall 等）。
 allowBuilds:
     esbuild: true

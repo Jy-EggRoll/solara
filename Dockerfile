@@ -11,11 +11,12 @@ RUN apt-get update \
 # 使用 --ignore-scripts 跳过可选的原生依赖编译，加快构建速度
 RUN npm install -g wrangler@3 --ignore-scripts
 
-# 复制项目文件（server/node_modules、data、.git 等已由 .dockerignore 排除）
+# 复制项目文件（node_modules、data、.git 等已由 .dockerignore 排除）
 COPY . .
 
-# 安装 Node.js 独立服务器的依赖
-RUN cd /app/server && npm install --ignore-scripts
+# 统一用 pnpm 安装（工作区含根与 server），仅装 server 运行所需依赖
+RUN npm install -g pnpm@11 --ignore-scripts \
+  && pnpm install --frozen-lockfile --ignore-scripts --filter solara-standalone...
 
 # 创建数据持久化目录（SQLite / D1 本地模拟文件写入此处）
 RUN mkdir -p /app/data

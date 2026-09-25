@@ -27,7 +27,7 @@ function resolveTsForJsSpecifier(): Plugin {
  * 产出：dist/，资源带内容哈希（/assets/*）；index.html 为薄入口（逻辑/样式已外置）。
  * 包管理器：pnpm（见 package.json 的 packageManager 字段）。
  * Cloudflare Pages 设置：Build command = `pnpm install --frozen-lockfile && pnpm build`，
- *                        Build output directory = `dist`，Node >= 20。
+ *                        Build output directory = `dist`，Node >= 24。
  *
  * 说明：
  *  - 源码收拢在 src/：src/scripts（前端逻辑）、src/styles（样式）；入口 index.html / login.html
