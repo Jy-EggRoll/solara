@@ -22,5 +22,11 @@ jobs:
             - name: Install
               run: pnpm install --frozen-lockfile
 
+            - name: Typecheck
+              run: pnpm typecheck
+
+            - name: CSS budget
+              run: pnpm check:css
+
             - name: Build
               run: pnpm build
