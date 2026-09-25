@@ -237,7 +237,6 @@
             transform 0.15s var(--spring-snappy),
             background 0.25s ease,
             border-color 0.25s ease;
-        position: relative;
     }
 
     html:root .mobile-toolbar__button .apple-svg-icon {
