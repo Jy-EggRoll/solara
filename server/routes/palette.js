@@ -13,6 +13,17 @@ const { Router } = require("express");
 const path = require("path");
 const cache = require("../cache");
 
+// 底层色彩工具与 functions/palette.ts 共用（Node ≥ 24 支持 require() ESM）
+const {
+    TARGET_SAMPLE_COUNT,
+    clamp,
+    hslToHex,
+    hslToRgb,
+    pickContrastColor,
+    resizeImage,
+    rgbToHsl,
+} = require("../../functions/lib/palette-core.js");
+
 // jpeg-decoder.js 是 ESM 模块（export default），Node.js 需用动态 import()
 // 用一个 Promise 缓存，确保只 import 一次
 const DECODER_PATH = path.join(__dirname, "../../functions/lib/vendor/jpeg-decoder.js").replace(/\\/g, "/");
@@ -22,93 +33,7 @@ async function getDecoder() {
     return _decoderPromise;
 }
 
-// ─── 常量（与 palette.ts 一致）─────────────────────────────────────────────────
-const MAX_DIMENSION = 96;
-const TARGET_SAMPLE_COUNT = 2400;
-
-// ─── 工具函数（直接从 palette.ts 移植）────────────────────────────────────────
-
-function clamp(value, min, max) {
-    return Math.min(Math.max(value, min), max);
-}
-
-function componentToHex(value) {
-    return clamp(Math.round(value), 0, 255).toString(16).padStart(2, "0");
-}
-
-function rgbToHex({ r, g, b }) {
-    return `#${componentToHex(r)}${componentToHex(g)}${componentToHex(b)}`;
-}
-
-function rgbToHsl(r, g, b) {
-    const rN = clamp(r / 255, 0, 1);
-    const gN = clamp(g / 255, 0, 1);
-    const bN = clamp(b / 255, 0, 1);
-    const max = Math.max(rN, gN, bN);
-    const min = Math.min(rN, gN, bN);
-    const delta = max - min;
-    let h = 0;
-    if (delta !== 0) {
-        if (max === rN) h = ((gN - bN) / delta) % 6;
-        else if (max === gN) h = (bN - rN) / delta + 2;
-        else h = (rN - gN) / delta + 4;
-        h *= 60;
-        if (h < 0) h += 360;
-    }
-    const l = (max + min) / 2;
-    const s = delta === 0 ? 0 : delta / (1 - Math.abs(2 * l - 1));
-    return { h, s, l };
-}
-
-function hueToRgb(p, q, t) {
-    if (t < 0) t += 1;
-    if (t > 1) t -= 1;
-    if (t < 1 / 6) return p + (q - p) * 6 * t;
-    if (t < 1 / 2) return q;
-    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
-    return p;
-}
-
-function hslToRgb(h, s, l) {
-    const sat = clamp(s, 0, 1);
-    const lit = clamp(l, 0, 1);
-    const nh = (((h % 360) + 360) % 360) / 360;
-    if (sat === 0) {
-        const v = lit * 255;
-        return { r: v, g: v, b: v };
-    }
-    const q = lit < 0.5 ? lit * (1 + sat) : lit + sat - lit * sat;
-    const p = 2 * lit - q;
-    return {
-        r: hueToRgb(p, q, nh + 1 / 3) * 255,
-        g: hueToRgb(p, q, nh) * 255,
-        b: hueToRgb(p, q, nh - 1 / 3) * 255,
-    };
-}
-
-function hslToHex(color) {
-    return rgbToHex(hslToRgb(color.h, color.s, color.l));
-}
-
-function relativeLuminance(r, g, b) {
-    const normalize = (v) => {
-        const c = clamp(v / 255, 0, 1);
-        return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
-    };
-    return 0.2126 * normalize(r) + 0.7152 * normalize(g) + 0.0722 * normalize(b);
-}
-
-function pickContrastColor(color) {
-    return relativeLuminance(color.r, color.g, color.b) > 0.45 ? "#1f2937" : "#f8fafc";
-}
-
-function adjustSaturation(base, factor, offset = 0) {
-    return clamp(base * factor + offset, 0, 1);
-}
-
-function adjustLightness(base, offset, factor = 1) {
-    return clamp(base * factor + offset, 0, 1);
-}
+// ─── 工具函数见 functions/lib/palette-core.js（两端共用）────────────────────────
 
 function analyzeImageColors(image) {
     const { data } = image;
@@ -274,28 +199,6 @@ function buildThemeTokens(accent) {
             }),
         },
     };
-}
-
-function resizeImage(image) {
-    const maxSide = Math.max(image.width, image.height);
-    if (maxSide <= MAX_DIMENSION) return image;
-    const scale = MAX_DIMENSION / maxSide;
-    const width = Math.max(1, Math.round(image.width * scale));
-    const height = Math.max(1, Math.round(image.height * scale));
-    const resized = new Uint8ClampedArray(width * height * 4);
-    for (let y = 0; y < height; y++) {
-        const srcY = Math.min(image.height - 1, Math.floor(y / scale));
-        for (let x = 0; x < width; x++) {
-            const srcX = Math.min(image.width - 1, Math.floor(x / scale));
-            const si = (srcY * image.width + srcX) * 4;
-            const di = (y * width + x) * 4;
-            resized[di] = image.data[si];
-            resized[di + 1] = image.data[si + 1];
-            resized[di + 2] = image.data[si + 2];
-            resized[di + 3] = image.data[si + 3];
-        }
-    }
-    return { width, height, data: resized };
 }
 
 async function decodeImage(arrayBuffer, contentType) {
