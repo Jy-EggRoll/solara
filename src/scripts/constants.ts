@@ -33,6 +33,12 @@ export interface Song {
     pic_id?: string;
     url_id?: string | number;
     pic?: string;
+    /** 本地音乐专用：blob 直链，仅存活于当前会话（见 core/local-library.ts） */
+    localUrl?: string;
+    /** 本地音乐专用：原始文件名，用于下载命名 */
+    fileName?: string;
+    /** 本地音乐专用：文件字节数 */
+    fileSize?: number;
 }
 
 export const DEFAULT_RADAR_GENRES = ["热歌榜", "新歌榜", "飙升榜"];

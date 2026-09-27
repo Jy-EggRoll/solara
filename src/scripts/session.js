@@ -10,7 +10,8 @@ import { state } from "./state.js";
 import { safeSetLocalStorage, preferHttpsUrl } from "./core/storage.js";
 import { showAlbumCoverPlaceholder, setAlbumCoverImage, scheduleDeferredPaletteUpdate } from "./visual/aurora.js";
 import { updateFavoriteIcons, updateFavoriteHighlight } from "./features/favorites.js";
-import { updatePlaylistHighlight } from "./features/playlist.js";
+import { updatePlaylistHighlight, getSongKey } from "./features/playlist.js";
+import { isLocalSong } from "./core/local-library.js";
 import { cancelPendingPlayback, updatePlayPauseButton, updateProgressBarBackground } from "./core/audio.js";
 import { clearLyricsContent } from "./features/lyrics.js";
 import { debugLog } from "./debug.js";
@@ -20,25 +21,67 @@ const isMobileView = isMobileLayout();
 // 状态保存快捷方法
 export function savePlayerState(options = {}) {
     const { skipRemote = false } = options;
-    safeSetLocalStorage("playlistSongs", JSON.stringify(state.playlistSongs), { skipRemote });
-    safeSetLocalStorage("currentTrackIndex", String(state.currentTrackIndex), { skipRemote });
+
+    // 本地音乐仅存活于当前会话：持久化时剔除，避免刷新后留下无法播放的幽灵条目（也会一并排除出云端同步）
+    const persistentSongs = Array.isArray(state.playlistSongs)
+        ? state.playlistSongs.filter((song) => !isLocalSong(song))
+        : [];
+    safeSetLocalStorage("playlistSongs", JSON.stringify(persistentSongs), { skipRemote });
+
+    const currentKey = state.currentSong ? getSongKey(state.currentSong) : null;
+    if (isLocalSong(state.currentSong)) {
+        safeSetLocalStorage("currentTrackIndex", "-1", { skipRemote });
+        safeSetLocalStorage("currentSong", "", { skipRemote });
+    } else {
+        let trackIndex = state.currentTrackIndex;
+        if (currentKey) {
+            const matched = persistentSongs.findIndex((song) => getSongKey(song) === currentKey);
+            if (matched >= 0) {
+                trackIndex = matched;
+            } else if (
+                trackIndex >= 0 &&
+                trackIndex < state.playlistSongs.length &&
+                isLocalSong(state.playlistSongs[trackIndex])
+            ) {
+                trackIndex = -1;
+            }
+        }
+        safeSetLocalStorage("currentTrackIndex", String(trackIndex), { skipRemote });
+        if (state.currentSong) {
+            safeSetLocalStorage("currentSong", JSON.stringify(state.currentSong), { skipRemote });
+        } else {
+            safeSetLocalStorage("currentSong", "", { skipRemote });
+        }
+    }
+
     safeSetLocalStorage("playMode", state.playMode, { skipRemote });
     safeSetLocalStorage("playbackQuality", state.playbackQuality, { skipRemote });
     safeSetLocalStorage("playerVolume", String(state.volume), { skipRemote });
     safeSetLocalStorage("currentPlaylist", state.currentPlaylist, { skipRemote });
     safeSetLocalStorage("currentList", state.currentList, { skipRemote });
-    if (state.currentSong) {
-        safeSetLocalStorage("currentSong", JSON.stringify(state.currentSong), { skipRemote });
-    } else {
-        safeSetLocalStorage("currentSong", "", { skipRemote });
-    }
     safeSetLocalStorage("currentPlaybackTime", String(state.currentPlaybackTime || 0), { skipRemote });
 }
 
 export function saveFavoriteState(options = {}) {
     const { skipRemote = false } = options;
-    safeSetLocalStorage("favoriteSongs", JSON.stringify(state.favoriteSongs), { skipRemote });
-    safeSetLocalStorage("currentFavoriteIndex", String(state.currentFavoriteIndex), { skipRemote });
+
+    const persistentFavorites = Array.isArray(state.favoriteSongs)
+        ? state.favoriteSongs.filter((song) => !isLocalSong(song))
+        : [];
+    safeSetLocalStorage("favoriteSongs", JSON.stringify(persistentFavorites), { skipRemote });
+
+    let favoriteIndex = state.currentFavoriteIndex;
+    if (state.currentList === "favorite" && state.currentSong) {
+        const key = getSongKey(state.currentSong);
+        const matched = key ? persistentFavorites.findIndex((song) => getSongKey(song) === key) : -1;
+        if (matched >= 0) {
+            favoriteIndex = matched;
+        } else if (isLocalSong(state.currentSong) || favoriteIndex >= persistentFavorites.length) {
+            favoriteIndex = -1;
+        }
+    }
+    safeSetLocalStorage("currentFavoriteIndex", String(favoriteIndex), { skipRemote });
+
     safeSetLocalStorage("favoritePlayMode", state.favoritePlayMode, { skipRemote });
     safeSetLocalStorage("favoritePlaybackTime", String(state.favoritePlaybackTime || 0), { skipRemote });
 }

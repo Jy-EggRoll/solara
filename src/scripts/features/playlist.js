@@ -5,6 +5,7 @@
 import { PLAYLIST_EXPORT_VERSION } from "../constants.js";
 import { safeSetLocalStorage, preferHttpsUrl } from "../core/storage.js";
 import { resetPlayerToIdle } from "../core/audio.js";
+import { isLocalSong } from "../core/local-library.js";
 import { showNotification } from "./settings.js";
 
 export function resolveSongId(rawSong) {
@@ -452,12 +453,19 @@ export function exportPlaylist(state, dom) {
         return;
     }
 
+    // 本地音乐依赖会话内的 blob 直链，无法随文件迁移，导出时剔除
+    const exportableSongs = state.playlistSongs.filter((song) => !isLocalSong(song));
+    if (exportableSongs.length === 0) {
+        showNotification("播放列表中没有可导出的在线歌曲", "warning", dom);
+        return;
+    }
+
     try {
         const payload = {
             version: PLAYLIST_EXPORT_VERSION,
             type: "solara_playlist",
             timestamp: new Date().toISOString(),
-            songs: state.playlistSongs,
+            songs: exportableSongs,
         };
         const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
         const url = URL.createObjectURL(blob);

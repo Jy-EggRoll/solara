@@ -3,6 +3,7 @@
  */
 
 import { API } from "../constants.js";
+import { isLocalSong } from "../core/local-library.js";
 
 export function parseLyrics(lyricText, state) {
     const lines = lyricText.split("\n");
@@ -192,6 +193,19 @@ export async function loadLyrics(song, state, dom, debugLogger = null) {
     };
 
     if (!song) return;
+
+    if (isLocalSong(song)) {
+        // 本地音乐不请求在线歌词接口，直接显示占位，避免无意义的失败请求
+        setLyricsContentHtml("<div>本地音乐暂无歌词</div>", dom);
+        if (dom.lyrics) {
+            dom.lyrics.classList.add("empty");
+            dom.lyrics.dataset.placeholder = "message";
+        }
+        state.lyricsData = [];
+        state.currentLyricLine = -1;
+        return;
+    }
+
     const cacheKey = `${song.source || "netease"}_${song.lyric_id || song.id}`;
 
     // 1. 优先命中前端内存缓存（0 网络请求）

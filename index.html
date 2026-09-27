@@ -653,6 +653,28 @@
                                 aria-hidden="false"
                             >
                                 <button
+                                    id="mobileAddLocalMusicBtn"
+                                    class="mobile-panel-action-btn"
+                                    type="button"
+                                    aria-label="添加本地音乐"
+                                    title="添加本地音乐"
+                                >
+                                    <svg
+                                        class="apple-svg-icon"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        aria-hidden="true"
+                                    >
+                                        <path d="M9 18V5l12-2v13" />
+                                        <circle cx="6" cy="18" r="3" />
+                                        <circle cx="18" cy="16" r="3" />
+                                    </svg>
+                                </button>
+                                <button
                                     id="mobileImportPlaylistBtn"
                                     class="mobile-panel-action-btn"
                                     type="button"
@@ -866,6 +888,36 @@
                                 </button>
                             </div>
                             <div class="playlist-actions-tray" role="group" aria-label="播放列表操作">
+                                <input
+                                    id="localMusicInput"
+                                    class="playlist-import-input"
+                                    type="file"
+                                    accept="audio/*,.mp3,.flac,.m4a,.aac,.ogg,.oga,.opus,.wav,.wma,.aiff,.aif,.ape"
+                                    multiple
+                                    hidden
+                                />
+                                <button
+                                    class="playlist-action-btn playlist-action-btn--local"
+                                    id="addLocalMusicBtn"
+                                    type="button"
+                                    title="添加本地音乐"
+                                    aria-label="添加本地音乐"
+                                >
+                                    <svg
+                                        class="apple-svg-icon"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        aria-hidden="true"
+                                    >
+                                        <path d="M9 18V5l12-2v13" />
+                                        <circle cx="6" cy="18" r="3" />
+                                        <circle cx="18" cy="16" r="3" />
+                                    </svg>
+                                </button>
                                 <input
                                     id="importPlaylistInput"
                                     class="playlist-import-input"

@@ -115,6 +115,7 @@ import {
 } from "./core/audio.js";
 import { initMediaSession } from "./core/media-session.js";
 import { debugLog } from "./debug.js";
+import { importLocalFiles, revokeLocalSong } from "./core/local-library.js";
 import { savePlayerState, saveFavoriteState, updateCurrentSongInfo, setSongAsPending } from "./session.js";
 
 export { savePlayerState, saveFavoriteState, updateCurrentSongInfo, setSongAsPending };
@@ -514,6 +515,62 @@ export async function togglePlayPause() {
     } else {
         debugLog(`[播放控制] 暂停播放: ${state.currentSong?.name || "当前歌曲"}`);
         dom.audioPlayer.pause();
+    }
+}
+
+// 本地音乐：解析所选文件并追加进播放列表（仅当前会话有效）
+async function handleLocalMusicSelection(event) {
+    const input = event?.target;
+    const files = input?.files ? Array.from(input.files) : [];
+
+    try {
+        if (files.length === 0) return;
+
+        showNotification(`正在解析 ${files.length} 个本地文件...`, "info", dom);
+        const imported = await importLocalFiles(files);
+
+        if (imported.length === 0) {
+            showNotification("未找到可识别的音频文件", "error", dom);
+            return;
+        }
+
+        const existingKeys = new Set(state.playlistSongs.map(getSongKey).filter(Boolean));
+        const added = [];
+        for (const song of imported) {
+            const key = getSongKey(song);
+            if (key && existingKeys.has(key)) {
+                revokeLocalSong(song);
+                continue;
+            }
+            if (key) existingKeys.add(key);
+            added.push(song);
+        }
+
+        if (added.length === 0) {
+            showNotification("所选文件已全部在播放列表中", "info", dom);
+            return;
+        }
+
+        const wasEmpty = state.playlistSongs.length === 0;
+        state.playlistSongs = state.playlistSongs.concat(added);
+        state.currentPlaylist = "playlist";
+        state.currentList = "playlist";
+
+        renderPlaylist(state, dom, getPlaylistCallbacks());
+        showNotification(`已添加 ${added.length} 首本地音乐`, "success", dom);
+
+        if (wasEmpty) {
+            await playPlaylistSong(0);
+        } else {
+            savePlayerState();
+        }
+    } catch (error) {
+        console.error("添加本地音乐失败:", error);
+        showNotification("本地音乐解析失败，请重试", "error", dom);
+    } finally {
+        if (input) {
+            input.value = "";
+        }
     }
 }
 
@@ -974,6 +1031,22 @@ function setupEventHandlers() {
                 switchLibraryTab(target, dom, { updateMobileLibraryActionVisibility });
             });
         });
+    }
+
+    // 本地音乐导入（桌面端与移动端共用同一个文件选择器）
+    const triggerLocalMusicPicker = () => {
+        if (!dom.localMusicInput) return;
+        dom.localMusicInput.value = "";
+        dom.localMusicInput.click();
+    };
+    if (dom.addLocalMusicBtn) {
+        dom.addLocalMusicBtn.addEventListener("click", triggerLocalMusicPicker);
+    }
+    if (dom.mobileAddLocalMusicBtn) {
+        dom.mobileAddLocalMusicBtn.addEventListener("click", triggerLocalMusicPicker);
+    }
+    if (dom.localMusicInput) {
+        dom.localMusicInput.addEventListener("change", handleLocalMusicSelection);
     }
 
     // 播放列表导入与导出

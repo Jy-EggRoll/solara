@@ -7,6 +7,7 @@ import { safeSetLocalStorage, preferHttpsUrl, buildAudioProxyUrl } from "./stora
 import { showNotification } from "../features/settings.js";
 import { getSongKey } from "../features/playlist.js";
 import { ensureFavoriteSongsArray } from "../features/favorites.js";
+import { isLocalSong, getLocalAudioUrl } from "./local-library.js";
 
 export const playModeTexts = {
     list: "列表循环",
@@ -300,8 +301,16 @@ export async function playSong(song, options = {}, state, dom, callbacks = {}, d
         const cacheKey = `${song.source || "netease"}_${song.id}_${quality}`;
         let originalAudioUrl = null;
 
+        if (isLocalSong(song)) {
+            // 本地音乐：直接使用会话内 blob 直链，跳过网络请求、直链缓存与代理
+            originalAudioUrl = getLocalAudioUrl(song);
+            if (!originalAudioUrl) {
+                throw new Error("本地音频已失效，请重新添加文件");
+            }
+            log(`[音频播放] 本地文件直连: ${song.name || "未知歌曲"}`);
+        }
         // 1. 优先命中前端内存短期直链缓存（0 网络请求）
-        if (!isRetry && audioUrlMemoryCache.has(cacheKey)) {
+        else if (!isRetry && audioUrlMemoryCache.has(cacheKey)) {
             const cachedItem = audioUrlMemoryCache.get(cacheKey);
             if (Date.now() - cachedItem.timestamp < AUDIO_URL_CACHE_TTL && cachedItem.url) {
                 originalAudioUrl = cachedItem.url;
@@ -598,6 +607,22 @@ export function playPrevious(state, dom, callbacks = {}) {
 }
 
 export async function downloadSong(song, quality = "320", dom = null) {
+    if (isLocalSong(song)) {
+        const localUrl = getLocalAudioUrl(song);
+        if (!localUrl) {
+            showNotification("本地音频已失效，请重新添加文件", "error", dom);
+            return;
+        }
+        const localLink = document.createElement("a");
+        localLink.href = localUrl;
+        localLink.download = song.fileName || `${song.name || "本地音乐"}.mp3`;
+        document.body.appendChild(localLink);
+        localLink.click();
+        document.body.removeChild(localLink);
+        showNotification("下载已开始", "success", dom);
+        return;
+    }
+
     try {
         showNotification("正在准备下载...", "info", dom);
 
