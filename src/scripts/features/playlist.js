@@ -173,17 +173,15 @@ export function updatePlaylistActionStates(state, dom) {
     }
 }
 
-/** 按唯一特征（Key / ID / 歌名）在曲库中定位当前播放曲目，匹配不到时退回既有索引。 */
+/** 按唯一特征（Key / ID）在曲库中定位当前播放曲目，匹配不到时退回既有索引（不做歌名兜底，避免同名不同源的歌曲被错认）。 */
 export function findCurrentSongIndex(songs, currentSong, fallbackIndex) {
     const currentKey = getSongKey(currentSong);
     const currentId = currentSong?.id ? String(currentSong.id) : null;
-    const currentName = currentSong?.name || null;
 
     const matchedIndex = songs.findIndex((song) => {
         const k = getSongKey(song);
         if (currentKey && k && k === currentKey) return true;
         if (currentId && song?.id && String(song.id) === currentId) return true;
-        if (currentName && song?.name && song.name === currentName) return true;
         return false;
     });
 

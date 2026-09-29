@@ -1573,8 +1573,6 @@ export async function bootstrap() {
     initMediaSession(state, dom, {
         playNext: () => playNext(state, dom, getAudioCallbacks()),
         playPrevious: () => playPrevious(state, dom, getAudioCallbacks()),
-        autoPlayNext: () => autoPlayNext(state, dom, getAudioCallbacks()),
-        updatePlayPauseButton: () => updatePlayPauseButton(dom),
     });
 
     // 渲染初始界面

@@ -464,11 +464,8 @@ export async function playSong(song, options = {}, state, dom, callbacks = {}, d
     }
 }
 
+/** 自动切歌唯一入口：app.js 中 audioPlayer 的 "ended" 监听器。 */
 export function autoPlayNext(state, dom, callbacks = {}) {
-    if (dom.audioPlayer && dom.audioPlayer.__solaraMediaSessionHandledEnded === "skip") {
-        dom.audioPlayer.__solaraMediaSessionHandledEnded = false;
-        return;
-    }
     const mode = getActivePlayMode(state);
     if (mode === "single") {
         dom.audioPlayer.currentTime = 0;
@@ -493,8 +490,10 @@ export function playNext(state, dom, callbacks = {}) {
             nextIndex = Math.floor(Math.random() * favorites.length);
         } else if (mode === "list") {
             nextIndex = (state.currentFavoriteIndex + 1) % favorites.length;
+        } else if (mode === "single") {
+            nextIndex = state.currentFavoriteIndex >= 0 ? state.currentFavoriteIndex : 0;
         }
-        if (mode !== "single") {
+        if (mode !== "single" || state.currentFavoriteIndex < 0) {
             state.currentFavoriteIndex = nextIndex;
         }
         if (typeof callbacks.playFavoriteSong === "function") {
@@ -528,7 +527,7 @@ export function playNext(state, dom, callbacks = {}) {
         nextIndex = state.currentTrackIndex >= 0 ? state.currentTrackIndex : 0;
     }
 
-    if (mode !== "single") {
+    if (mode !== "single" || state.currentTrackIndex < 0) {
         state.currentTrackIndex = nextIndex;
     }
 
@@ -558,8 +557,10 @@ export function playPrevious(state, dom, callbacks = {}) {
             if (prevIndex < 0) {
                 prevIndex = favorites.length - 1;
             }
+        } else if (mode === "single") {
+            prevIndex = state.currentFavoriteIndex >= 0 ? state.currentFavoriteIndex : 0;
         }
-        if (mode !== "single") {
+        if (mode !== "single" || state.currentFavoriteIndex < 0) {
             state.currentFavoriteIndex = prevIndex;
         }
         if (typeof callbacks.playFavoriteSong === "function") {
@@ -591,7 +592,7 @@ export function playPrevious(state, dom, callbacks = {}) {
         prevIndex = state.currentTrackIndex >= 0 ? state.currentTrackIndex : 0;
     }
 
-    if (mode !== "single") {
+    if (mode !== "single" || state.currentTrackIndex < 0) {
         state.currentTrackIndex = prevIndex;
     }
 

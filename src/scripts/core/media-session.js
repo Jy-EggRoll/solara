@@ -52,7 +52,6 @@ export function initMediaSession(state, dom, actions = {}) {
 
     let handlersBound = false;
     let lastPositionUpdateTime = 0;
-    const MEDIA_SESSION_ENDED_FLAG = "__solaraMediaSessionHandledEnded";
 
     const preferLockScreenTrackControls = (() => {
         if (typeof navigator === "undefined") {
@@ -221,46 +220,12 @@ export function initMediaSession(state, dom, actions = {}) {
     audio.addEventListener("seeking", updatePositionState);
     audio.addEventListener("seeked", updatePositionState);
 
+    // 自动切歌的唯一入口是 app.js 中 audioPlayer 的 "ended" 监听器，
+    // 这里只负责刷新媒体会话状态，避免同一次 ended 推进两首。
     audio.addEventListener("ended", () => {
         navigator.mediaSession.playbackState = "paused";
         updatePositionState();
-        const refresh = () => {
-            triggerMediaSessionMetadataRefresh();
-            audio[MEDIA_SESSION_ENDED_FLAG] = false;
-        };
-
-        const autoPlayFn = actions.autoPlayNext || window.autoPlayNext;
-        if (typeof autoPlayFn === "function") {
-            try {
-                audio[MEDIA_SESSION_ENDED_FLAG] = "handling";
-                autoPlayFn();
-                audio[MEDIA_SESSION_ENDED_FLAG] = "skip";
-                Promise.resolve().then(refresh);
-                return;
-            } catch (error) {
-                console.warn("自动播放下一首失败:", error);
-            }
-        }
-
-        audio[MEDIA_SESSION_ENDED_FLAG] = "skip";
-        const nextFn = actions.playNext || window.playNext;
-        if (typeof nextFn === "function") {
-            try {
-                const result = nextFn();
-                if (typeof actions.updatePlayPauseButton === "function") {
-                    actions.updatePlayPauseButton();
-                }
-                if (result && typeof result.then === "function") {
-                    result.finally(refresh);
-                } else {
-                    Promise.resolve().then(refresh);
-                }
-                return;
-            } catch (error) {
-                console.warn("自动播放下一首失败:", error);
-            }
-        }
-        refresh();
+        Promise.resolve().then(triggerMediaSessionMetadataRefresh);
     });
 
     return {
