@@ -523,11 +523,14 @@ async function handleLocalMusicSelection(event) {
     const input = event?.target;
     const files = input?.files ? Array.from(input.files) : [];
 
+    // 声明在 try 之外：异常时才能回收本次已创建、但未进入播放列表的 blob 直链
+    let imported = [];
+
     try {
         if (files.length === 0) return;
 
         showNotification(`正在解析 ${files.length} 个本地文件...`, "info", dom);
-        const imported = await importLocalFiles(files);
+        imported = await importLocalFiles(files);
 
         if (imported.length === 0) {
             showNotification("未找到可识别的音频文件", "error", dom);
@@ -565,6 +568,12 @@ async function handleLocalMusicSelection(event) {
             savePlayerState();
         }
     } catch (error) {
+        // 只回收「未进入播放列表」的直链：已入列的曲目仍持有自己的 blob，不可误释放
+        for (const song of imported) {
+            if (!state.playlistSongs.includes(song)) {
+                revokeLocalSong(song);
+            }
+        }
         console.error("添加本地音乐失败:", error);
         showNotification("本地音乐解析失败，请重试", "error", dom);
     } finally {

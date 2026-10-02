@@ -5,7 +5,7 @@
 import { PLAYLIST_EXPORT_VERSION } from "../constants.js";
 import { safeSetLocalStorage, preferHttpsUrl } from "../core/storage.js";
 import { resetPlayerToIdle } from "../core/audio.js";
-import { isLocalSong } from "../core/local-library.js";
+import { isLocalSong, revokeLocalSong } from "../core/local-library.js";
 import { showNotification } from "./settings.js";
 
 export function resolveSongId(rawSong) {
@@ -357,6 +357,8 @@ export function removeFromPlaylist(index, state, dom, callbacks = {}) {
                 resetPlayerToIdle(state, dom, callbacks);
             }
         }
+        // 音频元素已停止并清空 src，可以安全回收该曲目的 blob 直链
+        revokeLocalSong(removingSong);
         renderPlaylist(state, dom, callbacks);
         if (typeof callbacks.clearLyricsIfLibraryEmpty === "function") {
             callbacks.clearLyricsIfLibraryEmpty();
@@ -391,6 +393,8 @@ export function removeFromPlaylist(index, state, dom, callbacks = {}) {
         if (typeof callbacks.setSongAsPending === "function") {
             callbacks.setSongAsPending(nextSong, targetIndex, "playlist");
         }
+        // 被移除的当前曲目已暂停并清空 src，回收其 blob 直链
+        revokeLocalSong(removingSong);
         showNotification("已从播放列表移除", "success", dom);
         return;
     }
@@ -400,6 +404,8 @@ export function removeFromPlaylist(index, state, dom, callbacks = {}) {
         state.currentTrackIndex--;
     }
 
+    // 删除的不是当前播放曲目，blob 直链可直接回收
+    revokeLocalSong(removingSong);
     renderPlaylist(state, dom, callbacks);
     if (typeof callbacks.clearLyricsIfLibraryEmpty === "function") {
         callbacks.clearLyricsIfLibraryEmpty();
@@ -426,6 +432,8 @@ export function clearPlaylist(state, dom, callbacks = {}) {
         (state.currentSong?.name && state.playlistSongs.some((song) => song.name === state.currentSong.name));
 
     const oldCount = state.playlistSongs.length;
+    // 本地曲目的 blob 直链只存活于会话内，清空列表时必须显式回收，否则文件内存会一直驻留
+    const localSongsToRevoke = state.playlistSongs.filter((song) => isLocalSong(song));
     state.playlistSongs = [];
     state.currentTrackIndex = -1;
     window.__solaraDebugLog?.(`[播放列表] 全部清空: 移除了 ${oldCount} 首歌曲`);
@@ -437,6 +445,9 @@ export function clearPlaylist(state, dom, callbacks = {}) {
             resetPlayerToIdle(state, dom, callbacks);
         }
     }
+
+    // 播放器已停止后再回收，避免释放正在播放的资源
+    localSongsToRevoke.forEach((song) => revokeLocalSong(song));
 
     renderPlaylist(state, dom, callbacks);
     if (typeof callbacks.clearLyricsIfLibraryEmpty === "function") {

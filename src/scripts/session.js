@@ -38,13 +38,11 @@ export function savePlayerState(options = {}) {
             const matched = persistentSongs.findIndex((song) => getSongKey(song) === currentKey);
             if (matched >= 0) {
                 trackIndex = matched;
-            } else if (
-                trackIndex >= 0 &&
-                trackIndex < state.playlistSongs.length &&
-                isLocalSong(state.playlistSongs[trackIndex])
-            ) {
-                trackIndex = -1;
             }
+        }
+        // 收敛：写盘索引必须落在「剔除本地曲后的数组」范围内，且不能指向被剔除的本地曲
+        if (trackIndex >= persistentSongs.length || (trackIndex >= 0 && isLocalSong(state.playlistSongs[trackIndex]))) {
+            trackIndex = -1;
         }
         safeSetLocalStorage("currentTrackIndex", String(trackIndex), { skipRemote });
         if (state.currentSong) {
@@ -76,7 +74,11 @@ export function saveFavoriteState(options = {}) {
         const matched = key ? persistentFavorites.findIndex((song) => getSongKey(song) === key) : -1;
         if (matched >= 0) {
             favoriteIndex = matched;
-        } else if (isLocalSong(state.currentSong) || favoriteIndex >= persistentFavorites.length) {
+        } else if (
+            isLocalSong(state.currentSong) ||
+            favoriteIndex >= persistentFavorites.length ||
+            (favoriteIndex >= 0 && isLocalSong(state.favoriteSongs[favoriteIndex]))
+        ) {
             favoriteIndex = -1;
         }
     }
