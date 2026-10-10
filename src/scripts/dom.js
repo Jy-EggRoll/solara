@@ -96,6 +96,7 @@ export const dom = {
     clearFavoritesBtn: document.getElementById("clearFavoritesBtn"),
     sortFavoritesBtn: document.getElementById("sortFavoritesBtn"),
     currentFavoriteToggle: document.getElementById("currentFavoriteToggle"),
+    currentShareBtn: document.getElementById("currentShareBtn"),
     settingsModal: document.getElementById("settingsModal"),
     closeSettingsBtn: document.getElementById("closeSettingsBtn"),
     saveSettingsBtn: document.getElementById("saveSettingsBtn"),

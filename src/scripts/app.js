@@ -66,6 +66,8 @@ import {
     exportPlaylist,
     sortPlaylistByArtist,
     handleImportPlaylistChange,
+    applySharedSongFromHash,
+    shareSongLink,
 } from "./features/playlist.js";
 import {
     ensureFavoriteSongsArray,
@@ -606,6 +608,14 @@ function setupEventHandlers() {
         });
     }
 
+    // 当前歌曲分享
+    if (dom.currentShareBtn) {
+        dom.currentShareBtn.addEventListener("click", () => {
+            if (!state.currentSong) return;
+            shareSongLink(state.currentSong, dom);
+        });
+    }
+
     // 播放模式与随机
     if (dom.playModeBtn) {
         dom.playModeBtn.addEventListener("click", () =>
@@ -881,9 +891,10 @@ function setupEventHandlers() {
             const removeBtn = e.target.closest(".playlist-item-remove");
             const favBtn = e.target.closest(".playlist-item-favorite");
             const dlBtn = e.target.closest(".playlist-item-download");
+            const shareBtn = e.target.closest('[data-playlist-action="share"]');
 
             // 1. 若点击命中操作容器槽或具体某个按钮
-            if (actionContainer || removeBtn || favBtn || dlBtn) {
+            if (actionContainer || removeBtn || favBtn || dlBtn || shareBtn) {
                 e.stopPropagation();
 
                 if (removeBtn) {
@@ -899,6 +910,11 @@ function setupEventHandlers() {
 
                 if (dlBtn) {
                     showQualityMenu(e, index, "playlist");
+                    return;
+                }
+
+                if (shareBtn) {
+                    shareSongLink(state.playlistSongs[index], dom);
                     return;
                 }
 
@@ -1689,6 +1705,11 @@ export async function bootstrap() {
             });
         }
     }
+
+    // 分享链接放在最后消费：上面的云端漫游会用快照整体替换 playlistSongs，
+    // 若先入列就会被冲掉。此处入列后 savePlayerState 会把「云端列表 + 分享的歌」
+    // 一并写回，语义正确；hash 已在首次消费时清除，因此不会重复入列。
+    applySharedSongFromHash(state, dom, getPlaylistCallbacks());
 }
 
 // 当 DOM 就绪时启动应用

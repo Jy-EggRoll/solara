@@ -6,6 +6,8 @@ import { PLAYLIST_EXPORT_VERSION } from "../constants.js";
 import { safeSetLocalStorage, preferHttpsUrl } from "../core/storage.js";
 import { resetPlayerToIdle } from "../core/audio.js";
 import { isLocalSong, revokeLocalSong } from "../core/local-library.js";
+import { isMobileLayout } from "../core/viewport.js";
+import { debugLog } from "../debug.js";
 import { showNotification } from "./settings.js";
 
 export function resolveSongId(rawSong) {
@@ -292,6 +294,9 @@ export function renderPlaylist(state, dom, callbacks = {}) {
                 </button>
                 <button class="playlist-item-download" type="button" data-playlist-action="download" data-index="${index}" title="下载" aria-label="下载">
                     <i class="fas fa-download"></i>
+                </button>
+                <button class="playlist-item-share" type="button" data-playlist-action="share" data-index="${index}" title="分享" aria-label="分享">
+                    <i class="fas fa-share-alt"></i>
                 </button>
                 <button class="playlist-item-remove" type="button" data-playlist-action="remove" data-index="${index}" title="从播放列表移除" aria-label="从播放列表移除">
                     <i class="fas fa-times"></i>
@@ -626,4 +631,199 @@ export function handleImportPlaylistChange(event, state, dom, callbacks = {}) {
     };
 
     reader.readAsText(file, "utf-8");
+}
+
+/* ─── 分享单曲链接 ───
+ * 链接把歌曲的少量身份字段编码进 hash（#s=...），因此不需要任何后端存储：
+ * 静态托管下也能直接打开。hash 只在载入时消费一次，随即被清除，
+ * 否则用户刷新页面会把同一首歌重复插进播放列表。
+ */
+
+const SHARE_LINK_VERSION = 1;
+const SHARE_HASH_PREFIX = "#s=";
+
+/** 把 JSON 编成 base64url；先经 TextEncoder 取 UTF-8 字节，避免 btoa 不能处理中文 */
+function encodeBase64Url(text) {
+    const bytes = new TextEncoder().encode(text);
+    let binary = "";
+    for (let i = 0; i < bytes.length; i += 1) {
+        binary += String.fromCharCode(bytes[i]);
+    }
+    return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+function decodeBase64Url(encoded) {
+    const padded = encoded.replace(/-/g, "+").replace(/_/g, "/");
+    const remainder = padded.length % 4;
+    const binary = atob(remainder ? padded + "=".repeat(4 - remainder) : padded);
+    const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+    return new TextDecoder().decode(bytes);
+}
+
+/** 生成分享链接；本地音乐（或缺少歌名/ID）返回空串，由调用方给出提示 */
+export function buildSongShareUrl(song, locationLike) {
+    const target = locationLike || (typeof window !== "undefined" ? window.location : null);
+    if (!song || typeof song !== "object" || !target) return "";
+    const id = resolveSongId(song) || "";
+    const name = typeof song.name === "string" ? song.name : "";
+    if (!id || !name) return "";
+    const payload = {
+        v: SHARE_LINK_VERSION,
+        i: id,
+        n: name,
+        a: Array.isArray(song.artist) ? song.artist.join(", ") : song.artist || "",
+        al: song.album || "",
+        s: song.source || "",
+        p: song.pic_id || "",
+        l: song.lyric_id || "",
+        u: song.url_id || "",
+    };
+    let encoded = "";
+    try {
+        encoded = encodeBase64Url(JSON.stringify(payload));
+    } catch (error) {
+        debugLog("分享链接编码失败:", error);
+        return "";
+    }
+    return `${target.origin}${target.pathname}${SHARE_HASH_PREFIX}${encoded}`;
+}
+
+/** 解析 hash 中的分享载荷；任何字段缺失或版本不符都返回 null，由调用方静默忽略 */
+export function decodeSongShareHash(hash) {
+    if (typeof hash !== "string" || !hash.startsWith(SHARE_HASH_PREFIX)) return null;
+    try {
+        const payload = JSON.parse(decodeBase64Url(hash.slice(SHARE_HASH_PREFIX.length)));
+        if (!payload || payload.v !== SHARE_LINK_VERSION) return null;
+        const id = typeof payload.i === "string" ? payload.i.trim() : "";
+        const name = typeof payload.n === "string" ? payload.n.trim() : "";
+        if (!id || !name) return null;
+        const song = {
+            id,
+            name,
+            artist: typeof payload.a === "string" ? payload.a : "",
+            album: typeof payload.al === "string" ? payload.al : "",
+            source: typeof payload.s === "string" && payload.s ? payload.s : "netease",
+        };
+        if (payload.p) song.pic_id = payload.p;
+        if (payload.l) song.lyric_id = payload.l;
+        if (payload.u) song.url_id = payload.u;
+        return song;
+    } catch (error) {
+        debugLog("分享链接解析失败:", error);
+        return null;
+    }
+}
+
+/** 清除 hash：replaceState 不触发跳转，也避免刷新时重复入列 */
+function clearShareHash() {
+    try {
+        const { pathname, search } = window.location;
+        window.history.replaceState(window.history.state, "", `${pathname}${search}`);
+    } catch (error) {
+        debugLog("清除分享 hash 失败:", error);
+    }
+}
+
+/**
+ * 启动时消费 #s= 载荷：已在列表则定位，不在则追加到末尾，然后设为待播。
+ * 解析失败只写 debug 日志，不打扰用户。
+ */
+export function applySharedSongFromHash(state, dom, callbacks = {}) {
+    if (typeof window === "undefined" || !window.location) return null;
+    const hash = window.location.hash || "";
+    if (!hash.startsWith(SHARE_HASH_PREFIX)) return null;
+
+    const song = decodeSongShareHash(hash);
+    clearShareHash();
+    if (!song) {
+        debugLog("忽略无法解析的分享链接:", hash);
+        return null;
+    }
+
+    if (!Array.isArray(state.playlistSongs)) state.playlistSongs = [];
+    const key = getSongKey(song);
+    let index = state.playlistSongs.findIndex((item) => getSongKey(item) === key);
+    const alreadyExists = index !== -1;
+    if (alreadyExists) {
+        debugLog("分享的歌曲已在播放列表中，定位到下标:", index);
+    } else {
+        state.playlistSongs.push(song);
+        index = state.playlistSongs.length - 1;
+    }
+
+    if (typeof callbacks.setSongAsPending === "function") {
+        callbacks.setSongAsPending(song, index, "playlist");
+    }
+    renderPlaylist(state, dom, callbacks);
+    showNotification("已载入分享的歌曲", "success", dom);
+    return { song, index, alreadyExists };
+}
+
+/** 复制文本：优先 Clipboard API，失败回退临时 textarea + execCommand */
+async function copyTextToClipboard(text) {
+    if (
+        typeof navigator !== "undefined" &&
+        navigator.clipboard &&
+        typeof navigator.clipboard.writeText === "function"
+    ) {
+        try {
+            await navigator.clipboard.writeText(text);
+            return true;
+        } catch (error) {
+            debugLog("剪贴板写入失败，回退到 execCommand:", error);
+        }
+    }
+    if (typeof document === "undefined") return false;
+    try {
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        textarea.setAttribute("readonly", "readonly");
+        textarea.style.position = "fixed";
+        textarea.style.top = "-1000px";
+        textarea.style.opacity = "0";
+        document.body.appendChild(textarea);
+        textarea.select();
+        const ok = document.execCommand("copy");
+        document.body.removeChild(textarea);
+        return ok;
+    } catch (error) {
+        debugLog("execCommand 复制失败:", error);
+        return false;
+    }
+}
+
+/**
+ * 分享入口（播放列表按钮与播放区按钮共用）。
+ * 返回 "local" | "shared" | "copied" | "cancelled" | "failed"，便于测试断言。
+ */
+export async function shareSongLink(song, dom) {
+    if (!song) return "failed";
+    if (isLocalSong(song)) {
+        showNotification("本地音乐无法分享", "warning", dom);
+        return "local";
+    }
+    const url = buildSongShareUrl(song);
+    if (!url) {
+        showNotification("复制失败", "error", dom);
+        return "failed";
+    }
+
+    if (isMobileLayout() && typeof navigator !== "undefined" && typeof navigator.share === "function") {
+        try {
+            await navigator.share({ title: song.name, url });
+            return "shared";
+        } catch (error) {
+            // 用户取消系统面板不算错误，其余情况继续走复制
+            if (error && error.name === "AbortError") return "cancelled";
+            debugLog("系统分享失败，回退到复制链接:", error);
+        }
+    }
+
+    const copied = await copyTextToClipboard(url);
+    if (copied) {
+        showNotification("分享链接已复制", "success", dom);
+        return "copied";
+    }
+    showNotification("复制失败", "error", dom);
+    return "failed";
 }
