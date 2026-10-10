@@ -947,9 +947,10 @@ function setupEventHandlers() {
             const addBtn = e.target.closest(".favorite-item-action--add");
             const removeBtn = e.target.closest(".favorite-item-action--remove");
             const dlBtn = e.target.closest(".favorite-item-action--download");
+            const shareBtn = e.target.closest('[data-favorite-action="share"]');
 
             // 1. 若点击命中操作容器槽或具体某个按钮
-            if (actionContainer || addBtn || removeBtn || dlBtn) {
+            if (actionContainer || addBtn || removeBtn || dlBtn || shareBtn) {
                 e.stopPropagation();
 
                 if (addBtn) {
@@ -1018,6 +1019,11 @@ function setupEventHandlers() {
 
                 if (dlBtn) {
                     showQualityMenu(e, index, "favorites");
+                    return;
+                }
+
+                if (shareBtn) {
+                    shareSongLink(state.favoriteSongs[index], dom);
                     return;
                 }
 

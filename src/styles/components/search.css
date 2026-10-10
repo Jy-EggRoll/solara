@@ -821,6 +821,12 @@ body.dark-mode .container.search-mode .search-results-list:empty::before {
     transform: scale(1.1);
 }
 
+/* 分享按钮 - 悬停变主题色 */
+.search-result-actions .action-btn.share:hover {
+    color: var(--accent-text);
+    transform: scale(1.1);
+}
+
 /* 下载按钮 - 悬停变绿色 */
 .search-result-actions .action-btn.download {
     position: relative;

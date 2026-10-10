@@ -9,7 +9,7 @@ import {
     cloneSearchResults,
     sanitizeStoredSearchState,
 } from "../core/storage.js";
-import { getSongKey, sanitizeImportedSong } from "./playlist.js";
+import { getSongKey, sanitizeImportedSong, shareSongLink } from "./playlist.js";
 import { ensureFavoriteSongsArray } from "./favorites.js";
 import { showNotification } from "./settings.js";
 
@@ -358,9 +358,21 @@ export function createSearchResultItem(song, index, state, dom, callbacks = {}) 
         if (typeof callbacks.showQualityMenu === "function") callbacks.showQualityMenu(event, index, "search");
     });
 
+    const shareButton = document.createElement("button");
+    shareButton.className = "action-btn share";
+    shareButton.type = "button";
+    shareButton.title = "分享";
+    shareButton.setAttribute("aria-label", "分享");
+    shareButton.innerHTML = '<i class="fas fa-share-alt"></i>';
+    shareButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        shareSongLink(song, dom);
+    });
+
     actions.appendChild(favoriteButton);
     actions.appendChild(playButton);
     actions.appendChild(downloadButton);
+    actions.appendChild(shareButton);
 
     item.appendChild(selectionToggle);
     item.appendChild(info);

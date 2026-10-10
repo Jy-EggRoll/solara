@@ -166,6 +166,9 @@ export function renderFavorites(state, dom) {
                 <button class="favorite-item-action favorite-item-action--download" type="button" data-favorite-action="download" data-index="${index}" title="下载" aria-label="下载">
                     <i class="fas fa-download"></i>
                 </button>
+                <button class="favorite-item-action favorite-item-action--share" type="button" data-favorite-action="share" data-index="${index}" title="分享" aria-label="分享">
+                    <i class="fas fa-share-alt"></i>
+                </button>
                 <button class="favorite-item-action favorite-item-action--remove" type="button" data-favorite-action="remove" data-index="${index}" title="从收藏列表移除" aria-label="从收藏列表移除">
                     <i class="fas fa-trash"></i>
                 </button>

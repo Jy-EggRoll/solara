@@ -814,7 +814,8 @@ body.dark-mode .playlist-tabs {
     color: #2ecc71;
     background: rgba(46, 204, 113, 0.1);
 }
-.playlist-item-share:hover {
+.playlist-item-share:hover,
+.favorite-item-action--share:hover {
     color: var(--accent-text);
     background: var(--item-hover-bg);
 }
