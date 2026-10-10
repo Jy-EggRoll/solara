@@ -666,21 +666,35 @@ export async function downloadSong(song, quality = "320", dom = null) {
 }
 
 /**
+ * 释放音频元素当前占用音源（暂停、卸载缓冲），供待播/移除/重置等路径复用。
+ *
+ * 只能 removeAttribute("src")，绝不能再补一句 el.src = ""：按 URL 属性的反射规则，
+ * src 被置成空串后读回的 el.src 会解析成页面自身地址（非空），
+ * 于是「有没有已加载的音源」这一判断会误判为已加载，点播放时直接 play() 空源，
+ * 浏览器抛 NotSupportedError「The element has no supported sources」，
+ * 用户看到的是「播放失败，请检查网络连接」。此坑已实测复现，勿改回。
+ */
+export function releaseAudioSource(dom) {
+    const player = dom && dom.audioPlayer;
+    if (!player) {
+        return;
+    }
+    try {
+        player.pause();
+        player.removeAttribute("src");
+        player.load();
+    } catch (error) {
+        console.warn("停止音频播放异常:", error);
+    }
+}
+
+/**
  * 彻底重置播放器为空闲/空态（停止播放、释放音频缓冲、重置界面与系统状态）
  */
 export function resetPlayerToIdle(state, dom, callbacks = {}) {
     cancelPendingPlayback();
 
-    if (dom.audioPlayer) {
-        try {
-            dom.audioPlayer.pause();
-            dom.audioPlayer.removeAttribute("src");
-            dom.audioPlayer.src = "";
-            dom.audioPlayer.load();
-        } catch (e) {
-            console.warn("停止音频播放异常:", e);
-        }
-    }
+    releaseAudioSource(dom);
 
     state.isPlaying = false;
     state.currentTrackIndex = -1;

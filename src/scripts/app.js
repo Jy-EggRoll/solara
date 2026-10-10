@@ -485,7 +485,9 @@ export async function togglePlayPause() {
         return;
     }
 
-    if (!dom.audioPlayer.src) {
+    // 判「是否已加载音源」要看属性而不是 .src 属性值：src 属性为空串时，读回的 .src
+    // 会被解析成页面自身地址（非空），据此判断会把待播态误当成已加载，点播放就会去 play() 空源
+    if (!dom.audioPlayer.getAttribute("src")) {
         try {
             await playSong(
                 state.currentSong,

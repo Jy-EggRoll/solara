@@ -4,7 +4,7 @@
 
 import { PLAYLIST_EXPORT_VERSION } from "../constants.js";
 import { safeSetLocalStorage, preferHttpsUrl } from "../core/storage.js";
-import { resetPlayerToIdle } from "../core/audio.js";
+import { resetPlayerToIdle, releaseAudioSource } from "../core/audio.js";
 import { isLocalSong, revokeLocalSong } from "../core/local-library.js";
 import { isMobileLayout } from "../core/viewport.js";
 import { debugLog } from "../debug.js";
@@ -413,15 +413,8 @@ export function removeFromPlaylist(index, state, dom, callbacks = {}) {
 
     // 4. 场景 B：列表还有歌，且删除了当前正在播放的歌曲
     if (removingCurrent) {
-        // 第一时间停止当前声音，释放旧音频
-        if (dom && dom.audioPlayer) {
-            try {
-                dom.audioPlayer.pause();
-                dom.audioPlayer.removeAttribute("src");
-                dom.audioPlayer.src = "";
-                dom.audioPlayer.load();
-            } catch (e) {}
-        }
+        // 第一时间停止当前声音，释放旧音频（必须走共享释放函数，别在这里写 el.src = ""）
+        releaseAudioSource(dom);
 
         // 计算顶上来的新索引
         let targetIndex = index;

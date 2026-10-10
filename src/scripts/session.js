@@ -12,7 +12,12 @@ import { showAlbumCoverPlaceholder, setAlbumCoverImage, scheduleDeferredPaletteU
 import { updateFavoriteIcons, updateFavoriteHighlight } from "./features/favorites.js";
 import { updatePlaylistHighlight, getSongKey } from "./features/playlist.js";
 import { isLocalSong } from "./core/local-library.js";
-import { cancelPendingPlayback, updatePlayPauseButton, updateProgressBarBackground } from "./core/audio.js";
+import {
+    cancelPendingPlayback,
+    updatePlayPauseButton,
+    updateProgressBarBackground,
+    releaseAudioSource,
+} from "./core/audio.js";
 import { clearLyricsContent } from "./features/lyrics.js";
 import { debugLog } from "./debug.js";
 
@@ -169,16 +174,7 @@ export function setSongAsPending(song, index, listType = "playlist") {
 
     if (!song) return;
 
-    if (dom.audioPlayer) {
-        try {
-            dom.audioPlayer.pause();
-            dom.audioPlayer.removeAttribute("src");
-            dom.audioPlayer.src = "";
-            dom.audioPlayer.load();
-        } catch (e) {
-            console.warn("停止音频播放异常:", e);
-        }
-    }
+    releaseAudioSource(dom);
 
     state.isPlaying = false;
     state.currentSong = song;

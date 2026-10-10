@@ -10,7 +10,7 @@ import {
     sanitizeImportedSong,
     sortSongsByArtist,
 } from "./playlist.js";
-import { resetPlayerToIdle } from "../core/audio.js";
+import { resetPlayerToIdle, releaseAudioSource } from "../core/audio.js";
 import { showNotification } from "./settings.js";
 
 export function ensureFavoriteSongsArray(state) {
@@ -218,14 +218,8 @@ export function removeFavoriteAtIndex(index, state, dom, callbacks = {}) {
         }
     } else if (removingCurrent) {
         // 第一时间停止当前正在播放的声音，防止异步加载待播歌曲时旧歌仍出声
-        if (dom && dom.audioPlayer) {
-            try {
-                dom.audioPlayer.pause();
-                dom.audioPlayer.removeAttribute("src");
-                dom.audioPlayer.src = "";
-                dom.audioPlayer.load();
-            } catch (e) {}
-        }
+        // （必须走共享释放函数，别在这里写 el.src = ""）
+        releaseAudioSource(dom);
 
         // 还有其他收藏歌曲，计算顶上来的下一首并纯本地就绪待播（不发 API）
         let targetIndex = index;
