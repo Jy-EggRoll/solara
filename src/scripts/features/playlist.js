@@ -65,6 +65,37 @@ export function normalizeArtistValue(value) {
     return undefined;
 }
 
+/**
+ * 按歌手重排（播放列表与收藏列表共用）。
+ *
+ * 为什么用稳定排序：同一歌手内保持原有相对顺序，用户手动积累的顺序不会被无谓打乱。
+ * 为什么显式比对原始下标：不依赖运行时是否实现了稳定排序，任何环境结果一致。
+ * 为什么把空歌手沉底：本地文件常缺内嵌标签，空串参与比较会把整组顺序搅乱。
+ */
+export function sortSongsByArtist(songs) {
+    if (!Array.isArray(songs) || songs.length === 0) {
+        return [];
+    }
+
+    return songs
+        .map((song, index) => ({
+            song,
+            index,
+            // 取值口径与 getSongKey 对齐（artist / artists / singers / singer 依次兜底），
+            // 保证「排序用的歌手」与「去重用的歌手」是同一个字段
+            artist: normalizeArtistValue(song?.artist ?? song?.artists ?? song?.singers ?? song?.singer) || "",
+        }))
+        .sort((a, b) => {
+            if (!a.artist && !b.artist) return a.index - b.index;
+            if (!a.artist) return 1;
+            if (!b.artist) return -1;
+            // 指定 zh-Hans-CN：中文按拼音、英文按字母，中英混排观感正常；不能依赖宿主默认区域
+            const byArtist = a.artist.localeCompare(b.artist, "zh-Hans-CN");
+            return byArtist !== 0 ? byArtist : a.index - b.index;
+        })
+        .map((entry) => entry.song);
+}
+
 export function getSongKey(song) {
     if (!song || typeof song !== "object") {
         return null;
@@ -170,6 +201,14 @@ export function updatePlaylistActionStates(state, dom) {
     if (dom.mobileClearPlaylistBtn) {
         dom.mobileClearPlaylistBtn.disabled = !hasSongs;
         dom.mobileClearPlaylistBtn.setAttribute("aria-disabled", hasSongs ? "false" : "true");
+    }
+    if (dom.sortPlaylistBtn) {
+        dom.sortPlaylistBtn.disabled = !hasSongs;
+        dom.sortPlaylistBtn.setAttribute("aria-disabled", hasSongs ? "false" : "true");
+    }
+    if (dom.mobileSortPlaylistBtn) {
+        dom.mobileSortPlaylistBtn.disabled = !hasSongs;
+        dom.mobileSortPlaylistBtn.setAttribute("aria-disabled", hasSongs ? "false" : "true");
     }
 }
 
@@ -454,6 +493,25 @@ export function clearPlaylist(state, dom, callbacks = {}) {
         callbacks.clearLyricsIfLibraryEmpty();
     }
     showNotification("已清空播放列表", "success", dom);
+}
+
+/** 一键按歌手重排播放列表。只改数组与索引，不触碰音频元素，正在播放的歌曲不会被打断。 */
+export function sortPlaylistByArtist(state, dom, callbacks = {}) {
+    if (!Array.isArray(state.playlistSongs) || state.playlistSongs.length === 0) {
+        return;
+    }
+
+    state.playlistSongs = sortSongsByArtist(state.playlistSongs);
+
+    // 列表索引是位置绑定的：重排后必须让索引跟着当前曲目走，否则「下一首」会从错误的歌开始
+    if (state.currentPlaylist === "playlist" && state.currentSong) {
+        const matched = findCurrentSongIndex(state.playlistSongs, state.currentSong, state.currentTrackIndex);
+        if (matched >= 0) state.currentTrackIndex = matched;
+    }
+
+    // renderPlaylist 内部会落盘（callbacks.savePlayerState）并刷新高亮
+    renderPlaylist(state, dom, callbacks);
+    showNotification("已按歌手排序", "success", dom);
 }
 
 export function exportPlaylist(state, dom) {

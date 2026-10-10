@@ -3,7 +3,13 @@
  */
 
 import { FAVORITE_EXPORT_VERSION } from "../constants.js";
-import { applyCurrentHighlight, findCurrentSongIndex, getSongKey, sanitizeImportedSong } from "./playlist.js";
+import {
+    applyCurrentHighlight,
+    findCurrentSongIndex,
+    getSongKey,
+    sanitizeImportedSong,
+    sortSongsByArtist,
+} from "./playlist.js";
 import { resetPlayerToIdle } from "../core/audio.js";
 import { showNotification } from "./settings.js";
 
@@ -49,6 +55,14 @@ export function updateFavoriteActionStates(state, dom) {
     if (dom.mobileAddAllFavoritesBtn) {
         dom.mobileAddAllFavoritesBtn.disabled = !hasFavorites;
         dom.mobileAddAllFavoritesBtn.setAttribute("aria-disabled", hasFavorites ? "false" : "true");
+    }
+    if (dom.sortFavoritesBtn) {
+        dom.sortFavoritesBtn.disabled = !hasFavorites;
+        dom.sortFavoritesBtn.setAttribute("aria-disabled", hasFavorites ? "false" : "true");
+    }
+    if (dom.mobileSortFavoritesBtn) {
+        dom.mobileSortFavoritesBtn.disabled = !hasFavorites;
+        dom.mobileSortFavoritesBtn.setAttribute("aria-disabled", hasFavorites ? "false" : "true");
     }
 }
 
@@ -325,6 +339,27 @@ export function clearFavorites(state, dom, callbacks = {}) {
     renderFavorites(state, dom);
     if (typeof callbacks.clearLyricsIfLibraryEmpty === "function") callbacks.clearLyricsIfLibraryEmpty();
     showNotification("已清空收藏列表", "success", dom);
+}
+
+/** 一键按歌手重排收藏列表。只改数组与索引，不触碰音频元素，正在播放的歌曲不会被打断。 */
+export function sortFavoritesByArtist(state, dom, callbacks = {}) {
+    const favorites = ensureFavoriteSongsArray(state);
+    if (favorites.length === 0) {
+        return;
+    }
+
+    state.favoriteSongs = sortSongsByArtist(favorites);
+
+    // 列表索引是位置绑定的：重排后必须让索引跟着当前曲目走，否则「下一首」会从错误的歌开始
+    if (state.currentList === "favorite" && state.currentSong) {
+        const matched = findCurrentSongIndex(state.favoriteSongs, state.currentSong, state.currentFavoriteIndex);
+        if (matched >= 0) state.currentFavoriteIndex = matched;
+    }
+
+    // renderFavorites 不负责落盘（与 renderPlaylist 不同），排序结果必须在这里显式写回存储
+    if (typeof callbacks.saveFavoriteState === "function") callbacks.saveFavoriteState();
+    renderFavorites(state, dom);
+    showNotification("已按歌手排序", "success", dom);
 }
 
 export function exportFavorites(state, dom) {

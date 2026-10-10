@@ -64,6 +64,7 @@ import {
     clearPlaylist,
     removeFromPlaylist,
     exportPlaylist,
+    sortPlaylistByArtist,
     handleImportPlaylistChange,
 } from "./features/playlist.js";
 import {
@@ -77,6 +78,7 @@ import {
     addAllFavoritesToPlaylist,
     clearFavorites,
     exportFavorites,
+    sortFavoritesByArtist,
     handleImportFavoritesChange,
 } from "./features/favorites.js";
 import {
@@ -1092,6 +1094,15 @@ function setupEventHandlers() {
         dom.mobileClearPlaylistBtn.addEventListener("click", () => clearPlaylist(state, dom, getPlaylistCallbacks()));
     }
 
+    // 按歌手重排：桌面与移动端各一个入口，共用同一套播放列表回调
+    const handleSortPlaylist = () => sortPlaylistByArtist(state, dom, getPlaylistCallbacks());
+    if (dom.sortPlaylistBtn) {
+        dom.sortPlaylistBtn.addEventListener("click", handleSortPlaylist);
+    }
+    if (dom.mobileSortPlaylistBtn) {
+        dom.mobileSortPlaylistBtn.addEventListener("click", handleSortPlaylist);
+    }
+
     // 收藏列表导入与导出
     if (dom.importFavoritesBtn && dom.importFavoritesInput) {
         dom.importFavoritesBtn.addEventListener("click", () => {
@@ -1136,6 +1147,15 @@ function setupEventHandlers() {
     }
     if (dom.mobileClearFavoritesBtn) {
         dom.mobileClearFavoritesBtn.addEventListener("click", handleClearFavorites);
+    }
+
+    // 收藏列表按歌手重排：renderFavorites 不落盘，必须显式传入保存回调
+    const handleSortFavorites = () => sortFavoritesByArtist(state, dom, { saveFavoriteState });
+    if (dom.sortFavoritesBtn) {
+        dom.sortFavoritesBtn.addEventListener("click", handleSortFavorites);
+    }
+    if (dom.mobileSortFavoritesBtn) {
+        dom.mobileSortFavoritesBtn.addEventListener("click", handleSortFavorites);
     }
 
     // 全部添加到播放列表
