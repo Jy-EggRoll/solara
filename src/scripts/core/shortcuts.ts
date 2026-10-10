@@ -71,3 +71,37 @@ export function registerShortcut(shortcut: Shortcut): () => void {
         if (index >= 0) registry.splice(index, 1);
     };
 }
+
+// 提示文字里的符号写法：macOS 用 ⌘ 这类符号，其它平台用 Ctrl 这类词
+const MAC_MODIFIER_SYMBOLS: Record<ShortcutModifier, string> = { ctrl: "⌃", meta: "⌘", alt: "⌥", shift: "⇧" };
+const OTHER_MODIFIER_LABELS: Record<ShortcutModifier, string> = {
+    ctrl: "Ctrl",
+    meta: "Win",
+    alt: "Alt",
+    shift: "Shift",
+};
+const KEY_LABELS: Record<string, string> = { ArrowUp: "↑", ArrowDown: "↓", ArrowLeft: "←", ArrowRight: "→" };
+
+export function isMacPlatform(): boolean {
+    if (typeof navigator === "undefined") return false;
+    return /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform || navigator.userAgent);
+}
+
+/**
+ * 把键位组合格式化成用于按钮提示的文字。
+ *
+ * 为什么按平台分两套写法：界面上的提示要跟用户手上的键盘一致，
+ * macOS 习惯写 ⌘A，其它平台写 Ctrl+A，同一套符号两边都用会让人认不出来。
+ */
+export function formatShortcutLabel(key: string, modifiers: ShortcutModifier[] = []): string {
+    const mainKey = KEY_LABELS[key] ?? key.toUpperCase();
+    if (isMacPlatform()) {
+        return modifiers.map((modifier) => MAC_MODIFIER_SYMBOLS[modifier]).join("") + mainKey;
+    }
+    return [...modifiers.map((modifier) => OTHER_MODIFIER_LABELS[modifier]), mainKey].join("+");
+}
+
+/** 平台主修饰键写法的键位：macOS 是 ⌘，其它平台是 Ctrl，对应 `ctrlKey || metaKey` 这类判定。 */
+export function formatPrimaryShortcut(key: string): string {
+    return formatShortcutLabel(key, [isMacPlatform() ? "meta" : "ctrl"]);
+}

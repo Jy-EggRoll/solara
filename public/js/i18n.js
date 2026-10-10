@@ -44,6 +44,7 @@
         "按歌手排序": "Sort by Artist",
         "收起播放面板": "Collapse Panel",
         "播放模式": "Play Mode",
+        "音量（↑ ↓ 每次 5%）": "Volume (↑ ↓ by 5%)",
         "上一曲": "Previous",
         "播放 / 暂停": "Play / Pause",
         "下一曲": "Next",

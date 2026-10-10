@@ -5,7 +5,7 @@
  * 键位：非输入状态下 F 切换（键位本身登记在 core/shortcuts）。
  */
 
-import { registerShortcut } from "./shortcuts.js";
+import { registerShortcut, formatShortcutLabel } from "./shortcuts.js";
 
 interface FullscreenDom {
     fullscreenBtn?: HTMLElement | null;
@@ -31,7 +31,8 @@ function isActive(): boolean {
 
 function render(): void {
     const on = isActive();
-    const label = `全屏：${on ? "开" : "关"}`;
+    // 提示里带上键位。这个标签由本模块独占维护，在别处追加会被这里的重绘覆盖
+    const label = `全屏：${on ? "开" : "关"} (${formatShortcutLabel("f")})`;
     for (const btn of buttons()) {
         btn.classList.toggle("is-active", on);
         btn.setAttribute("aria-pressed", on ? "true" : "false");

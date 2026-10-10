@@ -4,6 +4,7 @@
 
 import { API } from "../constants.js";
 import { safeSetLocalStorage, preferHttpsUrl, buildAudioProxyUrl } from "./storage.js";
+import { registerShortcut } from "./shortcuts.js";
 import { showNotification } from "../features/settings.js";
 import { getSongKey } from "../features/playlist.js";
 import { ensureFavoriteSongsArray } from "../features/favorites.js";
@@ -228,6 +229,43 @@ export function updateVolumeIcon(dom, volume) {
         icon = "fa-volume-low";
     }
     dom.volumeIcon.setAttribute("class", `fas ${icon}`);
+}
+
+/** 快捷键每次调整音量的步长 */
+export const VOLUME_STEP = 0.05;
+
+/**
+ * 统一应用音量。
+ *
+ * 声音、状态、滑轨显示、本地存储四者必须一起变，任何一处漏改都会出现
+ * “声音变了但滑轨没动”这类不一致，所以把这段同步收在一处，供滑轨输入、
+ * 静音切换与方向键快捷键共用。
+ */
+export function applyVolume(volume, state, dom) {
+    const clamped = Math.min(Math.max(Number.isFinite(volume) ? volume : 0, 0), 1);
+    if (dom.audioPlayer) dom.audioPlayer.volume = clamped;
+    state.volume = clamped;
+    if (clamped > 0) {
+        state.previousVolume = clamped;
+    }
+    if (dom.volumeSlider) dom.volumeSlider.value = String(clamped);
+    updateVolumeSliderBackground(dom, clamped);
+    updateVolumeIcon(dom, clamped);
+    safeSetLocalStorage("playerVolume", String(clamped));
+    return clamped;
+}
+
+/** 上下方向键调整音量，每次 5%。键位比较忽略大小写且要求修饰键完全一致，所以这里不会抢走 Ctrl+↑。 */
+export function registerVolumeShortcuts(state, dom) {
+    const current = () => (Number.isFinite(state.volume) ? state.volume : 0.8);
+    registerShortcut({
+        key: "ArrowUp",
+        handler: () => applyVolume(current() + VOLUME_STEP, state, dom),
+    });
+    registerShortcut({
+        key: "ArrowDown",
+        handler: () => applyVolume(current() - VOLUME_STEP, state, dom),
+    });
 }
 
 export function setAudioCurrentTime(time, state, dom) {

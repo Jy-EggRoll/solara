@@ -281,8 +281,10 @@
         opacity: 1 !important;
     }
 
-    /* 隐藏移动端底栏冗余模块与独立随机按钮（移动端已由模式按钮一体化轮转） */
+    /* 隐藏移动端底栏冗余模块与独立随机按钮（移动端已由模式按钮一体化轮转）；
+       底栏的分享按钮同样隐藏，移动端改用顶部栏左侧那个入口 */
     html:root #shuffleToggleBtn,
+    html:root #currentShareBtn,
     html:root #loadOnlineBtn,
     html:root .audio-tools,
     html:root .control-trailing,

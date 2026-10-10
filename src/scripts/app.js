@@ -116,7 +116,11 @@ import {
     formatTime,
     resetPlayerToIdle,
     cancelPendingPlayback,
+    applyVolume,
+    registerVolumeShortcuts,
+    VOLUME_STEP,
 } from "./core/audio.js";
+import { formatShortcutLabel, formatPrimaryShortcut } from "./core/shortcuts.js";
 import { initMediaSession } from "./core/media-session.js";
 import { debugLog } from "./debug.js";
 import { importLocalFiles, revokeLocalSong } from "./core/local-library.js";
@@ -590,6 +594,32 @@ async function handleLocalMusicSelection(event) {
 }
 
 // 全局事件装配
+/** 取 i18n 译文：i18n.js 里按中文原文查表，查不到时原样返回 */
+function translateText(text) {
+    return typeof window !== "undefined" && typeof window.t === "function" ? window.t(text) : text;
+}
+
+/** 音量快捷键的提示文字，键位符号按平台给出 */
+function volumeShortcutHint() {
+    return `音量（${formatShortcutLabel("ArrowUp")} ${formatShortcutLabel("ArrowDown")} 每次 ${VOLUME_STEP * 100}%）`;
+}
+
+/**
+ * 给已存在的提示追加键位说明。
+ *
+ * 为什么读当前值再拼接：i18n 只监听节点增删与文本变化，不监听属性，
+ * 初次翻译之后写进去的提示不会再被翻译；读已经翻译过的当前值拼接，
+ * 中英文两种语言下都能得到正确结果，也不需要为每种组合单列字典项。
+ */
+function appendShortcutHint(element, shortcutLabel) {
+    if (!element || !shortcutLabel) return;
+    for (const attr of ["title", "aria-label"]) {
+        const current = element.getAttribute(attr);
+        if (!current || current.includes(shortcutLabel)) continue;
+        element.setAttribute(attr, `${current} (${shortcutLabel})`);
+    }
+}
+
 function setupEventHandlers() {
     // 播放 / 暂停
     if (dom.playPauseBtn) {
@@ -610,13 +640,20 @@ function setupEventHandlers() {
         });
     }
 
-    // 当前歌曲分享
+    // 当前歌曲分享：桌面在播放控制条，移动端在顶部栏左侧，共用同一处理
+    const shareCurrentSong = () => {
+        if (!state.currentSong) return;
+        shareSongLink(state.currentSong, dom);
+    };
     if (dom.currentShareBtn) {
-        dom.currentShareBtn.addEventListener("click", () => {
-            if (!state.currentSong) return;
-            shareSongLink(state.currentSong, dom);
-        });
+        dom.currentShareBtn.addEventListener("click", shareCurrentSong);
     }
+    if (dom.mobileShareBtn) {
+        dom.mobileShareBtn.addEventListener("click", shareCurrentSong);
+    }
+
+    // 带快捷键的入口补上键位提示：Logo 双击可开设置，也能用 Ctrl/⌘ + 逗号
+    appendShortcutHint(dom.brandWrap, formatPrimaryShortcut(","));
 
     // 播放模式与随机
     if (dom.playModeBtn) {
@@ -640,23 +677,12 @@ function setupEventHandlers() {
         if (currentVolume > 0) {
             // 当前非静音 -> 静音并记住当前音量
             state.previousVolume = currentVolume;
-            const targetVolume = 0;
-            if (dom.audioPlayer) dom.audioPlayer.volume = targetVolume;
-            state.volume = targetVolume;
-            if (dom.volumeSlider) dom.volumeSlider.value = "0";
-            updateVolumeSliderBackground(dom, targetVolume);
-            updateVolumeIcon(dom, targetVolume);
-            safeSetLocalStorage("playerVolume", "0");
+            applyVolume(0, state, dom);
         } else {
             // 当前静音 -> 恢复之前的音量
             const restoreVolume =
                 Number.isFinite(state.previousVolume) && state.previousVolume > 0 ? state.previousVolume : 0.8;
-            if (dom.audioPlayer) dom.audioPlayer.volume = restoreVolume;
-            state.volume = restoreVolume;
-            if (dom.volumeSlider) dom.volumeSlider.value = String(restoreVolume);
-            updateVolumeSliderBackground(dom, restoreVolume);
-            updateVolumeIcon(dom, restoreVolume);
-            safeSetLocalStorage("playerVolume", String(restoreVolume));
+            applyVolume(restoreVolume, state, dom);
         }
     };
 
@@ -673,18 +699,14 @@ function setupEventHandlers() {
 
     if (dom.volumeSlider) {
         dom.volumeSlider.addEventListener("input", (e) => {
-            const volume = Number.parseFloat(e.target.value);
-            const clamped = Number.isFinite(volume) ? Math.min(Math.max(volume, 0), 1) : 0.8;
-            dom.audioPlayer.volume = clamped;
-            state.volume = clamped;
-            if (clamped > 0) {
-                state.previousVolume = clamped;
-            }
-            updateVolumeSliderBackground(dom, clamped);
-            updateVolumeIcon(dom, clamped);
-            safeSetLocalStorage("playerVolume", String(clamped));
+            applyVolume(Number.parseFloat(e.target.value), state, dom);
         });
+        // 音量提示挂在这里：音量图标本身的提示由静音状态维护，放不下键位说明
+        dom.volumeSlider.setAttribute("title", translateText(volumeShortcutHint()));
     }
+
+    // 上下方向键调音量（每次 5%）
+    registerVolumeShortcuts(state, dom);
 
     if (dom.progressBar) {
         dom.progressBar.addEventListener("input", () => {

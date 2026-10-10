@@ -10,6 +10,7 @@ import {
     sanitizeStoredSearchState,
 } from "../core/storage.js";
 import { getSongKey, sanitizeImportedSong, shareSongLink } from "./playlist.js";
+import { formatPrimaryShortcut } from "../core/shortcuts.js";
 import { ensureFavoriteSongsArray } from "./favorites.js";
 import { showNotification } from "./settings.js";
 
@@ -173,10 +174,7 @@ export function updateSelectAllMenuItem(state, dom) {
 
     const badge = dom.selectAllShortcutBadge;
     if (badge) {
-        const isMac =
-            typeof navigator !== "undefined" &&
-            /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform || navigator.userAgent);
-        badge.textContent = isMac ? "⌘A" : "Ctrl+A";
+        badge.textContent = formatPrimaryShortcut("a");
     }
 }
 
