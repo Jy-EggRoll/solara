@@ -84,7 +84,7 @@ export function sortSongsByArtist(songs) {
             song,
             index,
             // 取值口径与 getSongKey 对齐（artist / artists / singers / singer 依次兜底），
-            // 保证「排序用的歌手」与「去重用的歌手」是同一个字段
+            // 保证“排序用的歌手”与“去重用的歌手”是同一个字段
             artist: normalizeArtistValue(song?.artist ?? song?.artists ?? song?.singers ?? song?.singer) || "",
         }))
         .sort((a, b) => {
@@ -501,7 +501,7 @@ export function sortPlaylistByArtist(state, dom, callbacks = {}) {
 
     state.playlistSongs = sortSongsByArtist(state.playlistSongs);
 
-    // 列表索引是位置绑定的：重排后必须让索引跟着当前曲目走，否则「下一首」会从错误的歌开始
+    // 列表索引是位置绑定的：重排后必须让索引跟着当前曲目走，否则“下一首”会从错误的歌开始
     if (state.currentPlaylist === "playlist" && state.currentSong) {
         const matched = findCurrentSongIndex(state.playlistSongs, state.currentSong, state.currentTrackIndex);
         if (matched >= 0) state.currentTrackIndex = matched;

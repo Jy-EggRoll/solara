@@ -485,7 +485,7 @@ export async function togglePlayPause() {
         return;
     }
 
-    // 判「是否已加载音源」要看属性而不是 .src 属性值：src 属性为空串时，读回的 .src
+    // 判“是否已加载音源”要看属性而不是 .src 属性值：src 属性为空串时，读回的 .src
     // 会被解析成页面自身地址（非空），据此判断会把待播态误当成已加载，点播放就会去 play() 空源
     if (!dom.audioPlayer.getAttribute("src")) {
         try {
@@ -574,7 +574,7 @@ async function handleLocalMusicSelection(event) {
             savePlayerState();
         }
     } catch (error) {
-        // 只回收「未进入播放列表」的直链：已入列的曲目仍持有自己的 blob，不可误释放
+        // 只回收“未进入播放列表”的直链：已入列的曲目仍持有自己的 blob，不可误释放
         for (const song of imported) {
             if (!state.playlistSongs.includes(song)) {
                 revokeLocalSong(song);
@@ -1709,7 +1709,7 @@ export async function bootstrap() {
     }
 
     // 分享链接放在最后消费：上面的云端漫游会用快照整体替换 playlistSongs，
-    // 若先入列就会被冲掉。此处入列后 savePlayerState 会把「云端列表 + 分享的歌」
+    // 若先入列就会被冲掉。此处入列后 savePlayerState 会把“云端列表 + 分享的歌”
     // 一并写回，语义正确；hash 已在首次消费时清除，因此不会重复入列。
     applySharedSongFromHash(state, dom, getPlaylistCallbacks());
 }

@@ -668,11 +668,11 @@ export async function downloadSong(song, quality = "320", dom = null) {
 /**
  * 释放音频元素当前占用音源（暂停、卸载缓冲），供待播/移除/重置等路径复用。
  *
- * 只能 removeAttribute("src")，绝不能再补一句 el.src = ""：按 URL 属性的反射规则，
- * src 被置成空串后读回的 el.src 会解析成页面自身地址（非空），
- * 于是「有没有已加载的音源」这一判断会误判为已加载，点播放时直接 play() 空源，
- * 浏览器抛 NotSupportedError「The element has no supported sources」，
- * 用户看到的是「播放失败，请检查网络连接」。此坑已实测复现，勿改回。
+ * 只能 removeAttribute("src")，绝不能再补一句 el.src = ""。原因是两处判定标准不一致：
+ * 反映 URL 的 el.src 读回会被解析成页面自身地址（非空），于是“是否已加载音源”的判断
+ * 误判为已加载而直接 play()；而媒体加载算法按属性文本判定，空串属性下 load() 会先
+ * 产生 error.code = 4（MEDIA_ELEMENT_ERROR: Empty src attribute），play() 随即抛
+ * NotSupportedError，用户看到的是“播放失败，请检查网络连接”。已实测复现，勿改回。
  */
 export function releaseAudioSource(dom) {
     const player = dom && dom.audioPlayer;

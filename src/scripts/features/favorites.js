@@ -344,7 +344,7 @@ export function sortFavoritesByArtist(state, dom, callbacks = {}) {
 
     state.favoriteSongs = sortSongsByArtist(favorites);
 
-    // 列表索引是位置绑定的：重排后必须让索引跟着当前曲目走，否则「下一首」会从错误的歌开始
+    // 列表索引是位置绑定的：重排后必须让索引跟着当前曲目走，否则“下一首”会从错误的歌开始
     if (state.currentList === "favorite" && state.currentSong) {
         const matched = findCurrentSongIndex(state.favoriteSongs, state.currentSong, state.currentFavoriteIndex);
         if (matched >= 0) state.currentFavoriteIndex = matched;
