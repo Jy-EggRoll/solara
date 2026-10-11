@@ -32,6 +32,7 @@ import {
     initTheme,
 } from "./visual/aurora.js";
 import { initSpotlightEffect, initDebugShortcut } from "./visual/spotlight.js";
+import { initAppTooltip } from "./visual/tooltip.js";
 import {
     loadLyrics,
     syncLyrics,
@@ -1645,6 +1646,9 @@ export async function bootstrap() {
     initTheme(dom, state);
     initSettings(dom, state, { debugLog, manualSync: handleManualCloudSync });
     initSpotlightEffect();
+    // 接管原生 title 提示。必须晚于 i18n 的首次翻译：提示文案取自 title，
+    // 那条链路只翻译节点与文本、不翻译属性，晚一点取才能拿到已翻译的文案
+    initAppTooltip();
     initMediaSession(state, dom, {
         playNext: () => playNext(state, dom, getAudioCallbacks()),
         playPrevious: () => playPrevious(state, dom, getAudioCallbacks()),

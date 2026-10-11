@@ -956,6 +956,46 @@ input[type="range"]:active::-moz-range-thumb {
     transform: scale(1.08) rotate(-15deg);
 }
 
+/* ─── 应用内悬浮提示（替代浏览器原生 title 的白底方框）─────────────────────
+   材质与其它浮层共用同一套 token。这里刻意不写提升优先级的声明：
+   预算脚本按字面量统计这类声明，注释里写出它同样会被计入，新增样式不该挤占额度。 */
+.app-tooltip {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000001;
+    max-width: min(320px, calc(100vw - 24px));
+    padding: 7px 11px;
+    border-radius: 10px;
+    border: 1px solid var(--apple-glass-border);
+    border-top-color: var(--apple-glass-border-top);
+    background: var(--component-bg);
+    backdrop-filter: var(--apple-glass-blur);
+    -webkit-backdrop-filter: var(--apple-glass-blur);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+    color: var(--text-color);
+    font-size: 12.5px;
+    font-weight: 500;
+    line-height: 1.35;
+    text-align: center;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(2px);
+    transition:
+        opacity 0.16s ease,
+        transform 0.16s ease,
+        visibility 0.16s;
+}
+
+.app-tooltip.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
 /* ─── Apple Design 灵动悬浮胶囊通知 (Dynamic Island HUD) ─────────────── */
 .notification {
     position: fixed;
